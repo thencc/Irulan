@@ -1,0 +1,193 @@
+@import './_variables.scss';
+
+* { box-sizing: border-box; }
+
+h1, h2, h3, h4, h5 {
+    font-size: 1em;
+}
+
+#app {
+    // TODO: import input mono from adobe!!
+    font-family: 'Input Mono', monospace;
+    background-color: $bg;
+    color: $text;
+    font-size: 85%;
+}
+
+a {
+    color: $pink;
+    &:hover {
+        color: darken($pink, 10%);
+    }
+}
+
+.muted {
+    color: $textlight;
+}
+
+.purple { color: $purple; }
+.green { color: $green; }
+.yellow { color: $yellow; }
+.pink { color: $pink; }
+.hotpink { color: $hotpink; }
+.blue { color: $blue; }
+
+// FORMS
+input, textarea {
+    background-color: $bgdark;
+    border: 1px solid transparent;
+    color: $text;
+    font-family: 'Input Mono', monospace;
+    padding: 4px;
+
+    &.small {
+        font-size: 0.8em;
+    }
+
+    &:active, &:focus {
+        border-color: $yellow;
+        outline: none;
+    }
+}
+
+.form-field {
+    padding-bottom: 10px;
+}
+
+.form-label {
+    color: $pink;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.align-left {
+    text-align: left;
+}
+
+.align-center {
+    text-align: center;
+}
+
+.vertical-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+button {
+    background-color: $btn-blue-bg;
+    border: 1px solid $btn-blue-border;
+    color: $btn-blue-text;
+    font-family: 'Input Mono', monospace;
+    padding: 8px 12px;
+    font-size: 0.9em;
+
+    &:hover {
+        background-color: lighten($btn-blue-bg, 5%);
+        cursor: pointer;
+    }
+
+    &:active {
+        border-color: $btn-blue-text;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        &:hover {
+            background-color: $btn-blue-bg;
+        }
+    }
+
+    &.btn-gray {
+        color: $btn-gray-text;
+        background-color: $btn-gray-bg;
+        border-color: $btn-gray-border;
+
+        &:hover {
+            background-color: lighten($btn-gray-bg, 5%);
+        }
+
+        &:active {
+            border-color: $btn-gray-text;
+        }
+
+        &:disabled:hover {
+            background-color: $btn-gray-bg;
+        }
+    }
+
+    &.btn-link {
+        color: $btn-gray-text;
+        background-color: transparent;
+        border-color: transparent;
+
+        &:hover {
+            color: white;
+        }
+
+        &:active {
+            border-color: transparent;
+        }
+
+        &:disabled:hover {
+            background-color: transparent;
+        }
+    }
+
+    &.btn-link-muted {
+        color: $textlight;
+        background-color: transparent;
+        border-color: transparent;
+
+        &:hover {
+            color: $text;
+        }
+
+        &:active {
+            border-color: transparent;
+        }
+
+        &:disabled:hover {
+            background-color: transparent;
+        }
+    }
+
+    &.btn-purple {
+        color: $btn-purple-text;
+        background-color: $btn-purple-bg;
+        border-color: $btn-purple-border;
+
+        &:hover {
+            background-color: lighten($btn-purple-bg, 5%);
+        }
+
+        &:active {
+            border-color: $btn-purple-text;
+        }
+
+        &:disabled:hover {
+            background-color: $btn-purple-bg;
+        }
+    }
+
+    &.btn-danger {
+        color: $btn-danger-text;
+        background-color: $btn-danger-bg;
+        border-color: $btn-danger-border;
+
+        &:hover {
+            background-color: lighten($btn-danger-bg, 5%);
+        }
+
+        &:active {
+            border-color: $btn-danger-text;
+        }
+
+        &:disabled:hover {
+            background-color: $btn-danger-bg;
+        }
+    }
+}

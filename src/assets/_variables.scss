@@ -1,0 +1,42 @@
+// main colors
+$bg: #2D2A2E;
+$bgdark: #18171a;
+$black: #1d1e22;
+$text: #eaeaea;
+$textbright: #fff;
+$textlight: #777079;
+$border: #3E3A3A;
+
+$terminalsuccess: #8EE338;
+$terminalerror: #F92633;
+
+// main color scheme
+$purple: #AE81FF;
+$green: #A9DC76;
+$pink: #FF6188;
+$blue: #ABD0D8;
+$yellow: #FFD866;
+$error: #F92633;
+$hotpink: #FA3162;
+
+// make things intuitive
+$account-color: $purple;
+$app-color: $green;
+$balance-color: $yellow;
+
+// buttons
+$btn-gray-bg: #343030;
+$btn-gray-border: #444141;
+$btn-gray-text: $text;
+$btn-purple-bg: #362752;
+$btn-purple-border: #564577;
+$btn-purple-text: $purple;
+$btn-blue-bg: #273541;
+$btn-blue-border: #3D4D5B;
+$btn-blue-text: $blue;
+$btn-danger-bg: #412731;
+$btn-danger-border: #5F3B49;
+$btn-danger-text: $hotpink;
+
+// sizes
+$headerheight: 62px;
