@@ -57,7 +57,7 @@ export default defineComponent({
     
   },
   mounted() {
-    state.log('Welcome to Irulan!');
+    state.log('The real universe is always one step beyond logic.');
   },  
   data() {
     return {

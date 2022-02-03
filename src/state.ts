@@ -5,6 +5,9 @@ const state = reactive({
     terminal: [] as { type: string, message: string }[],
     connected: false,
     connecting: false,
+    isAccount: false,
+    activeAccount: null,
+    signingMode: '' as 'sk' | 'wc',
     algonaut: {} as Algonaut,
     init: async function (config: { ledger: string, server: string, apiKey: string, useCustomNode: boolean, port: string }) {
         this.connecting = true;

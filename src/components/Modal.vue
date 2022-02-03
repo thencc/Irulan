@@ -53,6 +53,14 @@ export default defineComponent({
     z-index: 100;
 }
 
+.modal-back {
+    cursor: pointer;
+    color: $textlight;
+    display: block;
+
+    &:hover { color: $text; }
+}
+
 .modal-title {
     padding: 0;
     margin: 0 0 1em 0;
