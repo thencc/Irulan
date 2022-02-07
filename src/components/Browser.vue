@@ -16,9 +16,8 @@
                         {{ response.type === 'account' ? response.object.address.substring(0, 20) + '...' : response.object.index }}
                     </span>
                 </h2>
+                <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button>
             </div>
-
-
 
             <pre class="response">{{ response }}</pre>
         </div>
@@ -43,6 +42,9 @@ export default defineComponent({
         }
     },
     methods: {
+        loadApp(appIndex: number) {
+            state.loadApp(appIndex);
+        },
         async search () {
             this.searching = true;
             this.response = null
@@ -147,9 +149,7 @@ $space: 10px;
 .object {
     margin: $space;
     h2 {
-        font-size: 1.2em;
         text-transform: capitalize;
-        font-weight: normal;
     }
 }
 </style>

@@ -41,6 +41,7 @@ import Setup from './components/Setup.vue';
 import Log from './components/Log.vue';
 import Accounts from './components/Accounts.vue';
 import Browser from './components/Browser.vue';
+import ContractTool from './components/ContractTool.vue';
 import Account from './components/Account.vue';
 import Modal from './components/Modal.vue';
 
@@ -51,7 +52,8 @@ export default defineComponent({
     Accounts,
     Account,
     Modal,
-    Browser
+    Browser,
+    ContractTool
   },
   setup() {
     
@@ -61,8 +63,11 @@ export default defineComponent({
   },  
   data() {
     return {
-      showAbout: false
+      showAbout: false,
+      currentApp: NaN
     }
+  },
+  methods: {
   }
 })
 </script>
@@ -156,22 +161,6 @@ header {
   color: $textlight;
 }
 
-.module {
-  border: 1px solid $border;
-  margin: 5px;
-
-  h2 {
-    padding: 5px;
-    border-bottom: 1px solid $border;
-    font-size: 0.7em;
-    text-transform: uppercase;
-  }
-
-  .module-content {
-    padding: 5px;
-  }
-}
-
 .container {
   display: flex;
   position: absolute;
@@ -183,6 +172,7 @@ header {
   .left-col {
     flex: 0 0 40%;
     display: flex;
+    max-width: 600px;
   }
 
   .right-col {

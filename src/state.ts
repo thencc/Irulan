@@ -5,10 +5,13 @@ const state = reactive({
     terminal: [] as { type: string, message: string }[],
     connected: false,
     connecting: false,
+    toolLoading: false,
+    currentApp: {} as any,
     isAccount: false,
     activeAccount: null,
     signingMode: '' as 'sk' | 'wc',
     algonaut: {} as Algonaut,
+
     init: async function (config: { ledger: string, server: string, apiKey: string, useCustomNode: boolean, port: string }) {
         this.connecting = true;
         this.connected = false;
@@ -40,12 +43,27 @@ const state = reactive({
         }
         this.connecting = false;
     },
+
+    loadApp: async function (appIndex: number) {
+        this.toolLoading = true;
+        try {
+            this.currentApp = await this.algonaut.getAppInfo(appIndex);
+            this.log('Loading app into contract tool...');
+        } catch (e) {
+            console.log(e);
+            this.error('Error loading app.');
+        }
+        this.toolLoading = false;
+    },
+
     error: function (message: string) {
         this.terminal.unshift({ type: 'error', message });
     },
+
     log: function(message: string) {
         this.terminal.unshift({ type: 'normal', message });
     },
+
     success: function (message: string) {
         this.terminal.unshift({ type: 'success', message });
     }

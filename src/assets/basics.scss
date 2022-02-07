@@ -6,6 +6,15 @@ h1, h2, h3, h4, h5 {
     font-size: 1em;
 }
 
+h3, h4 {
+    font-weight: normal;
+}
+
+h2 {
+    font-size: 1.2em;
+    font-weight: normal;
+}
+
 #app {
     // TODO: import input mono from adobe!!
     font-family: 'Input Mono', monospace;
@@ -38,7 +47,7 @@ input, textarea {
     border: 1px solid transparent;
     color: $text;
     font-family: 'Input Mono', monospace;
-    padding: 4px;
+    padding: 10px;
 
     &.small {
         font-size: 0.8em;
@@ -68,6 +77,11 @@ input, textarea {
 
 .align-center {
     text-align: center;
+}
+
+.mp0 {
+    margin: 0;
+    padding: 0;
 }
 
 .small {
