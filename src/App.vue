@@ -85,7 +85,7 @@ export default defineComponent({
   height: $headerheight;
 
   h1 {
-    flex: 0 0 25%;
+    flex: 0 0 auto;
   background: linear-gradient(45deg, #FFD78A 0%, #EC66AA 16%, #7B4CDE 33%, #69DEE6 56%, #7B4DDF 70%, #FF6188 85%, #FFD866 100%);
     font-weight: bold;
     font-size: 1.5em;
@@ -109,7 +109,7 @@ export default defineComponent({
 }
 
 .header-left {
-  flex: 1 1 20%;
+  flex: 1 1 50%;
   display: flex;
 
   h1, .about-link {
@@ -118,13 +118,13 @@ export default defineComponent({
   }
 
   .about-link {
-    //margin-left: 20px;
+    flex: 0 1 auto;
   }
 }
 
 .header-right {
   text-align: right;
-  flex: 1 1 80%;
+  flex: 1 1 50%;
 
   button {
     margin: 5px 5px 0;

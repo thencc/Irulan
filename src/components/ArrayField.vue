@@ -12,7 +12,7 @@ interface FieldItem {
 
 export default defineComponent({
     props: {
-        field: {
+        model: {
             type: Array,
             // default: [{ value: '' }]
         },
@@ -29,7 +29,7 @@ export default defineComponent({
         }
     },
     methods: {
-        addField(event) {
+        addField(event: any) {
             console.log(event.target)
             if (event.target.parentNode.lastElementChild === event.target) {
                 console.log('is last child.');

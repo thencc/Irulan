@@ -34,8 +34,9 @@
             <h3>Fund App</h3>
             <form @submit.prevent="fundApp">
                 <p class="small muted">Escrow address: <span class="purple">{{ escrowAddress }}</span></p>
-                <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send"></p>
-                <p class="align-right"><button type="submit">Fund App</button></p>
+                <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
+                <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
+                <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
             </form>
         </div>
         <div class="utility opt-in">
@@ -54,6 +55,8 @@
 import { defineComponent } from 'vue'
 import state from '../state';
 import ArrayField from './ArrayField.vue';
+import { doTxn } from '../algo';
+import LoadingButton from './LoadingButton.vue';
 
 export default defineComponent({
     data() {
@@ -93,8 +96,25 @@ export default defineComponent({
             this.callAppLoading = false;
         },
         async fundApp() {
+            if (!this.escrowAddress || !this.fundAppAmt) return false;
+
             this.fundAppLoading = true;
             console.log(this.fundAppAmt);
+            state.log(`Sending ${this.fundAppAmt} to ${this.escrowAddress}`);
+
+            try {
+                const res = await doTxn([ await state.algonaut.atomicPayment(this.escrowAddress, this.fundAppAmt) ])
+                if (res.status === 'fail') {
+                    state.error(res.message);
+                } else {
+                    state.log(res.message);
+                    this.fundAppAmt = null;
+                    state.success('Application funded');
+                }
+            } catch (e) {
+                console.log(e);
+                state.error('Error funding app.');
+            }
             this.fundAppLoading = false;
         },
         async optInApp() {
@@ -113,7 +133,7 @@ export default defineComponent({
 
         }
     },
-    components: { ArrayField }
+    components: { ArrayField, LoadingButton }
 })
 </script>
 <style lang="scss" scoped>

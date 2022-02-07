@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            <!-- <pre class="response">{{ response }}</pre> -->
+            <pre class="response">{{ response }}</pre>
         </div>
     </div>
 </template>
