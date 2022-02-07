@@ -17,18 +17,20 @@
     <div class="utilities">
         <div class="utility call-app">
             <h3>Call App</h3>
-            <form @submit.prevent="callApp">
+            <!-- <form @submit.prevent="callApp"> -->
+            <div>
                 <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
                 <h4 class="purple">App Arguments</h4>
-                <ArrayField :field="callAppArgs.appArgs" :placeholder="'Arguments (press enter to add another)'" />
+                <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Arguments (press enter to add another)'" />
                 <h4 class="purple">Accounts</h4>
-                <ArrayField :field="callAppArgs.accounts" :placeholder="'Accounts (press enter to add another)'" />
+                <ArrayField v-model="callAppArgs.accounts" :placeholder="'Accounts (press enter to add another)'" />
                 <h4 class="purple">Foreign Applications</h4>
-                <ArrayField :field="callAppArgs.applications" :placeholder="'Application IDs (press enter to add another)'" />
+                <ArrayField v-model="callAppArgs.applications" :placeholder="'Application IDs (press enter to add another)'" />
                 <h4 class="purple">Foreign Assets</h4>
-                <ArrayField :field="callAppArgs.assets" :placeholder="'Asset IDs (press enter to add another)'" />
-                <p class="align-right"><button type="submit">Call App</button></p>
-            </form>
+                <ArrayField v-model="callAppArgs.assets" :placeholder="'Asset IDs (press enter to add another)'" />
+                <p class="align-right"><button @click="callApp" type="submit">Call App</button></p>
+            </div>
+            <!-- </form> -->
         </div>
         <div class="utility fund-app">
             <h3>Fund App</h3>
