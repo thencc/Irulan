@@ -16,10 +16,43 @@
                         {{ response.type === 'account' ? response.object.address.substring(0, 20) + '...' : response.object.index }}
                     </span>
                 </h2>
+                <p v-if="response.object.creatorAddress">Creator: <span class="purple">{{ response.object.creatorAddress }}</span></p>
                 <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button>
+
+                <div class="app" v-if="response.type === 'app'">
+                    <h3 class="purple">Global State</h3>
+                    <table class="browser-table state-table" v-if="response.object.globals && response.object.globals.length">
+                        <tr class="browser-table-heading">
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Address</th>
+                        </tr>
+                        <tr v-for="item in response.object.globals" :key="item.key">
+                            <td class="key">{{ item.key }}</td>
+                            <td>{{ item.value }}</td>
+                            <td>{{ item.address }}</td>
+                        </tr>
+                    </table>
+                    <p class="muted" v-if="!response.object.globals || !response.object.globals.length">No global state schema.</p>
+
+                    <h3 class="purple">Local State</h3>
+                    <table class="browser-table state-table" v-if="response.object.locals && response.object.locals.length">
+                        <tr class="browser-table-heading">
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Address</th>
+                        </tr>
+                        <tr v-for="item in response.object.locals" :key="item.key">
+                            <td class="key">{{ item.key }}</td>
+                            <td>{{ item.value }}</td>
+                            <td>{{ item.address }}</td>
+                        </tr>
+                    </table>
+                    <p class="muted" v-if="!response.object.locals || !response.object.locals.length">No local state schema.</p>
+                </div>
             </div>
 
-            <pre class="response">{{ response }}</pre>
+            <!-- <pre class="response">{{ response }}</pre> -->
         </div>
     </div>
 </template>
@@ -96,6 +129,13 @@ export default defineComponent({
                 this.searching = false;
             }
         }
+    },
+    computed: {
+        globalState: function () {
+            if (this.response && this.response.object && this.response.type === 'app') {
+                return state.algonaut.stateArrayToObject(this.response.object.globals);
+            }
+        }
     }
 });
 </script>
@@ -150,6 +190,41 @@ $space: 10px;
     margin: $space;
     h2 {
         text-transform: capitalize;
+    }
+}
+
+.browser-table {
+    background-color: $bgdark;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    tr.browser-table-heading {
+        background-color: $bg;
+
+        th {
+            padding: 10px;
+            font-weight: normal;
+            color: $textlight;
+        }
+    }
+
+
+    tr {
+        border: none;
+        padding: 0;
+        margin: 0;
+        border-collapse: collapse;
+        border-bottom: 1px solid $bg;
+    }
+
+    td {
+        border: none;
+        margin: 0;
+        padding: 10px;
+
+        &.key {
+            color: $yellow;
+        }
     }
 }
 </style>
