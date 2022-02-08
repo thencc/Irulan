@@ -1,4 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import VueClipboard from 'vue3-clipboard';
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+app.use(VueClipboard);
+
+app.mount('#app')

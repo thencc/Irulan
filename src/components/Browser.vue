@@ -50,9 +50,10 @@
                     </table>
                     <p class="muted" v-if="!response.object.locals || !response.object.locals.length">No local state schema.</p>
                 </div>
-            </div>
 
-            <pre class="response">{{ response }}</pre>
+                <h3 class="purple">Full Response</h3>
+                <pre class="response">{{ response.object }}</pre>
+            </div>
         </div>
     </div>
 </template>
@@ -155,6 +156,10 @@ $space: 10px;
     flex: 1 1 70%;
     border: 2px solid $border;
     overflow-y: scroll;
+
+    h3 {
+        margin-top: 2em;
+    }
 }
 
 .search {

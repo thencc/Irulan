@@ -47,6 +47,10 @@
                 <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
             </form>
         </div>
+        <div class="utility algonaut-code">
+            <h3>Copy Algonaut.js Call</h3>
+            <pre>{{ state.algonautJSCode }}</pre>
+        </div>
     </div>
 </div>
 </template>
@@ -92,16 +96,25 @@ export default defineComponent({
     },
     methods: {
         async callApp() {
+            if (!state.algonaut.account) return state.error('No account connected.');
             this.callAppLoading = true;
+            state.algonautJSCode = '';
 
             const args = this.callAppArgs.operationType === 'callApp' ? 
-                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs) : 
-                            this.callAppArgs.appArgs;
+                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs.map((item: any) => item.value)) : 
+                            this.callAppArgs.appArgs.map((item: any) => item.value);
             const optionalFields = {
-                accounts: this.callAppArgs.accounts,
-                applications: this.callAppArgs.applications,
-                assets: this.callAppArgs.assets,
+                accounts: this.callAppArgs.accounts.map((item: any) => item.value),
+                applications: this.callAppArgs.applications.map((item: any) => item.value),
+                assets: this.callAppArgs.assets.map((item: any) => item.value),
             }
+
+            state.algonautJSCode = 
+`const response = await algonaut.${this.callAppArgs.operationType}(
+    ${state.currentApp.index},
+    ${JSON.stringify(args)},
+    ${JSON.stringify(optionalFields)}
+);`;
 
             let txn: any;
             if (this.callAppArgs.operationType === 'callApp') {
@@ -129,6 +142,7 @@ export default defineComponent({
         },
         async fundApp() {
             if (!this.escrowAddress || !this.fundAppAmt) return false;
+            if (!state.algonaut.account) return state.error('No account connected.');
 
             this.fundAppLoading = true;
             console.log(this.fundAppAmt);
@@ -150,16 +164,25 @@ export default defineComponent({
             this.fundAppLoading = false;
         },
         async closeOut() {
+            if (!state.algonaut.account) return state.error('No account connected.');
             this.closeOutLoading = true;
             this.closeOutLoading = false;
 
         },
         async deleteApp() {
+            if (!state.algonaut.account) return state.error('No account connected.');
+            if (state.activeAccount !== this.app.creatorAddress) {
+                state.log('The connected account is not the creator of the app, but we will attempt to delete the application anyway.');
+            }
             if (window.confirm('Are you sure you want to delete this application? You may only do so if you are the creator.')) {
                 this.deleteAppLoading = true;
                 try {
                     const res = await doTxn([await state.algonaut.atomicDeleteApplication(state.currentApp.index)]);
-                    state.log(res.message);
+                    if (res.status === 'fail') {
+                        state.error(res.message);
+                    } else {
+                        state.log(res.message);
+                    }
                 } catch (e) {
                     console.log(e);
                     state.error('Error deleting application. Most likely, you do not have permission to delete it.')
