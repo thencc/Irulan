@@ -17,18 +17,20 @@
     <div class="utilities">
         <div class="utility call-app">
             <h3>Call App</h3>
-            <form @submit.prevent="callApp">
+            <!-- <form @submit.prevent="callApp"> -->
+            <div>
                 <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
                 <h4 class="purple">App Arguments</h4>
-                <ArrayField :field="callAppArgs.appArgs" :placeholder="'Arguments (press enter to add another)'" />
+                <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
                 <h4 class="purple">Accounts</h4>
-                <ArrayField :field="callAppArgs.accounts" :placeholder="'Accounts (press enter to add another)'" />
+                <ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
                 <h4 class="purple">Foreign Applications</h4>
-                <ArrayField :field="callAppArgs.applications" :placeholder="'Application IDs (press enter to add another)'" />
+                <ArrayField v-model="callAppArgs.applications" :placeholder="'Add app ID'" />
                 <h4 class="purple">Foreign Assets</h4>
-                <ArrayField :field="callAppArgs.assets" :placeholder="'Asset IDs (press enter to add another)'" />
-                <p class="align-right"><button type="submit">Call App</button></p>
-            </form>
+                <ArrayField v-model="callAppArgs.assets" :placeholder="'Add app ID'" />
+                <p class="align-right"><LoadingButton @click="callApp" type="submit" :loading="callAppLoading">Call App</LoadingButton></p>
+            </div>
+            <!-- </form> -->
         </div>
         <div class="utility fund-app">
             <h3>Fund App</h3>
@@ -41,11 +43,11 @@
         </div>
         <div class="utility opt-in">
             <h3>Opt-In to App</h3>
-            <form @submit.prevent="optInApp">
+            <!-- <form @submit.prevent="optInApp"> -->
                 <h4 class="purple">Arguments</h4>
                 <ArrayField v-model="optInArgs" :placeholder="'Argument (press enter to add another)'" />
-                <p class="align-right"><button type="submit">Opt In</button></p>
-            </form>
+                <p class="align-right"><button type="button" @click="optInApp">Opt In</button></p>
+            <!-- </form> -->
 
         </div>
     </div>
@@ -74,6 +76,7 @@ export default defineComponent({
             fundAppLoading: false,
             callAppLoading: false,
             closeOutLoading: false,
+            optInAppLoading: false,
             deleteAppLoading: false
         };
     },
@@ -92,7 +95,25 @@ export default defineComponent({
     methods: {
         async callApp() {
             this.callAppLoading = true;
-            console.log(this.callAppArgs);
+            
+            state.log(`Calling app with args: ${JSON.stringify(this.callAppArgs)}`);
+            try {
+                const res = await doTxn([ 
+                    await state.algonaut.atomicCallApp(
+                        state.currentApp.index, 
+                        [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs)
+                    )
+                ]);
+                if (res.status === 'fail') {
+                    state.error(res.message);
+                } else {
+                    state.log(res.message);
+                }
+            } catch (e) {
+                console.log(e);
+                state.error('Error calling app.');
+            }
+
             this.callAppLoading = false;
         },
         async fundApp() {
