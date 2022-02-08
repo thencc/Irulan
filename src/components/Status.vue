@@ -31,7 +31,7 @@ export default defineComponent({
             if (server) {
                 var name =  parseDomain(fromUrl(server));
                 if (name.type === 'RESERVED') return name.hostname;
-                return name.domain;
+                return (name as any).domain;
             }
             return '';
         }
@@ -63,6 +63,6 @@ export default defineComponent({
     margin-left: 3px;
     text-transform: uppercase;
     font-size: 90%;
-    
+
 }
 </style>

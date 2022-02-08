@@ -1,6 +1,6 @@
 <template>
     <div class="field" v-for="(field, index) in modelValue" xxkey="field.value.toString()" :key="index">
-        <input type="text" v-model="field.value" :placeholder="placeholder" xxkeyup.enter="updateField(index, field)" :ref="index === modelValue.length-1 ? 'lastItem' : ''" />
+        <input type="text" v-model="field.value" :placeholder="placeholder" nothingenter="updateField(index, field)" :ref="index === modelValue.length-1 ? 'lastItem' : ''" />
         <button style="position: absolute; top: 0; right: 0;" class="btn-link" @click.stop="removeField(index)">X</button>
     </div>
     <div class="add-new-field">

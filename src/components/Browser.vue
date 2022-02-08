@@ -68,7 +68,7 @@ export default defineComponent({
         Modal
     },
     data() {
-        return { 
+        return {
             state,
             response: null as any,
             query: '',
@@ -134,7 +134,7 @@ export default defineComponent({
     computed: {
         globalState: function () {
             if (this.response && this.response.object && this.response.type === 'app') {
-                return state.algonaut.stateArrayToObject(this.response.object.globals);
+                return state.algonaut.stateArrayToObject((this as any).response.object.globals);
             }
         }
     }
