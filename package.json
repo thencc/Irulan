@@ -1,13 +1,13 @@
 {
-  "name": "algotool",
-  "version": "0.0.0",
+  "name": "irulan",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "algonaut.js": "^0.0.15",
+    "algonaut.js": "^0.0.20",
     "parse-domain": "^7.0.0",
     "vue": "^3.2.25",
     "vue3-keypress": "^4.0.1"

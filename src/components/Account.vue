@@ -47,7 +47,7 @@ export default defineComponent({
         Modal
     },
     data() {
-        return { 
+        return {
             state,
             showModal: false,
             error: '',
@@ -70,7 +70,7 @@ export default defineComponent({
             if (acct) {
                 console.log(acct);
                 state.algonaut.setAccount(acct as any);
-                state.activeAccount = acct.addr;
+                state.activeAccount = (acct as any).addr;
                 state.signingMode = 'sk';
                 state.success('Connected to account: ' + state.activeAccount);
                 this.close();
