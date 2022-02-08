@@ -11,16 +11,22 @@
         </div>
         <div class="contract-actions">
             <button @click="closeOut">Close Out</button>
-            <button @click="deleteApp" class="btn-danger">Delete App</button>
+            <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
         </div>
     </div>
     <div class="utilities">
         <div class="utility call-app">
-            <h3>Call App</h3>
+            <h3>App Operations</h3>
             <!-- <form @submit.prevent="callApp"> -->
             <div>
-                <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
-                <h4 class="purple">App Arguments</h4>
+                Transaction type:
+                <select name="operationType" id="operationType" v-model="callAppArgs.operationType">
+                    <option value="callApp">Call App</option>
+                    <option value="optInApp">Opt-In App</option>
+                </select>
+                <p v-if="callAppArgs.operationType === 'callApp'"><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
+                <p class="small muted">(method name gets prepended to arguments array)</p>
+                <h4 class="purple">Arguments</h4>
                 <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
                 <h4 class="purple">Accounts</h4>
                 <ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
@@ -41,15 +47,6 @@
                 <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
             </form>
         </div>
-        <div class="utility opt-in">
-            <h3>Opt-In to App</h3>
-            <!-- <form @submit.prevent="optInApp"> -->
-                <h4 class="purple">Arguments</h4>
-                <ArrayField v-model="optInArgs" :placeholder="'Argument (press enter to add another)'" />
-                <p class="align-right"><button type="button" @click="optInApp">Opt In</button></p>
-            <!-- </form> -->
-
-        </div>
     </div>
 </div>
 </template>
@@ -65,7 +62,8 @@ export default defineComponent({
         return {
             state,
             callAppArgs: {
-                methodName: "",
+                operationType: 'callApp',
+                methodName: '',
                 appArgs: [],
                 accounts: [],
                 applications: [],
@@ -95,15 +93,28 @@ export default defineComponent({
     methods: {
         async callApp() {
             this.callAppLoading = true;
+
+            const args = this.callAppArgs.operationType === 'callApp' ? 
+                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs) : 
+                            this.callAppArgs.appArgs;
+            const optionalFields = {
+                accounts: this.callAppArgs.accounts,
+                applications: this.callAppArgs.applications,
+                assets: this.callAppArgs.assets,
+            }
+
+            let txn: any;
+            if (this.callAppArgs.operationType === 'callApp') {
+                txn = await state.algonaut.atomicCallApp(state.currentApp.index, args, optionalFields);
+            } else if (this.callAppArgs.operationType === 'optInApp') {
+                txn = await state.algonaut.atomicOptInApp(state.currentApp.index, args, optionalFields);
+            } else if (this.callAppArgs.operationType === 'closeOutApp') {
+                //txn = await state.algonaut.atomicCloseOutApp(state.currentApp.index, args, optionalFields);
+            }
             
             state.log(`Calling app with args: ${JSON.stringify(this.callAppArgs)}`);
             try {
-                const res = await doTxn([ 
-                    await state.algonaut.atomicCallApp(
-                        state.currentApp.index, 
-                        [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs)
-                    )
-                ]);
+                const res = await doTxn([txn]);
                 if (res.status === 'fail') {
                     state.error(res.message);
                 } else {
@@ -111,7 +122,7 @@ export default defineComponent({
                 }
             } catch (e) {
                 console.log(e);
-                state.error('Error calling app.');
+                state.error('Transaction error.');
             }
 
             this.callAppLoading = false;
@@ -138,20 +149,23 @@ export default defineComponent({
             }
             this.fundAppLoading = false;
         },
-        async optInApp() {
-            this.optInAppLoading = true;
-            console.log(this.optInArgs);
-            this.optInAppLoading = false;
-        },
         async closeOut() {
             this.closeOutLoading = true;
             this.closeOutLoading = false;
 
         },
         async deleteApp() {
-            this.deleteAppLoading = true;
+            if (window.confirm('Are you sure you want to delete this application? You may only do so if you are the creator.')) {
+                this.deleteAppLoading = true;
+                try {
+                    const res = await doTxn([await state.algonaut.atomicDeleteApplication(state.currentApp.index)]);
+                    state.log(res.message);
+                } catch (e) {
+                    console.log(e);
+                    state.error('Error deleting application. Most likely, you do not have permission to delete it.')
+                }
+            }
             this.deleteAppLoading = false;
-
         }
     },
     components: { ArrayField, LoadingButton }
