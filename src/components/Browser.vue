@@ -152,7 +152,7 @@
                     <p class="muted" v-if="!response.object['apps-local-state'] || !response.object['apps-local-state'].length">No local state.</p>
 
                     <div class="local-state-app" v-for="app in response.object['apps-local-state']" :key="app.id">
-                        <h4 class="green">{{ app.id }}</h4>
+                        <h4>App <a href="" @click.prevent="setSearch(app.id)" class="green">{{ app.id }}</a></h4>
                         <table class="browser-table" v-if="app['key-value'] && app['key-value'].length">
                             <tr class="browser-table-heading">
                                 <th>Key</th>
