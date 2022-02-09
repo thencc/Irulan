@@ -197,7 +197,7 @@ export default defineComponent({
             this.deleteAppLoading = false;
         },
         copyAlgoCode () {
-            this.$copyText(state.algonautJSCode, undefined, (error: any, event: any) => {
+            copyText(state.algonautJSCode, undefined, (error: any, event: any) => {
                 if (error) {
                     state.error(error);
                 } else {
@@ -219,6 +219,23 @@ export default defineComponent({
 h2 {
     margin-top: 0;
     padding-top: 10px;
+}
+
+.contract-header {
+    display: flex;
+
+    .contract-info {
+        flex: 0 0 50%;
+    }
+    
+    .contract-actions {
+        flex: 0 0 50%;
+        text-align: right;
+
+        button {
+            margin: 10px;
+        }
+    }
 }
 
 .utilities {

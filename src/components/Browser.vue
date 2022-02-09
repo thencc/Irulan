@@ -16,7 +16,7 @@
                         {{ response.type === 'account' ? response.object.address.substring(0, 20) + '...' : response.object.index }}
                     </span>
                 </h2>
-                <p v-if="response.object.creatorAddress">Creator: <span class="purple">{{ response.object.creatorAddress }}</span></p>
+                <p v-if="response.object.creatorAddress">Creator: <a href class="purple" @click.prevent="setSearch(response.object.creatorAddress)">{{ response.object.creatorAddress }}</a></p>
                 <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button>
 
                 <div class="app" v-if="response.type === 'app'">
@@ -51,8 +51,141 @@
                     <p class="muted" v-if="!response.object.locals || !response.object.locals.length">No local state schema.</p>
                 </div>
 
-                <h3 class="purple">Full Response</h3>
-                <pre class="response">{{ response.object }}</pre>
+                <div class="asset" v-if="response.type === 'asset'">
+                    <table class="browser-table">
+                        <tr>
+                            <td class="key">Name</td>
+                            <td>{{ response.object.params.name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Unit Name</td>
+                            <td>{{ response.object.params['unit-name'] }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Total</td>
+                            <td>{{ response.object.params.total }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">URL</td>
+                            <td class="small"><a :href="response.object.params.url" target="_blank">{{ response.object.params.url }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="key">Frozen</td>
+                            <td>{{ response.object.params['default-frozen'] }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Decimals</td>
+                            <td>{{ response.object.params.decimals }}</td>
+                        </tr>
+                        <tr>
+                            <td class="key">Creator</td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.creator)" class="purple">{{ response.object.params.creator.substring(0, 20) }}...</a></td>
+                        </tr>
+                        <tr>
+                            <td class="key">Manager</td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.manager)" class="purple">{{ response.object.params.manager.substring(0, 20) }}...</a></td>
+                        </tr>
+                        <tr>
+                            <td class="key">Clawback</td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.clawback)" class="purple">{{ response.object.params.clawback.substring(0, 20) }}...</a></td>
+                        </tr>
+                        <tr>
+                            <td class="key">Reserve</td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.reserve)" class="purple">{{ response.object.params.reserve.substring(0, 20) }}...</a></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="account" v-if="response.type === 'account'">
+                    <div class="balances">
+                        <div class="balance">
+                            <p class="balance-caption muted">Balance</p>
+                            <p class="balance-amount yellow">{{ (response.object.amount / 1000000).toFixed(4) }} ALGO</p>
+                        </div>
+                        <div class="balance">
+                            <p class="balance-caption muted">Rewards</p>
+                            <p class="balance-amount yellow">{{ (response.object.rewards / 1000000).toFixed(4) }} ALGO</p>
+                        </div>
+                    </div>
+
+                    <h3 class="purple">Assets</h3>
+                    <p class="muted" v-if="!response.object.assets || !response.object.assets.length">No assets.</p>
+                    <table class="browser-table" v-if="response.object['assets'].length">
+                        <tr class="browser-table-heading">
+                            <th>Asset ID</th>
+                            <th>Amount</th>
+                            <th>Frozen?</th>
+                            <th>Creator</th>
+                        </tr>
+                        <tr v-for="asset in response.object.assets" :key="asset['asset-id']">
+                            <td class="key">
+                                <a href="" @click.prevent="setSearch(asset['asset-id'])" class="yellow">{{ asset['asset-id'] }}</a>
+                            </td>
+                            <td>{{ asset.amount }}</td>
+                            <td>{{ asset['is-frozen'].toString() }}</td>
+                            <td><a href="" @click.prevent="setSearch(asset.creator)" class="purple">{{ asset.creator }}</a></td>
+                        </tr>
+                    </table>
+
+                    <h3 class="purple">Created Assets</h3>
+                    <p class="muted" v-if="!response.object['created-assets'] || !response.object['created-assets'].length">No created assets.</p>
+                    <table class="browser-table" v-if="response.object['created-assets'].length">
+                        <tr class="browser-table-heading">
+                            <th>Asset ID</th>
+                            <th>Asset Name</th>
+                            <th>Unit Name</th>
+                            <th>Total</th>
+                            <th>URL</th>
+                        </tr>
+                        <tr v-for="asset in response.object['created-assets']" :key="asset.index">
+                            <td class="key">
+                                <a href="" @click.prevent="setSearch(asset.index)" class="yellow">{{ asset.index }}</a>
+                            </td>
+                            <td>{{ asset.params.name }}</td>
+                            <td>{{ asset.params['unit-name'] }}</td>
+                            <td>{{ asset.params.total }}</td>
+                            <td><a :href="asset.params.url" target="_blank">{{ asset.params.url }}</a></td>
+                        </tr>
+                    </table>
+
+                    <h3 class="purple">Local State</h3>
+                    <p class="muted" v-if="!response.object['apps-local-state'] || !response.object['apps-local-state'].length">No local state.</p>
+
+                    <div class="local-state-app" v-for="app in response.object['apps-local-state']" :key="app.id">
+                        <h4 class="green">{{ app.id }}</h4>
+                        <table class="browser-table" v-if="app['key-value'] && app['key-value'].length">
+                            <tr class="browser-table-heading">
+                                <th>Key</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr v-for="item in app['key-value']" :key="item.key">
+                                <td class="key">{{ decode(item.key) }}</td>
+                                <td>
+                                    {{ item.value.type === 1 ? decode(item.value.bytes) : item.value.uint }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h3 class="purple">Created Apps</h3>
+                    <p class="muted" v-if="!response.object['created-apps'] || !response.object['created-apps'].length">No created apps.</p>
+                    <table class="browser-table" v-if="response.object['created-apps'].length">
+                        <tr class="browser-table-heading">
+                            <th>App ID</th>
+                            <th></th>
+                        </tr>
+                        <tr v-for="app in response.object['created-apps']" :key="app.id">
+                            <td class="key">{{ app.id }}</td>
+                            <td>
+                                <button class="btn-link pink" @click="setSearch(app.id)">View in Browser</button>
+                                <button @click="loadApp(app.id)">Load Contract</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- <h3 class="purple">Full Response</h3>
+                <pre class="response">{{ response.object }}</pre> -->
             </div>
         </div>
     </div>
@@ -79,6 +212,13 @@ export default defineComponent({
         loadApp(appIndex: number) {
             state.loadApp(appIndex);
         },
+        setSearch(query: any) {
+            this.query = query;
+            this.search();
+        },
+        decode (s: string) {
+            return state.algonaut.fromBase64(s);
+        },  
         async search () {
             this.searching = true;
             this.response = null

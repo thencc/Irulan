@@ -142,6 +142,11 @@ button {
         background-color: transparent;
         border-color: transparent;
 
+        &.pink { color: $pink; }
+        &.yellow { color: $yellow; }
+        &.green { color: $green; }
+        &.purple { color: $purple; }
+
         &:hover {
             color: white;
         }
