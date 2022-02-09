@@ -123,7 +123,7 @@
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
-                            <td><a href="" @click.prevent="setSearch(asset.creator)" class="purple">{{ asset.creator }}</a></td>
+                            <td><a href="" @click.prevent="setSearch(asset.creator)" class="purple">{{ asset.creator.substring(0, 20) }}...</a></td>
                         </tr>
                     </table>
 
