@@ -22,6 +22,10 @@
                         <input type="text" v-model="config.apiKey" id="apiKey" name="apiKey">
                     </p>
                     <p v-show="config.useCustomNode">
+                        <label for="apiKeyHeaderName">Key Header</label>
+                        <input type="text" v-model="config.apiKeyHeaderName" id="apiKeyHeaderName" name="apiKeyHeaderName">
+                    </p>
+                    <p v-show="config.useCustomNode">
                         <label for="server">Server</label>
                         <input type="text" v-model="config.server" id="server" name="server">
                     </p>
@@ -61,6 +65,7 @@ export default defineComponent({
             config: {
                 useCustomNode: false,
                 apiKey: '',
+                apiKeyHeaderName: 'X-API-Key',
                 ledger: 'TestNet',
                 port: '',
                 server: ''
@@ -80,6 +85,7 @@ export default defineComponent({
                 useCustomNode: false,
                 apiKey: '',
                 ledger: 'TestNet',
+                apiKeyHeaderName: 'X-API-Key',
                 port: '',
                 server: ''
             }
@@ -88,11 +94,20 @@ export default defineComponent({
         },
         fetchCachedConfig() {
             console.log('getting config from cache...')
-            const cachedConfig = JSON.parse(localStorage.getItem('config') || '');
+            const cachedConfig = JSON.parse(localStorage.getItem('config') || '{}');
             if (cachedConfig) {
                 this.config = cachedConfig;
                 state.log('Fetched settings from local storage.');
                 this.applySettings();
+            } else {
+                this.config = {
+                    useCustomNode: false,
+                    apiKey: '',
+                    ledger: 'TestNet',
+                    apiKeyHeaderName: 'X-API-Key',
+                    port: '',
+                    server: ''
+                }
             }
         }
     }

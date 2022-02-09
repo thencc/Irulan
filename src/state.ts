@@ -13,18 +13,25 @@ const state = reactive({
     algonaut: {} as Algonaut,
     algonautJSCode: '',
 
-    init: async function (config: { ledger: string, server: string, apiKey: string, useCustomNode: boolean, port: string }) {
+    init: async function (config: { ledger: string, server: string, apiKey: string, apiKeyHeaderName: string, useCustomNode: boolean, port: string }) {
         this.connecting = true;
         this.connected = false;
         let algoConfig = {
             BASE_SERVER: 'https://testnet-algorand.api.purestake.io/ps2',
             LEDGER: config.ledger,
             PORT: '',
-            API_TOKEN: { 'X-API-Key': config.apiKey }
+            API_TOKEN: {} as any
         };
+
+        config.apiKeyHeaderName = config.apiKeyHeaderName || 'X-API-Key';
+
+        algoConfig.API_TOKEN[config.apiKeyHeaderName] = config.apiKey;
+
         if (config.useCustomNode) {
             algoConfig.BASE_SERVER = config.server;
             algoConfig.PORT = config.port;
+        } else if (!config.useCustomNode && config.ledger === 'MainNet') {
+            algoConfig.BASE_SERVER = 'https://mainnet-algorand.api.purestake.io/ps2';
         }
         this.algonaut = new Algonaut(algoConfig);
         this.log('Connecting...');

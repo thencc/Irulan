@@ -24,8 +24,10 @@
                     <option value="callApp">Call App</option>
                     <option value="optInApp">Opt-In App</option>
                 </select>
-                <p v-if="callAppArgs.operationType === 'callApp'"><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
-                <p class="small muted">(method name gets prepended to arguments array)</p>
+                <div class="method-name" v-if="callAppArgs.operationType === 'callApp'">
+                    <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
+                    <p class="small muted">(method name gets prepended to arguments array)</p>
+                </div>
                 <h4 class="purple">Arguments</h4>
                 <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
                 <h4 class="purple">Accounts</h4>
@@ -49,7 +51,8 @@
         </div>
         <div class="utility algonaut-code">
             <h3>Copy Algonaut.js Call</h3>
-            <pre>{{ state.algonautJSCode }}</pre>
+            <p class="small muted">Click to copy</p>
+            <pre @click="copyAlgoCode">{{ state.algonautJSCode }}</pre>
         </div>
     </div>
 </div>
@@ -60,6 +63,7 @@ import state from '../state';
 import ArrayField from './ArrayField.vue';
 import { doTxn } from '../algo';
 import LoadingButton from './LoadingButton.vue';
+import { copyText } from 'vue3-clipboard';
 
 export default defineComponent({
     data() {
@@ -105,15 +109,17 @@ export default defineComponent({
                             this.callAppArgs.appArgs.map((item: any) => item.value);
             const optionalFields = {
                 accounts: this.callAppArgs.accounts.map((item: any) => item.value),
-                applications: this.callAppArgs.applications.map((item: any) => item.value),
-                assets: this.callAppArgs.assets.map((item: any) => item.value),
+                applications: this.callAppArgs.applications.map((item: any) => parseInt(item.value)),
+                assets: this.callAppArgs.assets.map((item: any) => parseInt(item.value)),
             }
+
+            const unquotedArgs = JSON.stringify(optionalFields).replace(/"([^"]+)":/g, '$1:');
 
             state.algonautJSCode = 
 `const response = await algonaut.${this.callAppArgs.operationType}(
     ${state.currentApp.index},
     ${JSON.stringify(args)},
-    ${JSON.stringify(optionalFields)}
+    ${unquotedArgs}
 );`;
 
             let txn: any;
@@ -189,10 +195,20 @@ export default defineComponent({
                 }
             }
             this.deleteAppLoading = false;
+        },
+        copyAlgoCode () {
+            this.$copyText(state.algonautJSCode, undefined, (error: any, event: any) => {
+                if (error) {
+                    state.error(error);
+                } else {
+                    state.log('Copied to clipboard.');
+                }
+            });
         }
     },
     components: { ArrayField, LoadingButton }
 })
+
 </script>
 <style lang="scss" scoped>
 @import '../assets/variables';
