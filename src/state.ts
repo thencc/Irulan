@@ -8,7 +8,7 @@ const state = reactive({
     toolLoading: false,
     currentApp: {} as any,
     isAccount: false,
-    activeAccount: null,
+    activeAccount: null as any,
     signingMode: '' as 'sk' | 'wc',
     algonaut: {} as Algonaut,
     algonautJSCode: '',

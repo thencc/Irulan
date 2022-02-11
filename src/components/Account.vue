@@ -1,13 +1,14 @@
 <template>
     <button class="btn-purple" @click="showModal = true">
-        {{ state.activeAccount || 'Connect Account' }}
+        {{ state.activeAccount ? accountDisplay : 'Connect Account' }}
     </button>
     <Modal :show="showModal" @close="close">
         <h3 class="modal-title">Connect Account</h3>
         <div class="modal-content">
             <div class="account-options" v-if="page === 'options'">
                 <div v-if="state.activeAccount">
-                    <p class="green">You are already connected to an account.</p>
+                    <p class="green">You are already connected to an account:</p>
+                    <p class="purple">{{ state.activeAccount }}</p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
                 </div>
                 <p class="align-center">Choose your fighter:</p>
@@ -54,6 +55,13 @@ export default defineComponent({
             page: 'options',
             recoveryPhrase: '',
             newAccount: {} as { address: string, mnemonic: string },
+        }
+    },
+    computed: {
+        accountDisplay () {
+            if (state.activeAccount && state.activeAccount.length) {
+                return state.activeAccount.toString().substring(0, 20) + '...';
+            }
         }
     },
     methods: {
