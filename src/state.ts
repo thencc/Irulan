@@ -44,6 +44,22 @@ const state = reactive({
 
                 // on success, save config
                 localStorage.setItem('config', JSON.stringify(config))
+
+                // if we have an account from WC, set it
+                if (this.activeAccount && this.signingMode === 'wc') {
+                    // this.algonaut.setWalletConnectAccount(this.activeAccount);
+                    this.algonaut.connectAlgoWallet({ 
+                        onConnect: () => { 
+                            this.success('Set WalletConnect account: ' + this.activeAccount)
+                        },
+                        onDisconnect: () => {
+                            
+                        },
+                        onSessionUpdate: () => {
+
+                        }
+                    })
+                }
             }
         } catch (error) {
             this.error('Error connecting. Check config.');

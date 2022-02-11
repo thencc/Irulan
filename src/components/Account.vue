@@ -10,9 +10,10 @@
                     <p class="green">You are already connected to an account:</p>
                     <p class="purple">{{ state.activeAccount }}</p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
+                    <button v-if="state.signingMode === 'wc'" class="danger" @click="wcLogout">Disconnect WalletConnect</button>
                 </div>
                 <p class="align-center">Choose your fighter:</p>
-                <button disabled>Connect to Algorand Wallet</button>
+                <button @click="wcLogin">Connect to Algorand Wallet</button>
                 <button @click="page = 'recover'">Recover from mnemonic</button>
                 <button @click="createNew">Create new account</button>
             </div>
@@ -57,6 +58,21 @@ export default defineComponent({
             newAccount: {} as { address: string, mnemonic: string },
         }
     },
+    mounted() {
+        const wcData = localStorage.getItem('walletconnect');
+        if (wcData) {
+            const parseData = JSON.parse(wcData ? wcData.toString() : '');
+            if (parseData.connected) {
+                console.log('WC data found.');
+                //state.algonaut.setWalletConnectAccount(parseData.accounts[0]);
+                state.signingMode = 'wc';
+                state.activeAccount = parseData.accounts[0];
+                //this.wcLogin();
+            } else {
+                console.log('No WC data');
+            }
+        } 
+    },
     computed: {
         accountDisplay () {
             if (state.activeAccount && state.activeAccount.length) {
@@ -89,6 +105,36 @@ export default defineComponent({
         close() {
             this.page = 'options';
             this.showModal = false;
+        },
+        async wcLogin() {
+            await state.algonaut.connectAlgoWallet({
+                onConnect: this.onConnect,
+                onDisconnect: this.onDisconnect,
+                onSessionUpdate: this.onSessionUpdate
+            } as any)
+        },
+        async wcLogout() {
+            localStorage.removeItem('walletconnect');
+            state.activeAccount = '';
+            state.algonaut.account = undefined;
+        },  
+        onConnect(payload: any) {
+            const { accounts } = payload.params[0];
+            state.signingMode = 'wc';
+            state.activeAccount = accounts[0];
+            state.algonaut.setWalletConnectAccount(accounts[0]);
+            state.success('Connected to account: ' + state.activeAccount);
+            this.close();
+        },
+        onDisconnect() {
+            state.activeAccount = null;
+            state.error('Disconnected from account.');
+        },  
+        onSessionUpdate(accounts: any) {
+            state.signingMode = 'wc';
+            state.activeAccount = accounts[0];
+            state.algonaut.setWalletConnectAccount(accounts[0]);
+            state.success('Connected to account: ' + state.activeAccount);
         }
     }
 })
