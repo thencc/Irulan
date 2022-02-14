@@ -5,54 +5,58 @@
             <h2>App <span class="green">{{ app.index }}</span></h2>
             <p class="metadata">
                 <span class="creator">
-                    <span class="muted">Creator:</span> <span class="purple">{{ app.creatorAddress.substring(0, 10) }}...</span>
+                    <span class="muted">Creator:</span> <span class="purple">{{ app.creatorAddress }}</span>
                 </span>
             </p>
         </div>
         <div class="contract-actions">
-            <button @click="closeOut">Close Out</button>
             <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
         </div>
     </div>
     <div class="utilities">
-        <div class="utility call-app">
-            <h3>App Operations</h3>
-            <!-- <form @submit.prevent="callApp"> -->
-            <div>
-                Transaction type:
-                <select name="operationType" id="operationType" v-model="callAppArgs.operationType">
-                    <option value="callApp">Call App</option>
-                    <option value="optInApp">Opt-In App</option>
-                </select>
-                <div class="method-name" v-if="callAppArgs.operationType === 'callApp'">
-                    <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
-                    <p class="small muted">(method name gets prepended to arguments array)</p>
+        <div class="left-col">
+            <div class="utility call-app">
+                <h3>App Operations</h3>
+                <!-- <form @submit.prevent="callApp"> -->
+                <div>
+                    Transaction type:
+                    <select name="operationType" id="operationType" v-model="callAppArgs.operationType">
+                        <option value="callApp">Call App</option>
+                        <option value="optInApp">Opt-In App</option>
+                        <option value="closeOutApp">Close Out App</option>
+                    </select>
+                    <div class="method-name" v-if="callAppArgs.operationType === 'callApp'">
+                        <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
+                        <p class="small muted">(method name gets prepended to arguments array)</p>
+                    </div>
+                    <h4 class="purple">Arguments</h4>
+                    <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
+                    <h4 class="purple">Accounts</h4>
+                    <ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
+                    <h4 class="purple">Foreign Applications</h4>
+                    <ArrayField v-model="callAppArgs.applications" :placeholder="'Add app ID'" />
+                    <h4 class="purple">Foreign Assets</h4>
+                    <ArrayField v-model="callAppArgs.assets" :placeholder="'Add app ID'" />
+                    <p class="align-right"><LoadingButton @click="callApp" type="submit" :loading="callAppLoading">Call App</LoadingButton></p>
                 </div>
-                <h4 class="purple">Arguments</h4>
-                <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
-                <h4 class="purple">Accounts</h4>
-                <ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
-                <h4 class="purple">Foreign Applications</h4>
-                <ArrayField v-model="callAppArgs.applications" :placeholder="'Add app ID'" />
-                <h4 class="purple">Foreign Assets</h4>
-                <ArrayField v-model="callAppArgs.assets" :placeholder="'Add app ID'" />
-                <p class="align-right"><LoadingButton @click="callApp" type="submit" :loading="callAppLoading">Call App</LoadingButton></p>
+                <!-- </form> -->
             </div>
-            <!-- </form> -->
         </div>
-        <div class="utility fund-app">
-            <h3>Fund App</h3>
-            <form @submit.prevent="fundApp">
-                <p class="small muted">Escrow address: <span class="purple">{{ escrowAddress }}</span></p>
-                <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
-                <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
-                <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
-            </form>
-        </div>
-        <div class="utility algonaut-code">
-            <h3>Copy Algonaut.js Call</h3>
-            <p class="small muted">Click to copy</p>
-            <pre @click="copyAlgoCode">{{ state.algonautJSCode }}</pre>
+        <div class="right-col">
+            <div class="utility fund-app">
+                <h3>Fund App</h3>
+                <form @submit.prevent="fundApp">
+                    <p class="small muted">Escrow address: <span class="purple">{{ escrowAddress }}</span></p>
+                    <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
+                    <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
+                    <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
+                </form>
+            </div>
+            <div class="utility algonaut-code">
+                <h3>Algonaut.js Code</h3>
+                <p class="small muted">Click to copy</p>
+                <pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
+            </div>
         </div>
     </div>
 </div>
@@ -172,6 +176,7 @@ export default defineComponent({
         async closeOut() {
             if (!state.algonaut.account) return state.error('No account connected.');
             this.closeOutLoading = true;
+            
             this.closeOutLoading = false;
 
         },
@@ -225,11 +230,11 @@ h2 {
     display: flex;
 
     .contract-info {
-        flex: 0 0 50%;
+        flex: 1 0 70%;
     }
     
     .contract-actions {
-        flex: 0 0 50%;
+        flex: 0 0 30%;
         text-align: right;
 
         button {
@@ -241,12 +246,18 @@ h2 {
 .utilities {
     display: flex;
     flex-wrap: wrap;
+
+    .left-col, .right-col {
+        flex: 1 1 45%;
+        margin: 5px;
+    }
 }
 
 .utility {
-    flex: 0 0 50%;
+    //flex: 0 0 50%;
     border: 2px solid $border;
     padding: 10px;
+    margin-bottom: 10px;
 
     h3 {
         color: $pink;
@@ -257,6 +268,16 @@ h2 {
 
     input {
         width: 100%;
+    }
+}
+
+.code-block {
+    background: $bgdark;
+    padding: 5px;
+
+    &:hover {
+        background-color: lighten($bgdark, 5%);
+        cursor: pointer;
     }
 }
 </style>

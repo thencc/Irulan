@@ -179,7 +179,7 @@ header {
   }
 
   .right-col {
-    flex: 0 0 60%;
+    flex: 1 0 60%;
 
     .module {
       margin-left: 0;
