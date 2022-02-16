@@ -7,8 +7,8 @@
         <div class="modal-content">
             <div class="account-options" v-if="page === 'options'">
                 <div v-if="state.activeAccount">
-                    <p class="green">You are already connected to an account:</p>
-                    <p class="purple">{{ state.activeAccount }}</p>
+                    <p class="green">You are already connected to an account (click to copy):</p>
+                    <p class="purple copy-account" @click="copyAccount">{{ state.activeAccount.substring(0, 20) }}...</p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
                     <button v-if="state.signingMode === 'wc'" class="danger" @click="wcLogout">Disconnect WalletConnect</button>
                 </div>
@@ -43,6 +43,7 @@
 import { defineComponent } from 'vue'
 import state from '../state';
 import Modal from './Modal.vue';
+import { copyText } from 'vue3-clipboard';
 
 export default defineComponent({
     components: {
@@ -135,6 +136,15 @@ export default defineComponent({
             state.activeAccount = accounts[0];
             state.algonaut.setWalletConnectAccount(accounts[0]);
             state.success('Connected to account: ' + state.activeAccount);
+        },
+        copyAccount () {
+            copyText(state.activeAccount, undefined, (error: any, event: any) => {
+                if (error) {
+                    state.error(error);
+                } else {
+                    state.log('Copied account to clipboard.');
+                }
+            });
         }
     }
 })
@@ -171,5 +181,9 @@ export default defineComponent({
     button {
         flex: 1 1 150px;
     }
+}
+
+.copy-account {
+    cursor: pointer;
 }
 </style>
