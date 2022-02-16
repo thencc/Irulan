@@ -91,24 +91,45 @@ export default defineComponent({
             if (!state.algonaut.account) return state.error('No account connected.');
             this.deployLoading = true;
             this.deployError = '';
-            const txn = await state.algonaut.atomicDeployFromTeal(
-                this.deployArgs.approvalProgram,
-                this.deployArgs.clearStateProgram,
-                this.deployArgs.args,
-                this.deployArgs.schema.localInts,
-                this.deployArgs.schema.localBytes,
-                this.deployArgs.schema.globalInts,
-                this.deployArgs.schema.globalBytes,
-                this.deployArgs.optionalFields
-            );
             state.log('Deploying application...');
             try {
-                const res = await doTxn([txn]);
+                let res;
+                if (state.signingMode === 'wc') {
+                    // sign via WC
+                    const txn = await state.algonaut.atomicDeployFromTeal(
+                        this.deployArgs.approvalProgram,
+                        this.deployArgs.clearStateProgram,
+                        this.deployArgs.args,
+                        this.deployArgs.schema.localInts,
+                        this.deployArgs.schema.localBytes,
+                        this.deployArgs.schema.globalInts,
+                        this.deployArgs.schema.globalBytes,
+                        this.deployArgs.optionalFields
+                    );
+                    res = await doTxn([txn]);
+                } else {
+                    res = await state.algonaut.deployFromTeal(
+                        this.deployArgs.approvalProgram,
+                        this.deployArgs.clearStateProgram,
+                        this.deployArgs.args,
+                        this.deployArgs.schema.localInts,
+                        this.deployArgs.schema.localBytes,
+                        this.deployArgs.schema.globalInts,
+                        this.deployArgs.schema.globalBytes,
+                        this.deployArgs.optionalFields
+                    );
+                }
                 if (res.status === 'fail') {
                     this.deployError = res.message;
                     state.error('Could not deploy app.');
                 } else {
-                    state.success('Successfully deployed! App ID: ' + res.index);
+                    console.log('deployed app');
+                    console.log(res);
+                    let appId;
+                    if (res.meta) {
+                        appId = res.meta['application-index'];
+                    }
+                    state.success('Successfully deployed! App ID: ' + appId);
                 }
             } catch (e) {
                 console.error(e);
