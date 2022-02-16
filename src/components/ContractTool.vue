@@ -45,6 +45,7 @@
         <div class="right-col">
             <div class="utility fund-app">
                 <h3>Fund App</h3>
+                <p>Current Balance: {{ app.balance ? app.balance / 100000 : 0 }}</p>
                 <form @submit.prevent="fundApp">
                     <p class="small muted">Escrow address: <span class="purple">{{ escrowAddress }}</span></p>
                     <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
@@ -87,7 +88,7 @@ export default defineComponent({
             callAppLoading: false,
             closeOutLoading: false,
             optInAppLoading: false,
-            deleteAppLoading: false
+            deleteAppLoading: false,
         };
     },
     computed: {
@@ -165,6 +166,7 @@ export default defineComponent({
                 } else {
                     state.log(res.message);
                     this.fundAppAmt = null;
+                    this.app.balance = await state.algonaut.getAlgoBalance(this.escrowAddress);
                     state.success('Application funded');
                 }
             } catch (e) {

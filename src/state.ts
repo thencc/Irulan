@@ -53,7 +53,7 @@ const state = reactive({
                             this.success('Set WalletConnect account: ' + this.activeAccount)
                         },
                         onDisconnect: () => {
-                            
+
                         },
                         onSessionUpdate: () => {
 
@@ -71,8 +71,9 @@ const state = reactive({
     loadApp: async function (appIndex: number) {
         this.toolLoading = true;
         try {
-            this.currentApp = await this.algonaut.getAppInfo(appIndex);
             this.log('Loading app into contract tool...');
+            this.currentApp = await this.algonaut.getAppInfo(appIndex);
+            this.currentApp.balance = await this.algonaut.getAlgoBalance(this.algonaut.getAppEscrowAccount(appIndex));
         } catch (e) {
             console.log(e);
             this.error('Error loading app.');
