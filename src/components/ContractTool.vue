@@ -45,7 +45,7 @@
         <div class="right-col">
             <div class="utility fund-app">
                 <h3>Fund App</h3>
-                <p>Current Balance: {{ app.balance ? app.balance / 100000 : 0 }} ALGO</p>
+                <p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
                 <form @submit.prevent="fundApp">
                     <p class="small muted">Escrow address: <span class="purple">{{ escrowAddress }}</span></p>
                     <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
