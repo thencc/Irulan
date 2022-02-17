@@ -18,5 +18,7 @@ This project is in early stages, we are looking for active contributors.
 
 Irulan is powered by Vue. To run:
 
-```npm install
-npm run dev```
+```
+npm install
+npm run dev
+```
