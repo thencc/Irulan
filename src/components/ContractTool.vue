@@ -160,7 +160,7 @@ export default defineComponent({
             state.log(`Sending ${this.fundAppAmt} to ${this.escrowAddress}`);
 
             try {
-                const res = await doTxn([ await state.algonaut.atomicPayment(this.escrowAddress, this.fundAppAmt) ])
+                const res = await doTxn([ await state.algonaut.atomicPayment(this.escrowAddress, this.fundAppAmt*1000000) ])
                 if (res.status === 'fail') {
                     state.error(res.message);
                 } else {
