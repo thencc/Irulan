@@ -154,26 +154,28 @@ export default defineComponent({
         async fundApp() {
             if (!this.escrowAddress || !this.fundAppAmt) return false;
             if (!state.algonaut.account) return state.error('No account connected.');
+            
+            if (this.fundAppAmt < 1000 || window.confirm('Are you sure you want to send this many ALGO?')) {
+                this.fundAppLoading = true;
+                console.log(this.fundAppAmt);
+                state.log(`Sending ${this.fundAppAmt} to ${this.escrowAddress}`);
 
-            this.fundAppLoading = true;
-            console.log(this.fundAppAmt);
-            state.log(`Sending ${this.fundAppAmt} to ${this.escrowAddress}`);
-
-            try {
-                const res = await doTxn([ await state.algonaut.atomicPayment(this.escrowAddress, this.fundAppAmt*1000000) ])
-                if (res.status === 'fail') {
-                    state.error(res.message);
-                } else {
-                    state.log(res.message);
-                    this.fundAppAmt = null;
-                    this.app.balance = await state.algonaut.getAlgoBalance(this.escrowAddress);
-                    state.success('Application funded');
+                try {
+                    const res = await doTxn([ await state.algonaut.atomicPayment(this.escrowAddress, this.fundAppAmt*1000000) ])
+                    if (res.status === 'fail') {
+                        state.error(res.message);
+                    } else {
+                        state.log(res.message);
+                        this.fundAppAmt = null;
+                        this.app.balance = await state.algonaut.getAlgoBalance(this.escrowAddress);
+                        state.success('Application funded');
+                    }
+                } catch (e) {
+                    console.log(e);
+                    state.error('Error funding app.');
                 }
-            } catch (e) {
-                console.log(e);
-                state.error('Error funding app.');
+                this.fundAppLoading = false;
             }
-            this.fundAppLoading = false;
         },
         async closeOut() {
             if (!state.algonaut.account) return state.error('No account connected.');
