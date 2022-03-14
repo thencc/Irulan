@@ -129,11 +129,23 @@ export default defineComponent({
 
             let txn: any;
             if (this.callAppArgs.operationType === 'callApp') {
-                txn = await state.algonaut.atomicCallApp(state.currentApp.index, args, optionalFields);
+                txn = await state.algonaut.atomicCallApp({ 
+                    appIndex: state.currentApp.index, 
+                    appArgs: args, 
+                    optionalFields: optionalFields
+                });
             } else if (this.callAppArgs.operationType === 'optInApp') {
-                txn = await state.algonaut.atomicOptInApp(state.currentApp.index, args, optionalFields);
+                txn = await state.algonaut.atomicOptInApp({ 
+                    appIndex: state.currentApp.index, 
+                    appArgs: args, 
+                    optionalFields: optionalFields
+                });
             } else if (this.callAppArgs.operationType === 'closeOutApp') {
-                //txn = await state.algonaut.atomicCloseOutApp(state.currentApp.index, args, optionalFields);
+                txn = await state.algonaut.atomicCloseOutApp({ 
+                    appIndex: state.currentApp.index, 
+                    appArgs: args, 
+                    optionalFields: optionalFields
+                });
             }
             
             state.log(`Calling app with args: ${JSON.stringify(this.callAppArgs)}`);
@@ -161,7 +173,7 @@ export default defineComponent({
                 state.log(`Sending ${this.fundAppAmt} to ${this.escrowAddress}`);
 
                 try {
-                    const res = await doTxn([ await state.algonaut.atomicPayment(this.escrowAddress, this.fundAppAmt*1000000) ])
+                    const res = await doTxn([ await state.algonaut.atomicPayment({ to: this.escrowAddress, amount: this.fundAppAmt*1000000 }) ])
                     if (res.status === 'fail') {
                         state.error(res.message);
                     } else {

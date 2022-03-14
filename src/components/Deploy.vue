@@ -96,28 +96,22 @@ export default defineComponent({
                 let res;
                 if (state.signingMode === 'wc') {
                     // sign via WC
-                    const txn = await state.algonaut.atomicDeployFromTeal(
-                        this.deployArgs.approvalProgram,
-                        this.deployArgs.clearStateProgram,
-                        this.deployArgs.args,
-                        this.deployArgs.schema.localInts,
-                        this.deployArgs.schema.localBytes,
-                        this.deployArgs.schema.globalInts,
-                        this.deployArgs.schema.globalBytes,
-                        this.deployArgs.optionalFields
-                    );
+                    const txn = await state.algonaut.atomicDeployFromTeal({
+                        tealApprovalCode: this.deployArgs.approvalProgram,
+                        tealClearCode: this.deployArgs.clearStateProgram,
+                        appArgs: this.deployArgs.args,
+                        schema: this.deployArgs.schema,
+                        optionalFields: this.deployArgs.optionalFields
+                    });
                     res = await doTxn([txn]);
                 } else {
-                    res = await state.algonaut.deployFromTeal(
-                        this.deployArgs.approvalProgram,
-                        this.deployArgs.clearStateProgram,
-                        this.deployArgs.args,
-                        this.deployArgs.schema.localInts,
-                        this.deployArgs.schema.localBytes,
-                        this.deployArgs.schema.globalInts,
-                        this.deployArgs.schema.globalBytes,
-                        this.deployArgs.optionalFields
-                    );
+                    res = await state.algonaut.deployFromTeal({
+                        tealApprovalCode: this.deployArgs.approvalProgram,
+                        tealClearCode: this.deployArgs.clearStateProgram,
+                        appArgs: this.deployArgs.args,
+                        schema: this.deployArgs.schema,
+                        optionalFields: this.deployArgs.optionalFields
+                    });
                 }
                 if (res.status === 'fail') {
                     this.deployError = res.message;
