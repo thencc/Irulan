@@ -1,0 +1,163 @@
+<template>
+    <button @click="showModal = true">
+        Update Contract
+    </button>
+    <Modal :show="showModal" @close="close" :width="'70%'">
+        <h3 class="modal-title">Update Contract</h3>
+        <div class="modal-content">
+            <div class="programs">
+                <p>(updating app <span class="green">{{ app.index }}</span>)</p>
+                <h4 class="purple">Approval Program</h4>
+                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10" v-model="deployArgs.approvalProgram"></textarea>
+                <h4 class="purple">Clear State Program</h4>
+                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10" v-model="deployArgs.clearStateProgram"></textarea>
+            </div>
+            <div class="args">
+                <h4 class="purple">Arguments</h4>
+                <ArrayField v-model="deployArgs.args" :placeholder="'Add argument'" />
+                <h4 class="purple">Accounts</h4>
+                <ArrayField v-model="deployArgs.optionalFields.accounts" :placeholder="'Add account'" />
+                <h4 class="purple">Foreign Applications</h4>
+                <ArrayField v-model="deployArgs.optionalFields.applications" :placeholder="'Add app ID'" />
+                <h4 class="purple">Foreign Assets</h4>
+                <ArrayField v-model="deployArgs.optionalFields.assets" :placeholder="'Add app ID'" />
+            </div>
+        </div>
+        <p class="pink" v-if="deployError">{{ deployError }}</p>
+        <p class="align-right"><LoadingButton @click="deploy" type="submit" :loading="deployLoading">Update Contract</LoadingButton></p>
+    </Modal>
+</template>
+<script lang="ts">
+import { defineComponent } from 'vue'
+import Modal from './Modal.vue';
+import ArrayField from './ArrayField.vue';
+import LoadingButton from './LoadingButton.vue';
+import { doTxn } from '../algo';
+import state from '../state';
+
+export default defineComponent({
+    props: {
+        app: {} as any
+    },
+    data() {
+        return {
+            showModal: false,
+            deployLoading: false,
+            deployError: '',
+            deployArgs: {
+                approvalProgram: '',
+                clearStateProgram: '',
+                args: [],
+                optionalFields: {
+                    accounts: [],
+                    applications: [],
+                    assets: []
+                }
+            }
+        }
+    },
+    methods: {
+        close () {
+            this.showModal = false;
+
+            // reset form
+            this.deployArgs = {
+                approvalProgram: '',
+                clearStateProgram: '',
+                args: [],
+                optionalFields: {
+                    accounts: [],
+                    applications: [],
+                    assets: []
+                }
+            }
+        },
+        async deploy () {
+            if (!state.algonaut.account) return state.error('No account connected.');
+            this.deployLoading = true;
+            this.deployError = '';
+            state.log('Deploying application...');
+            try {
+                let res;
+                if (state.signingMode === 'wc') {
+                    // sign via WC
+                    const txn = await state.algonaut.atomicUpdateApp({
+                        appIndex: this.app.index,
+                        tealApprovalCode: this.deployArgs.approvalProgram,
+                        tealClearCode: this.deployArgs.clearStateProgram,
+                        appArgs: this.deployArgs.args,
+                        optionalFields: this.deployArgs.optionalFields
+                    });
+                    res = await doTxn([txn]);
+                } else {
+                    res = await state.algonaut.updateApp({
+                        appIndex: this.app.index,
+                        tealApprovalCode: this.deployArgs.approvalProgram,
+                        tealClearCode: this.deployArgs.clearStateProgram,
+                        appArgs: this.deployArgs.args,
+                        optionalFields: this.deployArgs.optionalFields
+                    });
+                }
+                if (res.status === 'fail') {
+                    this.deployError = res.message;
+                    state.error('Could not update app.');
+                } else {
+                    console.log('deployed app');
+                    console.log(res);
+                    let appId;
+                    if (res.meta) {
+                        appId = res.meta['application-index'];
+                    }
+                    state.success('Successfully updated! App ID: ' + appId);
+                }
+            } catch (e) {
+                console.error(e);
+                state.error('Error deploying app.')
+            }
+            this.deployLoading = false;
+        }
+    },
+    components: {
+        Modal,
+        ArrayField,
+        LoadingButton
+    },
+})
+</script>
+<style lang="scss" scoped>
+.modal-content {
+    display: flex;
+}
+
+.programs {
+    flex: 1 1 50%;
+    margin-right: 20px;
+
+    textarea {
+        width: 100%;
+    }
+}
+
+.schema .field {
+    display: flex;
+
+    label {
+        flex: 0 1 100px;
+        height: 40px;
+        line-height: 40px;
+    }
+
+    input {
+        font-size: 95%;
+        flex: 1 1 80%;
+    }
+}
+
+.schema input {
+    font-size: 95%;
+}
+
+.args {
+    flex: 1 1 50%;
+}
+</style>

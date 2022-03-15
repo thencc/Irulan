@@ -10,6 +10,7 @@
             </p>
         </div>
         <div class="contract-actions">
+            <UpdateApp :app="app" />
             <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
         </div>
     </div>
@@ -69,6 +70,7 @@ import ArrayField from './ArrayField.vue';
 import { doTxn } from '../algo';
 import LoadingButton from './LoadingButton.vue';
 import { copyText } from 'vue3-clipboard';
+import UpdateApp from './UpdateApp.vue';
 
 export default defineComponent({
     data() {
@@ -227,7 +229,7 @@ export default defineComponent({
             });
         }
     },
-    components: { ArrayField, LoadingButton }
+    components: { ArrayField, LoadingButton, UpdateApp }
 })
 
 </script>
