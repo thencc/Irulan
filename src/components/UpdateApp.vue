@@ -86,6 +86,7 @@ export default defineComponent({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
+                        schema: {} as any, // this is a lil hack, should be removed on algonaut.js@0.1.4
                         optionalFields: this.deployArgs.optionalFields
                     });
                     res = await doTxn([txn]);
@@ -95,6 +96,7 @@ export default defineComponent({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
+                        schema: {} as any, // this is a lil hack, should be removed on algonaut.js@0.1.4
                         optionalFields: this.deployArgs.optionalFields
                     });
                 }
