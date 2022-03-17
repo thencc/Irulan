@@ -10,7 +10,12 @@
                     <p class="green">You are already connected to an account (click to copy):</p>
                     <p class="purple copy-account" @click="copyAccount">{{ state.activeAccount.substring(0, 20) }}...</p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
-                    <button v-if="state.signingMode === 'wc'" class="danger" @click="wcLogout">Disconnect WalletConnect</button>
+                    <button 
+                        v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'" 
+                        class="danger" 
+                        @click="wcLogout">
+                            Disconnect WalletConnect
+                    </button>
                 </div>
                 <p class="align-center">Choose your fighter:</p>
                 <button @click="wcLogin">Connect to Algorand Wallet</button>
@@ -66,7 +71,7 @@ export default defineComponent({
             if (parseData.connected) {
                 console.log('WC data found.');
                 //state.algonaut.setWalletConnectAccount(parseData.accounts[0]);
-                state.signingMode = 'wc';
+                if (state.algonaut.config) state.algonaut.config.SIGNING_MODE = 'walletconnect';
                 state.activeAccount = parseData.accounts[0];
                 //this.wcLogin();
             } else {
@@ -96,7 +101,6 @@ export default defineComponent({
                 console.log(acct);
                 state.algonaut.setAccount(acct as any);
                 state.activeAccount = (acct as any).addr;
-                state.signingMode = 'sk';
                 state.success('Connected to account: ' + state.activeAccount);
                 this.close();
             } else {
@@ -121,7 +125,6 @@ export default defineComponent({
         },  
         onConnect(payload: any) {
             const { accounts } = payload.params[0];
-            state.signingMode = 'wc';
             state.activeAccount = accounts[0];
             state.algonaut.setWalletConnectAccount(accounts[0]);
             state.success('Connected to account: ' + state.activeAccount);
@@ -132,7 +135,6 @@ export default defineComponent({
             state.error('Disconnected from account.');
         },  
         onSessionUpdate(accounts: any) {
-            state.signingMode = 'wc';
             state.activeAccount = accounts[0];
             state.algonaut.setWalletConnectAccount(accounts[0]);
             state.success('Connected to account: ' + state.activeAccount);

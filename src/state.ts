@@ -1,6 +1,7 @@
 import { reactive } from 'vue';
 import Algonaut from 'algonaut.js';
 
+
 const state = reactive({
     terminal: [] as { type: string, message: string }[],
     connected: false,
@@ -8,8 +9,8 @@ const state = reactive({
     toolLoading: false,
     currentApp: {} as any,
     isAccount: false,
+    indexer: {} as any, 
     activeAccount: null as any,
-    signingMode: '' as 'sk' | 'wc',
     algonaut: {} as Algonaut,
     algonautJSCode: '',
 
@@ -34,6 +35,7 @@ const state = reactive({
             algoConfig.BASE_SERVER = 'https://mainnet-algorand.api.purestake.io/ps2';
         }
         this.algonaut = new Algonaut(algoConfig);
+
         this.log('Connecting...');
 
         try {
@@ -46,7 +48,7 @@ const state = reactive({
                 localStorage.setItem('config', JSON.stringify(config))
 
                 // if we have an account from WC, set it
-                if (this.activeAccount && this.signingMode === 'wc') {
+                if (this.activeAccount && localStorage.getItem('walletconnect')) {
                     // this.algonaut.setWalletConnectAccount(this.activeAccount);
                     this.algonaut.connectAlgoWallet({ 
                         onConnect: () => { 

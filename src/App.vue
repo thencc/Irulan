@@ -41,7 +41,6 @@ import { defineComponent } from 'vue';
 import state from './state';
 import Setup from './components/Setup.vue';
 import Log from './components/Log.vue';
-import Accounts from './components/Accounts.vue';
 import Browser from './components/Browser.vue';
 import ContractTool from './components/ContractTool.vue';
 import Account from './components/Account.vue';
@@ -52,7 +51,6 @@ export default defineComponent({
   components: {
     Setup,
     Log,
-    Accounts,
     Account,
     Modal,
     Browser,

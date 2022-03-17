@@ -32,7 +32,6 @@ import { defineComponent } from 'vue'
 import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
-import { doTxn } from '../algo';
 import state from '../state';
 
 export default defineComponent({
@@ -78,33 +77,18 @@ export default defineComponent({
             this.deployError = '';
             state.log('Deploying application...');
             try {
-                let res;
-                if (state.signingMode === 'wc') {
-                    // sign via WC
-                    const txn = await state.algonaut.atomicUpdateApp({
-                        appIndex: this.app.index,
-                        tealApprovalCode: this.deployArgs.approvalProgram,
-                        tealClearCode: this.deployArgs.clearStateProgram,
-                        appArgs: this.deployArgs.args,
-                        schema: {} as any, // this is a lil hack, should be removed on algonaut.js@0.1.4
-                        optionalFields: this.deployArgs.optionalFields
-                    });
-                    res = await doTxn([txn]);
-                } else {
-                    res = await state.algonaut.updateApp({
-                        appIndex: this.app.index,
-                        tealApprovalCode: this.deployArgs.approvalProgram,
-                        tealClearCode: this.deployArgs.clearStateProgram,
-                        appArgs: this.deployArgs.args,
-                        schema: {} as any, // this is a lil hack, should be removed on algonaut.js@0.1.4
-                        optionalFields: this.deployArgs.optionalFields
-                    });
-                }
+                let res = await state.algonaut.updateApp({
+                    appIndex: this.app.index,
+                    tealApprovalCode: this.deployArgs.approvalProgram,
+                    tealClearCode: this.deployArgs.clearStateProgram,
+                    appArgs: this.deployArgs.args,
+                    optionalFields: this.deployArgs.optionalFields
+                });
                 if (res.status === 'fail') {
                     this.deployError = res.message;
                     state.error('Could not update app.');
                 } else {
-                    console.log('deployed app');
+                    console.log('updated app');
                     console.log(res);
                     let appId;
                     if (res.meta) {
@@ -114,7 +98,7 @@ export default defineComponent({
                 }
             } catch (e) {
                 console.error(e);
-                state.error('Error deploying app.')
+                state.error('Error updating app.')
             }
             this.deployLoading = false;
         }

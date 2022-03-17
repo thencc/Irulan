@@ -38,7 +38,6 @@ import { defineComponent } from 'vue'
 import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
-import { doTxn } from '../algo';
 import state from '../state';
 
 export default defineComponent({
@@ -94,7 +93,7 @@ export default defineComponent({
             state.log('Deploying application...');
             try {
                 let res;
-                if (state.signingMode === 'wc') {
+                if (state.algonaut.config?.SIGNING_MODE === 'walletconnect') {
                     // sign via WC
                     const txn = await state.algonaut.atomicDeployFromTeal({
                         tealApprovalCode: this.deployArgs.approvalProgram,
@@ -103,7 +102,7 @@ export default defineComponent({
                         schema: this.deployArgs.schema,
                         optionalFields: this.deployArgs.optionalFields
                     });
-                    res = await doTxn([txn]);
+                    res = await state.algonaut.sendTransaction([txn]);
                 } else {
                     res = await state.algonaut.deployFromTeal({
                         tealApprovalCode: this.deployArgs.approvalProgram,
