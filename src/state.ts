@@ -3,7 +3,7 @@ import Algonaut from 'algonaut.js';
 
 
 const state = reactive({
-    terminal: [] as { type: string, message: string }[],
+    terminal: [] as { type: string, message: string, route?: string }[],
     connected: false,
     connecting: false,
     toolLoading: false,
@@ -89,6 +89,10 @@ const state = reactive({
 
     log: function(message: string) {
         this.terminal.unshift({ type: 'normal', message });
+    },
+
+    logRoute: function(message: string, route: string) {
+        this.terminal.unshift({ type: 'link', message, route });
     },
 
     success: function (message: string) {

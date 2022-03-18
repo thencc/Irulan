@@ -2,10 +2,10 @@
 <div class="contract-tool" v-if="app">
     <div class="contract-header">
         <div class="contract-info">
-            <h2>App <span class="green">{{ app.index }}</span></h2>
+            <h2>App <span class="green link" @click="browserLink(app.index)">{{ app.index }}</span></h2>
             <p class="metadata">
                 <span class="creator">
-                    <span class="muted">Creator:</span> <span class="purple">{{ app.creatorAddress }}</span>
+                    <span class="muted">Creator:</span> <span class="purple link" @click="browserLink(app.creatorAddress)">{{ app.creatorAddress }}</span>
                 </span>
             </p>
         </div>
@@ -48,7 +48,7 @@
                 <h3>Fund App</h3>
                 <p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
                 <form @submit.prevent="fundApp">
-                    <p class="small muted">Escrow address: <span class="purple">{{ escrowAddress }}</span></p>
+                    <p class="small muted">Escrow address: <span class="purple link" @click="browserLink(escrowAddress || '')">{{ escrowAddress }}</span></p>
                     <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
                     <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
                     <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
@@ -191,6 +191,9 @@ export default defineComponent({
                 this.fundAppLoading = false;
             }
         },
+        async browserLink(query: string) {
+            this.$router.push('/contract/' + state.currentApp.index + '/s/' + query);
+        },
         async closeOut() {
             if (!state.algonaut.account) return state.error('No account connected.');
             this.closeOutLoading = true;
@@ -296,6 +299,15 @@ h2 {
     &:hover {
         background-color: lighten($bgdark, 5%);
         cursor: pointer;
+    }
+}
+
+.link {
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 0.8;
     }
 }
 </style>

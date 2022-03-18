@@ -1,6 +1,9 @@
 <template>
     <div class="terminal">
-        <p v-for="line in state.terminal" :key="line.message" :class="'line ' + line.type">{{ line.message }}</p>
+        <p v-for="line in state.terminal" :key="line.message" :class="'line ' + line.type">
+            <router-link v-if="line.route" :to="line.route">{{ line.message }}</router-link>
+            <span v-if="!line.route">{{ line.message }}</span>
+        </p>
     </div>
 </template>
 

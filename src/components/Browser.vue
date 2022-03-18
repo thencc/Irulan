@@ -208,8 +208,27 @@ export default defineComponent({
             searching: false
         }
     },
+    created () {
+        this.$watch(
+            () => this.$route.params,
+            (toParams: any) => {
+                console.log(toParams);
+                if (this.$route.name === 'search' || this.$route.name === 'full') {
+                    this.setSearch(toParams.query);
+                }
+                if (this.$route.name === 'contract' || this.$route.name === 'full') {
+                    this.loadApp(parseInt(toParams.contractId));
+                }
+            }
+        )        
+    },
     methods: {
         loadApp(appIndex: number) {
+            if (this.$route.name === 'search' || this.$route.name === 'full') {
+                this.$router.push('/contract/' + appIndex + '/s/' + this.$route.params.query);
+            } else if (this.$route.name === 'contract') {
+                this.$router.push('/contract/' + appIndex);
+            }
             state.loadApp(appIndex);
         },
         setSearch(query: any) {
@@ -220,10 +239,12 @@ export default defineComponent({
             return state.algonaut.fromBase64(s);
         },  
         async search () {
+            const route = this.$route.name === 'search' ? '/s/' + this.query : '/contract/' + this.$route.params.contractId + '/s/' + this.query
+            this.$router.push(route);
             this.searching = true;
             this.response = null
             var response = {} as any;
-            state.log('Searching: "' + this.query + '"...');
+            state.logRoute(`Searching: ${this.query}`, route);
             if (state.algonaut.sdk?.isValidAddress(this.query)) {
                 state.success('Account found.');
                 response = await state.algonaut.getAccountInfo(this.query);

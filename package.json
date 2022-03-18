@@ -7,9 +7,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "algonaut.js": "^0.1.5",
+    "algonaut.js": "^0.1.8",
     "parse-domain": "^7.0.0",
     "vue": "^3.2.25",
+    "vue-router": "^4.0.14",
     "vue3-clipboard": "^1.0.0",
     "vue3-keypress": "^4.0.1"
   },

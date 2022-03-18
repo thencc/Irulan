@@ -63,6 +63,14 @@ export default defineComponent({
   mounted() {
     state.log('The real universe is always one step beyond logic.');
   },  
+  created() {
+    this.$watch(
+      () => this.$route.params,
+      (toParams: any) => {
+        console.log(toParams);
+      }
+    )
+  },
   data() {
     return {
       showAbout: false,
