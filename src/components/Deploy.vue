@@ -95,7 +95,7 @@ export default defineComponent({
                 let res;
                 if (state.algonaut.config?.SIGNING_MODE === 'walletconnect') {
                     // sign via WC
-                    const txn = await state.algonaut.atomicDeployFromTeal({
+                    const txn = await state.algonaut.atomicCreateApp({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
@@ -104,7 +104,7 @@ export default defineComponent({
                     });
                     res = await state.algonaut.sendTransaction([txn]);
                 } else {
-                    res = await state.algonaut.deployFromTeal({
+                    res = await state.algonaut.createApp({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
