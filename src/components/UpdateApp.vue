@@ -104,8 +104,10 @@ export default defineComponent({
                         this.$router.push(`/contract/${appId}`);
                     }
                 }
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e);
+                state.error(e);
+                this.deployError = e.toString();
                 state.error('Error updating app.')
             }
             this.deployLoading = false;
