@@ -118,11 +118,22 @@ export default defineComponent({
                 } else {
                     console.log('deployed app');
                     console.log(res);
+                    console.log(res.createdIndex);
                     let appId;
                     if (res.meta) {
                         appId = res.meta['application-index'];
                     }
                     state.success('Successfully deployed! App ID: ' + appId);
+                    this.close();
+
+                    if (res.createdIndex) {
+                        console.log('navigating to contract...')
+                        if (this.$route.name === 'full' || this.$route.name === 'search') {
+                            this.$router.push(`/contract/${res.createdIndex}/s/${this.$route.params.query}`);
+                        } else {
+                            this.$router.push(`/contract/${res.createdIndex}`);
+                        }
+                    }
                 }
             } catch (e) {
                 console.error(e);

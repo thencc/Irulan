@@ -95,6 +95,14 @@ export default defineComponent({
                         appId = res.meta['application-index'];
                     }
                     state.success('Successfully updated! App ID: ' + appId);
+                    this.close();
+
+                    console.log('navigating to contract...')
+                    if (this.$route.name === 'full' || this.$route.name === 'search') {
+                        this.$router.push(`/contract/${appId}/s/${this.$route.params.query}`);
+                    } else {
+                        this.$router.push(`/contract/${appId}`);
+                    }
                 }
             } catch (e) {
                 console.error(e);
