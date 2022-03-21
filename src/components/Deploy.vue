@@ -135,8 +135,10 @@ export default defineComponent({
                         }
                     }
                 }
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e);
+                state.error(e);
+                this.deployError = e.toString();
                 state.error('Error deploying app.')
             }
             this.deployLoading = false;
