@@ -67,6 +67,8 @@ export default defineComponent({
     methods: {
         close () {
             this.showModal = false;
+            this.deployError = '';
+            this.deployLoading = false;
 
             // reset form
             this.deployArgs = {
@@ -118,20 +120,23 @@ export default defineComponent({
                 } else {
                     console.log('deployed app');
                     console.log(res);
-                    console.log(res.createdIndex);
                     let appId;
-                    if (res.meta) {
+                    if (res.createdIndex) {
+                        appId = res.createdIndex;
+                    } else if (res.meta) {
                         appId = res.meta['application-index'];
                     }
+
                     state.success('Successfully deployed! App ID: ' + appId);
+                    
                     this.close();
 
-                    if (res.createdIndex) {
+                    if (appId) {
                         console.log('navigating to contract...')
                         if (this.$route.name === 'full' || this.$route.name === 'search') {
-                            this.$router.push(`/contract/${res.createdIndex}/s/${this.$route.params.query}`);
+                            this.$router.push(`/contract/${appId}/s/${this.$route.params.query}`);
                         } else {
-                            this.$router.push(`/contract/${res.createdIndex}`);
+                            this.$router.push(`/contract/${appId}`);
                         }
                     }
                 }

@@ -58,6 +58,8 @@ export default defineComponent({
     methods: {
         close () {
             this.showModal = false;
+            this.deployError = '';
+            this.deployLoading = false;
 
             // reset form
             this.deployArgs = {
@@ -91,7 +93,9 @@ export default defineComponent({
                     console.log('updated app');
                     console.log(res);
                     let appId;
-                    if (res.meta) {
+                    if (res.createdIndex) {
+                        appId = res.createdIndex;
+                    } else if (res.meta) {
                         appId = res.meta['application-index'];
                     }
                     state.success('Successfully updated! App ID: ' + appId);
