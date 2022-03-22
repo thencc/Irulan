@@ -17,12 +17,12 @@
                             Disconnect WalletConnect
                     </button>
                 </div>
-                <div v-if="!state.activeAccount">
+                <!-- <div v-if="!state.activeAccount"> -->
                     <p class="align-center">Choose your fighter:</p>
                     <button @click="wcLogin">Connect to Algorand Wallet</button>
                     <button @click="page = 'recover'">Recover from mnemonic</button>
                     <button @click="createNew">Create new account</button>
-                </div>
+                <!-- </div> -->
             </div>
 
             <div class="recover-account" v-if="page === 'recover'">
