@@ -253,6 +253,18 @@ export default defineComponent({
                     type: 'account',
                     object: response
                 }
+
+
+                // get asset info
+                if (this.response.object.assets) {
+                    this.response.object.assets.map((asset: any) => {
+                        state.algonaut.getAssetInfo(asset['asset-id']).then(assetInfo => {
+                            console.log(assetInfo);
+                            asset.creator = assetInfo.params.creator;
+                            return asset;
+                        })
+                    })
+                }
             } else if (parseInt(this.query)) {
                 // attempt to find app
                 try {
