@@ -123,7 +123,7 @@
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
-                            <td><a href="" @click.prevent="setSearch(asset.creator)" class="purple">{{ asset.creator.substring(0, 20) }}...</a></td>
+                            <td v-if="asset.creator"><a href="" @click.prevent="setSearch(asset.creator)" class="purple">{{ asset.creator.substring(0, 20) }}...</a></td>
                         </tr>
                     </table>
 
@@ -239,7 +239,7 @@ export default defineComponent({
             return state.algonaut.fromBase64(s);
         },  
         async search () {
-            const route = this.$route.name === 'search' ? '/s/' + this.query : '/contract/' + this.$route.params.contractId + '/s/' + this.query
+            const route = this.$route.name === 'search' || this.$route.name === 'home' ? '/s/' + this.query : '/contract/' + this.$route.params.contractId + '/s/' + this.query
             this.$router.push(route);
             this.searching = true;
             this.response = null

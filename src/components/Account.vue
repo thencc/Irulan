@@ -17,16 +17,21 @@
                             Disconnect WalletConnect
                     </button>
                 </div>
-                <p class="align-center">Choose your fighter:</p>
-                <button @click="wcLogin">Connect to Algorand Wallet</button>
-                <button @click="page = 'recover'">Recover from mnemonic</button>
-                <button @click="createNew">Create new account</button>
+                <div v-if="!state.activeAccount">
+                    <p class="align-center">Choose your fighter:</p>
+                    <button @click="wcLogin">Connect to Algorand Wallet</button>
+                    <button @click="page = 'recover'">Recover from mnemonic</button>
+                    <button @click="createNew">Create new account</button>
+                </div>
             </div>
 
             <div class="recover-account" v-if="page === 'recover'">
                 <p><a class="modal-back small" @click="page = 'options'">&larr; back</a></p>
+                <p>If you'd like to save this account in local storage for easy recall, provide a passcode to encrypt your mnemonic with (we do not store the passcode).</p>
+                <p>Or, leave the field blank to not store the account.</p>
                 <form @submit.prevent="recoverAccount(recoveryPhrase)">
-                    <input type="text" v-model="recoveryPhrase" placeholder="Type mnemonic here to recover account.">
+                    <input type="text" v-model="recoveryPhrase" placeholder="Type mnemonic here to recover account."><br>
+                    <input type="text" v-model="recoveryPhrasePasscode" placeholder="Passcode">
                     <button type="submit">Connect</button>
                 </form>
             </div>
@@ -42,6 +47,21 @@
         </div>
         <p class="pink" v-if="error">{{ error }}</p>
     </Modal>
+
+    <Modal :show="showRecover" @close="closeRecover">
+        <h3 class="modal-title">Log in</h3>
+        <div class="modal-content recover-with-passcode">
+            <p>You have an account in local storage. Type in your passcode to login or click <span class="pink">clear account</span> and we'll forget you ever came here.</p>
+            <p v-if="loginError" class="danger">{{ loginError }}</p>
+            <form @submit.prevent="recoverWithPasscode">
+                <input type="password" ref="passcodeInput" tabindex=1 v-model="loginPasscode" placeholder="Passcode">
+                <div class="buttons">
+                    <button tabindex=3 class="btn-danger">Clear Account</button>
+                    <button tabindex=2 type="submit">Connect</button>
+                </div>
+            </form>
+        </div>
+    </Modal>
 </template>
 
 <script lang="ts">
@@ -49,6 +69,16 @@ import { defineComponent } from 'vue'
 import state from '../state';
 import Modal from './Modal.vue';
 import { copyText } from 'vue3-clipboard';
+import CryptoJS from 'crypto-js';
+
+function encrypt(mnemonic: string, passphrase: string): string {
+	return CryptoJS.AES.encrypt(mnemonic, passphrase).toString();
+}
+
+function decrypt(encryptedMnemonic: string, passphrase: string): string {
+	var bytes = CryptoJS.AES.decrypt(encryptedMnemonic, passphrase);
+	return bytes.toString(CryptoJS.enc.Utf8);
+}
 
 export default defineComponent({
     components: {
@@ -58,9 +88,13 @@ export default defineComponent({
         return {
             state,
             showModal: false,
+            showRecover: false,
+            loginPasscode: '',
             error: '',
             page: 'options',
             recoveryPhrase: '',
+            recoveryPhrasePasscode: '',
+            loginError: '',
             newAccount: {} as { address: string, mnemonic: string },
         }
     },
@@ -78,6 +112,15 @@ export default defineComponent({
                 console.log('No WC data');
             }
         } 
+
+        const mnemonic = localStorage.getItem('saved_wallet');
+        if (mnemonic) {
+            this.showRecover = true;
+            console.log(this.$refs.passcodeInput);
+            this.$nextTick(() => {
+                this.$refs.passcodeInput.focus();
+            });
+        }
     },
     computed: {
         accountDisplay () {
@@ -102,14 +145,41 @@ export default defineComponent({
                 state.algonaut.setAccount(acct as any);
                 state.activeAccount = (acct as any).addr;
                 state.success('Connected to account: ' + state.activeAccount);
+
+                // store account in local storage
+                if (this.recoveryPhrasePasscode) {
+                    localStorage.setItem('saved_wallet', encrypt(mnemonic, this.recoveryPhrasePasscode));
+                    state.success('Account saved.');
+                }
+
                 this.close();
             } else {
                 this.error = 'Not a valid account.'
             }
         },
+        recoverWithPasscode() {
+            this.loginError = '';
+            const encryptedMnemonic = localStorage.getItem('saved_wallet');
+            if (!encryptedMnemonic) return this.loginError = 'No wallet saved.';
+            try {
+                const acct = state.algonaut.recoverAccount(decrypt(encryptedMnemonic, this.loginPasscode));
+                if (!acct) return this.loginError = 'Incorrect passcode.';
+                state.algonaut.setAccount(acct as any);
+                state.activeAccount = (acct as any).addr;
+                state.success('Connected to account: ' + state.activeAccount);
+                this.closeRecover();
+            } catch (e: any) {
+                this.loginError = e.toString();
+            }
+        },
         close() {
             this.page = 'options';
             this.showModal = false;
+        },
+        closeRecover() {
+            this.showRecover = false;
+            this.loginError = '';
+            this.loginPasscode = '';
         },
         async wcLogin() {
             await state.algonaut.connectAlgoWallet({
@@ -169,7 +239,7 @@ export default defineComponent({
 }
 
 .recover-account form {
-    display: flex;
+    //display: flex;
 
     input,button {
         height: 40px;
@@ -177,15 +247,31 @@ export default defineComponent({
     }
 
     input {
-        flex: 1 1 60%;
+        width: 100%;
+        margin-bottom: 5px;
     }
 
     button {
-        flex: 1 1 150px;
+        width: 100%;
     }
 }
 
 .copy-account {
     cursor: pointer;
+}
+
+.recover-with-passcode form {
+    input {
+        width: 100%;
+    }
+
+    .buttons {
+        display: flex;
+
+        button {
+            flex: 0 0 50%;
+            margin: 0;
+        }
+    }
 }
 </style>
