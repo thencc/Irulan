@@ -95,10 +95,12 @@ input, textarea {
     transform: translate(-50%, -50%);
 }
 
-button {
+button, a.btn {
     background-color: $btn-blue-bg;
     border: 1px solid $btn-blue-border;
+    text-decoration: none;
     color: $btn-blue-text;
+    text-align: center;
     font-family: 'Input Mono', monospace;
     padding: 8px 12px;
     font-size: 0.9em;
@@ -106,6 +108,7 @@ button {
     &:hover {
         background-color: lighten($btn-blue-bg, 5%);
         cursor: pointer;
+        text-decoration: none;
     }
 
     &:active {

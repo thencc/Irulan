@@ -16,6 +16,13 @@
                         @click="wcLogout">
                             Disconnect WalletConnect
                     </button>
+
+                    <button
+                        v-if="savedWallet"
+                        class="btn-danger"
+                        @click="clearSavedWallet">
+                        Clear Local Storage Wallet
+                    </button>
                 </div>
                 <!-- <div v-if="!state.activeAccount"> -->
                     <p class="align-center">Choose your fighter:</p>
@@ -56,7 +63,7 @@
             <form @submit.prevent="recoverWithPasscode">
                 <input type="password" ref="passcodeInput" tabindex=1 v-model="loginPasscode" placeholder="Passcode">
                 <div class="buttons">
-                    <button tabindex=3 class="btn-danger">Clear Account</button>
+                    <a tabindex=3 class="btn btn-danger" @click.prevent="clearSavedWallet">Clear Account</a>
                     <button tabindex=2 type="submit">Connect</button>
                 </div>
             </form>
@@ -127,6 +134,10 @@ export default defineComponent({
             if (state.activeAccount && state.activeAccount.length) {
                 return state.activeAccount.toString().substring(0, 20) + '...';
             }
+        },
+        savedWallet() {
+            if (localStorage.getItem('saved_wallet')) return true;
+            return false;
         }
     },
     methods: {
@@ -171,6 +182,13 @@ export default defineComponent({
             } catch (e: any) {
                 this.loginError = e.toString();
             }
+        },
+        clearSavedWallet() {
+            localStorage.removeItem('saved_wallet');
+            state.activeAccount = '';
+            state.algonaut.account = undefined;
+            state.success('Local storage wallet cleared.')
+            this.closeRecover();
         },
         close() {
             this.page = 'options';
@@ -268,7 +286,7 @@ export default defineComponent({
     .buttons {
         display: flex;
 
-        button {
+        button, a {
             flex: 0 0 50%;
             margin: 0;
         }
