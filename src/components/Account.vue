@@ -118,7 +118,7 @@ export default defineComponent({
             this.showRecover = true;
             console.log(this.$refs.passcodeInput);
             this.$nextTick(() => {
-                this.$refs.passcodeInput.focus();
+                (this.$refs.passcodeInput as any).focus();
             });
         }
     },
