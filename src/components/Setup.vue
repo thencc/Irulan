@@ -89,19 +89,11 @@ export default defineComponent({
     },
     methods: {
         async applySettings () {
-            console.log('applying settings')
-            // console.log(window.location.pathname);
-            // console.log(this.config.ledger);
-
             // we don't want to check the URL if we are applying settings from the modal
             const path = window.location.pathname.toLowerCase()
             let urlLedger;
             if (path.startsWith('/mainnet')) urlLedger = 'MainNet';
             if (path.startsWith('/testnet')) urlLedger = 'TestNet';
-
-            console.log('route: ', this.$route.params.ledger);
-            console.log('url: ', urlLedger);
-            console.log('config: ', this.config.ledger);
 
             // if this.$route.params is empty, we will prefer the URL ledger because this is a COLD OPEN
             // otherwise, we'll use the config ledger
@@ -114,7 +106,6 @@ export default defineComponent({
 
             await state.init(this.config);
 
-            console.log('changing url');
             this.$router.replace({
                 name: this.$route.name || 'home',
                 params: {
