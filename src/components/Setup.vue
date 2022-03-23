@@ -88,37 +88,41 @@ export default defineComponent({
         }
     },
     methods: {
-        async applySettings (checkUrl: boolean = false) {
+        async applySettings () {
             console.log('applying settings')
             // console.log(window.location.pathname);
             // console.log(this.config.ledger);
 
             // we don't want to check the URL if we are applying settings from the modal
-            if (checkUrl) {
-                const path = window.location.pathname.toLowerCase()
-                let urlLedger;
-                if (path.startsWith('/mainnet')) urlLedger = 'MainNet';
-                if (path.startsWith('/testnet')) urlLedger = 'TestNet';
+            const path = window.location.pathname.toLowerCase()
+            let urlLedger;
+            if (path.startsWith('/mainnet')) urlLedger = 'MainNet';
+            if (path.startsWith('/testnet')) urlLedger = 'TestNet';
 
-                // this.$route.params is empty at this point, even if we have a URL to parse
+            console.log('route: ', this.$route.params.ledger);
+            console.log('url: ', urlLedger);
+            console.log('config: ', this.config.ledger);
+
+            // if this.$route.params is empty, we will prefer the URL ledger because this is a COLD OPEN
+            // otherwise, we'll use the config ledger
+            if (!this.$route.params.ledger) {
                 if (urlLedger && this.config.ledger.toLowerCase() !== urlLedger.toLowerCase()) {
                     console.log('Route has different ledger than config')
                     this.config.ledger = urlLedger;
                 }
             }
+
             await state.init(this.config);
 
-            if (!checkUrl) {
-                console.log('changing url');
-                this.$router.replace({
-                    name: this.$route.name || 'home',
-                    params: {
-                        ledger: this.config.ledger.toLowerCase(),
-                        query: this.$route.params.query || undefined,
-                        conract: this.$route.params.contract || undefined
-                    }
-                });
-            }
+            console.log('changing url');
+            this.$router.replace({
+                name: this.$route.name || 'home',
+                params: {
+                    ledger: this.config.ledger.toLowerCase(),
+                    query: this.$route.params.query || undefined,
+                    conract: this.$route.params.contract || undefined
+                }
+            });
             this.showSetup = false;
         },
         clearSettings () {
@@ -139,7 +143,7 @@ export default defineComponent({
             if (cachedConfig) {
                 this.config = cachedConfig;
                 state.log('Fetched settings from local storage.');
-                this.applySettings(true);
+                this.applySettings();
             } else {
                 this.config = {
                     useCustomNode: false,
