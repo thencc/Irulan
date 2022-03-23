@@ -75,9 +75,50 @@ export default defineComponent({
     mounted() {
         this.fetchCachedConfig();
     },
+    watch: {
+        $route(to, from) {
+            // if (to.params && to.params.ledger && 
+            //     from.params && from.params.ledger && 
+            //     to.params.ledger !== from.params.ledger) {
+            //         console.log(`We were at ${from.params.ledger}, now we are at ${to.params.ledger}`)
+            //         // if we came from a different ledger, update settings
+            //         this.config.ledger = state.getLedgerFromUrl(this.$route);
+            //         state.init(this.config);
+            // }
+        }
+    },
     methods: {
-        applySettings () {
-            state.init(this.config);
+        async applySettings (checkUrl: boolean = false) {
+            console.log('applying settings')
+            // console.log(window.location.pathname);
+            // console.log(this.config.ledger);
+
+            // we don't want to check the URL if we are applying settings from the modal
+            if (checkUrl) {
+                const path = window.location.pathname.toLowerCase()
+                let urlLedger;
+                if (path.startsWith('/mainnet')) urlLedger = 'MainNet';
+                if (path.startsWith('/testnet')) urlLedger = 'TestNet';
+
+                // this.$route.params is empty at this point, even if we have a URL to parse
+                if (urlLedger && this.config.ledger.toLowerCase() !== urlLedger.toLowerCase()) {
+                    console.log('Route has different ledger than config')
+                    this.config.ledger = urlLedger;
+                }
+            }
+            await state.init(this.config);
+
+            if (!checkUrl) {
+                console.log('changing url');
+                this.$router.replace({
+                    name: this.$route.name || 'home',
+                    params: {
+                        ledger: this.config.ledger.toLowerCase(),
+                        query: this.$route.params.query || undefined,
+                        conract: this.$route.params.contract || undefined
+                    }
+                });
+            }
             this.showSetup = false;
         },
         clearSettings () {
@@ -98,7 +139,7 @@ export default defineComponent({
             if (cachedConfig) {
                 this.config = cachedConfig;
                 state.log('Fetched settings from local storage.');
-                this.applySettings();
+                this.applySettings(true);
             } else {
                 this.config = {
                     useCustomNode: false,

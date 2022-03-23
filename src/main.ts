@@ -10,13 +10,13 @@ app.use(VueClipboard, {});
 const router = createRouter({
     history: createWebHistory(),
     routes: [{
-        name: 'home', path: '/', component: App,
+        name: 'home', path: '/:ledger', component: App,
     }, {
-        name: 'search', path: '/s/:query', component: App
+        name: 'search', path: '/:ledger/s/:query', component: App
     }, {
-        name: 'contract', path: '/contract/:contractId', component: App
+        name: 'contract', path: '/:ledger/contract/:contractId', component: App
     }, {
-        name: 'full', path: '/contract/:contractId/s/:query', component: App
+        name: 'full', path: '/:ledger/contract/:contractId/s/:query', component: App
     }]
 });
 

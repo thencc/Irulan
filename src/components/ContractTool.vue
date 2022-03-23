@@ -192,7 +192,7 @@ export default defineComponent({
             }
         },
         async browserLink(query: string) {
-            this.$router.push('/contract/' + state.currentApp.index + '/s/' + query);
+            this.$router.push(state.getNewRoute(this.$route, { contractId: state.currentApp.index.toString(), query }));
         },
         async closeOut() {
             if (!state.algonaut.account) return state.error('No account connected.');

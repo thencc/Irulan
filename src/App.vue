@@ -67,7 +67,7 @@ export default defineComponent({
     this.$watch(
       () => this.$route.params,
       (toParams: any) => {
-        console.log(toParams);
+        //console.log(toParams);
       }
     )
   },

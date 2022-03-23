@@ -83,6 +83,36 @@ const state = reactive({
         this.toolLoading = false;
     },
 
+    /**
+     * Returns a new route to navigate to
+     * @param currentRoute Current route object
+     * @param toParams Params to update
+     */
+    getNewRoute(currentRoute: any, toParams: { query?: string, contractId?: string, ledger?: string }) {
+        let route = '/' + (currentRoute.params.ledger?.toLowerCase() || 'testnet');
+
+        // replace ledger parameter
+        if (toParams.ledger) {
+            route = '/' + toParams.ledger;
+        }
+
+        // add contract parameter
+        if (toParams.contractId) {
+            route += '/contract/' + toParams.contractId;
+        } else if (currentRoute.name === 'contract' || currentRoute.name === 'full') {
+            route += '/contract/' + currentRoute.params.contractId;
+        }
+
+        // add search parameter
+        if (toParams.query) {
+            route += '/s/' + toParams.query;
+        } else if (currentRoute.name === 'search' || currentRoute.name === 'full') {
+            route += '/s/' + currentRoute.params.query;
+        }
+
+        return route;
+    },
+
     error: function (message: string) {
         this.terminal.unshift({ type: 'error', message });
     },
