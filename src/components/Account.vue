@@ -106,7 +106,7 @@ export default defineComponent({
         }
     },
     mounted() {
-        const wcData = localStorage.getItem('walletconnect');
+        const wcData = state.getAccount('walletconnect');
         if (wcData) {
             const parseData = JSON.parse(wcData ? wcData.toString() : '');
             if (parseData.connected) {
@@ -120,7 +120,7 @@ export default defineComponent({
             }
         } 
 
-        const mnemonic = localStorage.getItem('saved_wallet');
+        const mnemonic = state.getAccount('local');
         if (mnemonic) {
             this.showRecover = true;
             console.log(this.$refs.passcodeInput);
@@ -136,7 +136,7 @@ export default defineComponent({
             }
         },
         savedWallet() {
-            if (localStorage.getItem('saved_wallet')) return true;
+            if (state.getAccount('local')) return true;
             return false;
         }
     },
@@ -159,7 +159,7 @@ export default defineComponent({
 
                 // store account in local storage
                 if (this.recoveryPhrasePasscode) {
-                    localStorage.setItem('saved_wallet', encrypt(mnemonic, this.recoveryPhrasePasscode));
+                    state.saveAccount('local', encrypt(mnemonic, this.recoveryPhrasePasscode));
                     state.success('Account saved.');
                 }
 
@@ -170,7 +170,7 @@ export default defineComponent({
         },
         recoverWithPasscode() {
             this.loginError = '';
-            const encryptedMnemonic = localStorage.getItem('saved_wallet');
+            const encryptedMnemonic = state.getAccount('local');
             if (!encryptedMnemonic) return this.loginError = 'No wallet saved.';
             try {
                 const acct = state.algonaut.recoverAccount(decrypt(encryptedMnemonic, this.loginPasscode));
@@ -184,7 +184,7 @@ export default defineComponent({
             }
         },
         clearSavedWallet() {
-            localStorage.removeItem('saved_wallet');
+            state.removeAccount('local');
             state.activeAccount = '';
             state.algonaut.account = undefined;
             state.success('Local storage wallet cleared.')
@@ -207,7 +207,7 @@ export default defineComponent({
             } as any)
         },
         async wcLogout() {
-            localStorage.removeItem('walletconnect');
+            state.removeAccount('walletconnect');
             state.activeAccount = '';
             state.algonaut.account = undefined;
         },  

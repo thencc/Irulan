@@ -13,6 +13,7 @@
     </Modal>
   </div>
   <div class="header-right">
+    <CreateAsset />
     <Deploy />
     <Account />
     <Setup />
@@ -46,6 +47,7 @@ import ContractTool from './components/ContractTool.vue';
 import Account from './components/Account.vue';
 import Modal from './components/Modal.vue';
 import Deploy from './components/Deploy.vue';
+import CreateAsset from './components/CreateAsset.vue';
 
 export default defineComponent({
   components: {
@@ -55,7 +57,8 @@ export default defineComponent({
     Modal,
     Browser,
     ContractTool,
-    Deploy
+    Deploy,
+    CreateAsset
   },
   setup() {
     

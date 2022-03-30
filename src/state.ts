@@ -113,6 +113,45 @@ const state = reactive({
         return route;
     },
 
+    /**
+     * gets account from local storage depending on ledger
+     * @param type local or walletconnect
+     * @returns {any} object corresponding to local account or testnet account
+     */
+    getAccount(type: 'local' | 'walletconnect') {
+        const ledger = this.getCurrentLedger();
+        return localStorage.getItem(`${type}_${ledger}`)
+    },
+
+    saveAccount(type: 'local' | 'walletconnect', account: any) {
+        const ledger = this.getCurrentLedger();
+        localStorage.setItem(`${type}_${ledger}`, account);
+    },
+
+    removeAccount(type: 'local' | 'walletconnect') {
+        const ledger = this.getCurrentLedger();
+        localStorage.removeItem(`${type}_${ledger}`);
+    },
+
+    getCurrentLedger() {
+        let ledger;
+
+        // prefer config ledger
+        if (this.algonaut.config) {
+            ledger = this.algonaut.config.LEDGER.toLowerCase();
+        } else {
+            // but if we don't have it, grab it from the url
+            ledger = window.location.pathname.substring(0, 7).toLowerCase();
+        }
+
+        // if something goes wrong, fall back on testnet
+        if (ledger !== 'mainnet' && ledger !== 'testnet') {
+            ledger = 'testnet';
+        }
+
+        return ledger;
+    },
+
     error: function (message: string) {
         this.terminal.unshift({ type: 'error', message });
     },
