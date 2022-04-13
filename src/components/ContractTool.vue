@@ -117,7 +117,7 @@ export default defineComponent({
                 // if it starts with a 0, treat it like a string (Number() and parseInt() both treat 0101 as an integer, and we lose the initial 0)
                 if (item[0] === '0') return item;
 
-                // we use Number() instead of parseInt() for cases like '32px' (parseInt would return `32`
+                // we use Number() instead of parseInt() for cases like '32px' (parseInt would return `32`)
                 if (!isNaN(Number(item))) return Number(item);
 
                 return item;
