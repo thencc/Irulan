@@ -93,6 +93,12 @@ export default defineComponent({
             this.deployLoading = true;
             this.deployError = '';
             state.log('Deploying application...');
+
+            this.deployArgs.schema.localInts = parseInt(this.deployArgs.schema.localInts as any || 0);
+            this.deployArgs.schema.localBytes = parseInt(this.deployArgs.schema.localBytes as any || 0);
+            this.deployArgs.schema.globalInts = parseInt(this.deployArgs.schema.globalInts as any || 0);
+            this.deployArgs.schema.globalBytes = parseInt(this.deployArgs.schema.globalBytes as any || 0);
+
             try {
                 let res;
                 if (state.algonaut.config?.SIGNING_MODE === 'walletconnect') {
