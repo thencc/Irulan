@@ -110,9 +110,22 @@ export default defineComponent({
             this.callAppLoading = true;
             state.algonautJSCode = '';
 
+            const convertAppArg = (item: any) => {
+                // we need to decide if this is an integer
+                item = item.toString();
+
+                // if it starts with a 0, treat it like a string (Number() and parseInt() both treat 0101 as an integer, and we lose the initial 0)
+                if (item[0] === '0') return item;
+
+                // we use Number() instead of parseInt() for cases like '32px' (parseInt would return `32`
+                if (!isNaN(Number(item))) return Number(item);
+
+                return item;
+            };
+
             const args = this.callAppArgs.operationType === 'callApp' ? 
-                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs.map((item: any) => item.value)) : 
-                            this.callAppArgs.appArgs.map((item: any) => item.value);
+                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs.map(convertAppArg)) : 
+                            this.callAppArgs.appArgs.map(convertAppArg);
             const optionalFields = {
                 accounts: this.callAppArgs.accounts.map((item: any) => item.value),
                 applications: this.callAppArgs.applications.map((item: any) => parseInt(item.value)),
