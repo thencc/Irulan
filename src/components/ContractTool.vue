@@ -112,7 +112,7 @@ export default defineComponent({
 
             const convertAppArg = (item: any) => {
                 // we need to decide if this is an integer
-                item = item.toString();
+                item = item.value.toString();
 
                 // if it starts with a 0, treat it like a string (Number() and parseInt() both treat 0101 as an integer, and we lose the initial 0)
                 if (item[0] === '0') return item;
@@ -126,6 +126,9 @@ export default defineComponent({
             const args = this.callAppArgs.operationType === 'callApp' ? 
                             [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs.map(convertAppArg)) : 
                             this.callAppArgs.appArgs.map(convertAppArg);
+            
+            console.log(args);
+
             const optionalFields = {
                 accounts: this.callAppArgs.accounts.map((item: any) => item.value),
                 applications: this.callAppArgs.applications.map((item: any) => parseInt(item.value)),
