@@ -99,7 +99,7 @@ export default defineComponent({
             // if this.$route.params is empty, we will prefer the URL ledger because this is a COLD OPEN
             // otherwise, we'll use the config ledger
             if (!this.$route.params.ledger) {
-                if (urlLedger && this.config.ledger.toLowerCase() !== urlLedger.toLowerCase()) {
+                if (urlLedger && this.config.ledger !== urlLedger) {
                     console.log('Route has different ledger than config')
                     this.config.ledger = urlLedger;
                 }
@@ -110,7 +110,7 @@ export default defineComponent({
             this.$router.replace({
                 name: this.$route.name || 'home',
                 params: {
-                    ledger: this.config.ledger.toLowerCase(),
+                    ledger: this.config.ledger,
                     query: this.$route.params.query || undefined,
                     conract: this.$route.params.contract || undefined
                 }
@@ -132,7 +132,7 @@ export default defineComponent({
         fetchCachedConfig() {
             console.log('getting config from cache...')
             const cachedConfig = JSON.parse(localStorage.getItem('config') || '{}');
-            if (cachedConfig) {
+            if (cachedConfig && cachedConfig.server) {
                 this.config = cachedConfig;
                 state.log('Fetched settings from local storage.');
                 this.applySettings();
@@ -145,6 +145,7 @@ export default defineComponent({
                     port: '',
                     server: ''
                 }
+                this.applySettings();
             }
         }
     }
