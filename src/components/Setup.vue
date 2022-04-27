@@ -8,28 +8,29 @@
             <div class="module-content">
                 <div class="form-field">
                     <p class="form-label">Ledger</p>
-                    <input type="radio" name="ledger" id="ledger-testnet" value="TestNet" v-model="config.ledger"> TestNet
-                    <input type="radio" name="ledger" id="ledger-mainnet" value="MainNet" v-model="config.ledger"> MainNet
+                    <input type="radio" name="ledger" id="ledger-testnet" value="testnet" v-model="config.ledger"> Testnet
+                    <input type="radio" name="ledger" id="ledger-mainnet" value="mainnet" v-model="config.ledger"> Mainnet
                 </div>
                 <div class="form-field">
-                    <p class="form-label">Node</p>
-                    <input type="radio" name="node" id="node-purestake" :value="false" v-model="config.useCustomNode"> PureStake Node
+                    <p class="form-label">Node Configuration</p>
+                    <input type="radio" name="node" id="node-default" :value="false" v-model="config.useCustomNode"> Default
                     <input type="radio" name="node" id="node-custom" :value="true" v-model="config.useCustomNode"> Custom Node
                 </div>
-                <div class="server-config">
+                <div class="server-config" v-show="config.useCustomNode">
                     <p>
                         <label for="apiKey">API Key</label>
                         <input type="text" v-model="config.apiKey" id="apiKey" name="apiKey">
                     </p>
-                    <p v-show="config.useCustomNode">
+                    <p>
                         <label for="apiKeyHeaderName">Key Header</label>
                         <input type="text" v-model="config.apiKeyHeaderName" id="apiKeyHeaderName" name="apiKeyHeaderName">
                     </p>
-                    <p v-show="config.useCustomNode">
+                    <p>
                         <label for="server">Server</label>
                         <input type="text" v-model="config.server" id="server" name="server">
                     </p>
-                    <p v-show="config.useCustomNode">
+                    <p class="small formtext">Make sure this server matches the ledger selection above.</p>
+                    <p>
                         <label for="port">Port</label>
                         <input type="text" v-model="config.port" id="port" name="port">
                     </p>
@@ -66,7 +67,7 @@ export default defineComponent({
                 useCustomNode: false,
                 apiKey: '',
                 apiKeyHeaderName: 'X-API-Key',
-                ledger: 'TestNet',
+                ledger: 'testnet',
                 port: '',
                 server: ''
             }
@@ -92,8 +93,8 @@ export default defineComponent({
             // we don't want to check the URL if we are applying settings from the modal
             const path = window.location.pathname.toLowerCase()
             let urlLedger;
-            if (path.startsWith('/mainnet')) urlLedger = 'MainNet';
-            if (path.startsWith('/testnet')) urlLedger = 'TestNet';
+            if (path.startsWith('/mainnet')) urlLedger = 'mainnet';
+            if (path.startsWith('/testnet')) urlLedger = 'testnet';
 
             // if this.$route.params is empty, we will prefer the URL ledger because this is a COLD OPEN
             // otherwise, we'll use the config ledger
@@ -120,7 +121,7 @@ export default defineComponent({
             this.config = {
                 useCustomNode: false,
                 apiKey: '',
-                ledger: 'TestNet',
+                ledger: 'testnet',
                 apiKeyHeaderName: 'X-API-Key',
                 port: '',
                 server: ''
@@ -139,7 +140,7 @@ export default defineComponent({
                 this.config = {
                     useCustomNode: false,
                     apiKey: '',
-                    ledger: 'TestNet',
+                    ledger: 'testnet',
                     apiKeyHeaderName: 'X-API-Key',
                     port: '',
                     server: ''

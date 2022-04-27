@@ -1,6 +1,11 @@
 import { reactive } from 'vue';
 import Algonaut from 'algonaut.js';
 
+const TESTNET_SERVER = 'https://twinfrogs.ncc.la/atn/';
+const TESTNET_APIKEY = '494d49c48f0f55f5d25d86fabb17bee8fbfcbf818ba257670f4ea076672e0fe2';
+const MAINNET_SERVER = 'https://twinfrogs.ncc.la/amn/';
+const MAINNET_APIKEY = '3fd53de10f0e2e2b24c4b3a30525a4c94c9b86d7ba9aba64bee01b00ae8b4cc9';
+
 
 const state = reactive({
     terminal: [] as { type: string, message: string, route?: string }[],
@@ -17,22 +22,23 @@ const state = reactive({
     init: async function (config: { ledger: string, server: string, apiKey: string, apiKeyHeaderName: string, useCustomNode: boolean, port: string }) {
         this.connecting = true;
         this.connected = false;
+
+        // the 
         let algoConfig = {
-            BASE_SERVER: 'https://testnet-algorand.api.purestake.io/ps2',
+            BASE_SERVER: TESTNET_SERVER,
             LEDGER: config.ledger,
             PORT: '',
-            API_TOKEN: {} as any
+            API_TOKEN: { 'X-Algo-API-Token': TESTNET_APIKEY } as any
         };
-
-        config.apiKeyHeaderName = config.apiKeyHeaderName || 'X-API-Key';
-
-        algoConfig.API_TOKEN[config.apiKeyHeaderName] = config.apiKey;
 
         if (config.useCustomNode) {
             algoConfig.BASE_SERVER = config.server;
             algoConfig.PORT = config.port;
-        } else if (!config.useCustomNode && config.ledger === 'MainNet') {
-            algoConfig.BASE_SERVER = 'https://mainnet-algorand.api.purestake.io/ps2';
+            config.apiKeyHeaderName = config.apiKeyHeaderName || 'X-API-Key';
+            algoConfig.API_TOKEN[config.apiKeyHeaderName] = config.apiKey;
+        } else if (!config.useCustomNode && config.ledger.toLowerCase() === 'mainnet') {
+            algoConfig.BASE_SERVER = MAINNET_SERVER;
+            algoConfig.API_TOKEN['X-Algo-API-Token'] = MAINNET_APIKEY;
         }
         this.algonaut = new Algonaut(algoConfig);
 
