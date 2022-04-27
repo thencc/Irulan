@@ -36,7 +36,7 @@ const state = reactive({
             algoConfig.PORT = config.port;
             config.apiKeyHeaderName = config.apiKeyHeaderName || 'X-API-Key';
             algoConfig.API_TOKEN[config.apiKeyHeaderName] = config.apiKey;
-        } else if (!config.useCustomNode && config.ledger && config.ledger.toLowerCase() === 'mainnet') {
+        } else if (!config.useCustomNode && config.ledger && config.ledger === 'mainnet') {
             algoConfig.BASE_SERVER = MAINNET_SERVER;
             algoConfig.API_TOKEN['X-Algo-API-Token'] = MAINNET_APIKEY;
         }
