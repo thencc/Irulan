@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
+    "link": "npm link algonaut.js",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "deploy": "firebase deploy --only hosting"

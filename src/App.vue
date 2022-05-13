@@ -28,8 +28,6 @@
   <div class="right-col">
     <ContractTool />
     <div class="footer-actions">
-      <NewContract />
-      <NewAsset />
     </div>
   </div>
 </main>

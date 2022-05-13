@@ -39,6 +39,11 @@ import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
 import state from '../state';
+import { approvalProgram, clearProgram, schema } from './deploy-test';
+
+// uncomment to load test contract
+// const TESTDATA = true;
+const TESTDATA = false;
 
 export default defineComponent({
     data() {
@@ -62,6 +67,13 @@ export default defineComponent({
                     assets: []
                 }
             }
+        }
+    },
+    mounted () {
+        if (TESTDATA) {
+            this.deployArgs.approvalProgram = approvalProgram;
+            this.deployArgs.clearStateProgram = clearProgram;
+            this.deployArgs.schema = schema;
         }
     },
     methods: {
@@ -134,11 +146,8 @@ export default defineComponent({
 
                     if (appId) {
                         console.log('navigating to contract...')
-                        if (this.$route.name === 'full' || this.$route.name === 'search') {
-                            this.$router.push(`/contract/${appId}/s/${this.$route.params.query}`);
-                        } else {
-                            this.$router.push(`/contract/${appId}`);
-                        }
+                        const route = state.getNewRoute(this.$route, { contractId: appId });
+                        this.$router.push(route);
                     }
                 }
             } catch (e: any) {
