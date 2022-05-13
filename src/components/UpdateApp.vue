@@ -40,6 +40,7 @@ export default defineComponent({
     },
     data() {
         return {
+            state,
             showModal: false,
             deployLoading: false,
             deployError: '',
@@ -55,6 +56,20 @@ export default defineComponent({
             }
         }
     },
+    watch: {
+        'state.currentApp.approvalDecompiled': {
+            immediate: true,
+            handler(c) {
+                this.deployArgs.approvalProgram = (c || '').replaceAll('\t','');
+            }
+        },
+        'state.currentApp.clearDecompiled': {
+            immediate: true,
+            handler(c) {
+                this.deployArgs.clearStateProgram = (c || '').replaceAll('\t','');
+            }
+        },
+    },
     methods: {
         close () {
             this.showModal = false;
@@ -63,8 +78,8 @@ export default defineComponent({
 
             // reset form
             this.deployArgs = {
-                approvalProgram: '',
-                clearStateProgram: '',
+                approvalProgram: (state.currentApp.approvalDecompiled || '').replaceAll('\t',''),
+                clearStateProgram: (state.currentApp.clearDecompiled || '').replaceAll('\t',''),
                 args: [],
                 optionalFields: {
                     accounts: [],

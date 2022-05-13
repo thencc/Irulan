@@ -10,9 +10,9 @@
                     <p class="green">You are already connected to an account (click to copy):</p>
                     <p class="purple copy-account" @click="copyAccount">{{ state.activeAccount.substring(0, 20) }}...</p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
-                    <button 
-                        v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'" 
-                        class="danger" 
+                    <button
+                        v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'"
+                        class="danger"
                         @click="wcLogout">
                             Disconnect WalletConnect
                     </button>
@@ -23,6 +23,24 @@
                         @click="clearSavedWallet">
                         Clear Local Storage Wallet
                     </button>
+
+                    <hr>
+
+                    <div>
+                        <span>
+                            Settings:
+                        </span>
+
+                        <div>
+                            <label for="defaultFee">Default Txn Fee (mAlgo)</label>
+                            <input
+                                v-model="state.defaultTxnFee"
+                                style="width: 100px; margin-left: 6px"
+                                id="defaultFee" type="number" />
+                        </div>
+                    </div>
+
+                    <hr>
                 </div>
                 <!-- <div v-if="!state.activeAccount"> -->
                     <p class="align-center">Choose your fighter:</p>
@@ -118,7 +136,7 @@ export default defineComponent({
             } else {
                 console.log('No WC data');
             }
-        } 
+        }
 
         const mnemonic = state.getAccount('local');
         if (mnemonic) {
@@ -210,7 +228,7 @@ export default defineComponent({
             state.removeAccount('walletconnect');
             state.activeAccount = '';
             state.algonaut.account = undefined;
-        },  
+        },
         onConnect(payload: any) {
             const { accounts } = payload.params[0];
             state.activeAccount = accounts[0];
@@ -221,7 +239,7 @@ export default defineComponent({
         onDisconnect() {
             state.activeAccount = null;
             state.error('Disconnected from account.');
-        },  
+        },
         onSessionUpdate(accounts: any) {
             state.activeAccount = accounts[0];
             state.algonaut.setWalletConnectAccount(accounts[0]);

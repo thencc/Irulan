@@ -12,6 +12,7 @@
       </div>
     </Modal>
   </div>
+  <div style="flex-grow: 1"></div>
   <div class="header-right">
     <CreateAsset />
     <Deploy />
@@ -59,11 +60,11 @@ export default defineComponent({
     CreateAsset
   },
   setup() {
-    
+
   },
   mounted() {
     state.log('The real universe is always one step beyond logic.');
-  },  
+  },
   created() {
     this.$watch(
       () => this.$route.params,
@@ -103,13 +104,13 @@ export default defineComponent({
     margin: 0;
     padding: 0;
     background-size: 800% auto;
-  
+
     color: $yellow;
     background-clip: text;
     text-fill-color: transparent;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-  
+
     animation: shine 300s linear infinite;
     @keyframes shine {
       to {
@@ -120,7 +121,7 @@ export default defineComponent({
 }
 
 .header-left {
-  flex: 1 1 50%;
+  // flex: 1 1 50%;
   display: flex;
 
   h1, .about-link {
@@ -135,7 +136,7 @@ export default defineComponent({
 
 .header-right {
   text-align: right;
-  flex: 1 1 50%;
+  // flex: 1 1 50%;
 
   button {
     margin: 5px 5px 0;
