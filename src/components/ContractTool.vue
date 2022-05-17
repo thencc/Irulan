@@ -138,11 +138,11 @@ export default defineComponent({
             const unquotedArgs = JSON.stringify(optionalFields).replace(/"([^"]+)":/g, '$1:');
 
             state.algonautJSCode = 
-`const response = await algonaut.${this.callAppArgs.operationType}(
-    ${state.currentApp.index},
-    ${JSON.stringify(args)},
-    ${unquotedArgs}
-);`;            
+`const response = await algonaut.${this.callAppArgs.operationType}({
+    appIndex: ${state.currentApp.index},
+    appArgs: ${JSON.stringify(args)},
+    optionalFields: ${unquotedArgs}
+});`;            
             
             state.log(`Calling app with args: ${JSON.stringify(this.callAppArgs)}`);
             try {
