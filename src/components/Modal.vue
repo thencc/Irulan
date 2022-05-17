@@ -44,7 +44,7 @@ export default defineComponent({
 <style lang="scss">
 @import '../assets/variables';
 .modal-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
@@ -83,8 +83,10 @@ export default defineComponent({
 
 .close-modal {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 0px;
+    top: 0px;
+    padding: 6px;
+    margin: 4px;
     cursor: pointer;
     color: $textlight;
 

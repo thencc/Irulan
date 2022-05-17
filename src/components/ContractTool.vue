@@ -2,17 +2,23 @@
 <div class="contract-tool" v-if="app">
     <div class="contract-header">
         <div class="contract-info">
-            <h2>App <span class="green link" @click="browserLink(app.index)">{{ app.index }}</span></h2>
+            <div style="display: flex; align-items: center;">
+                <h2>App <span class="green link" @click="browserLink(app.index)">{{ app.index }}</span></h2>
+                <div style="flex-grow: 1"></div>
+                <UpdateApp :app="app" />
+                <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
+            </div>
+
             <p class="metadata">
                 <span class="creator">
                     <span class="muted">Creator:</span> <span class="purple link" @click="browserLink(app.creatorAddress)">{{ app.creatorAddress }}</span>
                 </span>
             </p>
         </div>
-        <div class="contract-actions">
+        <!-- <div class="contract-actions">
             <UpdateApp :app="app" />
             <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
-        </div>
+        </div> -->
     </div>
     <div class="utilities">
         <div class="left-col">
@@ -123,10 +129,10 @@ export default defineComponent({
                 return item;
             };
 
-            const args = this.callAppArgs.operationType === 'callApp' ? 
-                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs.map(convertAppArg)) : 
+            const args = this.callAppArgs.operationType === 'callApp' ?
+                            [this.callAppArgs.methodName].concat(this.callAppArgs.appArgs.map(convertAppArg)) :
                             this.callAppArgs.appArgs.map(convertAppArg);
-            
+
             console.log(args);
 
             const optionalFields = {
@@ -148,21 +154,30 @@ export default defineComponent({
             try {
                 let res;
                 if (this.callAppArgs.operationType === 'callApp') {
-                    res = await state.algonaut.callApp({ 
-                        appIndex: state.currentApp.index, 
-                        appArgs: args, 
+                    // res = await state.algonaut.callApp({
+                    //     appIndex: state.currentApp.index,
+                    //     appArgs: args,
+                    //     optionalFields: optionalFields
+                    // });
+
+                    // defaultTxnFee test (sometime unusual fees are needed to test contract-to-contract calls where sender covers inner txn fee. this will also need to be implemented in deploy app etc)
+                    const txn = await state.algonaut.atomicCallApp({
+                        appIndex: state.currentApp.index,
+                        appArgs: args,
                         optionalFields: optionalFields
                     });
+                    txn.transaction.fee = state.defaultTxnFee;
+                    res = await state.algonaut.sendTransaction(txn);
                 } else if (this.callAppArgs.operationType === 'optInApp') {
-                    res = await state.algonaut.optInApp({ 
-                        appIndex: state.currentApp.index, 
-                        appArgs: args, 
+                    res = await state.algonaut.optInApp({
+                        appIndex: state.currentApp.index,
+                        appArgs: args,
                         optionalFields: optionalFields
                     });
                 } else if (this.callAppArgs.operationType === 'closeOutApp') {
-                    res = await state.algonaut.closeOutApp({ 
-                        appIndex: state.currentApp.index, 
-                        appArgs: args, 
+                    res = await state.algonaut.closeOutApp({
+                        appIndex: state.currentApp.index,
+                        appArgs: args,
                         optionalFields: optionalFields
                     });
                 } else {
@@ -184,7 +199,7 @@ export default defineComponent({
         async fundApp() {
             if (!this.escrowAddress || !this.fundAppAmt) return false;
             if (!state.algonaut.account) return state.error('No account connected.');
-            
+
             if (this.fundAppAmt < 1000 || window.confirm('Are you sure you want to send this many ALGO?')) {
                 this.fundAppLoading = true;
                 console.log(this.fundAppAmt);
@@ -213,7 +228,7 @@ export default defineComponent({
         async closeOut() {
             if (!state.algonaut.account) return state.error('No account connected.');
             this.closeOutLoading = true;
-            
+
             this.closeOutLoading = false;
 
         },
@@ -268,16 +283,20 @@ h2 {
 
     .contract-info {
         flex: 1 0 70%;
-    }
-    
-    .contract-actions {
-        flex: 0 0 30%;
-        text-align: right;
 
         button {
-            margin: 10px;
+            margin: 0 5px 0 10px;
         }
     }
+
+    // .contract-actions {
+    //     flex: 0 0 30%;
+    //     text-align: right;
+
+    //     button {
+    //         margin: 10px;
+    //     }
+    // }
 }
 
 .utilities {

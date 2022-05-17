@@ -14,16 +14,17 @@ const state = reactive({
     toolLoading: false,
     currentApp: {} as any,
     isAccount: false,
-    indexer: {} as any, 
+    indexer: {} as any,
     activeAccount: null as any,
     algonaut: {} as Algonaut,
     algonautJSCode: '',
+    defaultTxnFee: 1000, // 0.001 algo
 
     init: async function (config: { ledger: string, server: string, apiKey: string, apiKeyHeaderName: string, useCustomNode: boolean, port: string }) {
         this.connecting = true;
         this.connected = false;
 
-        // the 
+        // the
         let algoConfig = {
             BASE_SERVER: TESTNET_SERVER,
             LEDGER: config.ledger,
@@ -56,8 +57,8 @@ const state = reactive({
                 // if we have an account from WC, set it
                 if (this.activeAccount && localStorage.getItem('walletconnect')) {
                     // this.algonaut.setWalletConnectAccount(this.activeAccount);
-                    this.algonaut.connectAlgoWallet({ 
-                        onConnect: () => { 
+                    this.algonaut.connectAlgoWallet({
+                        onConnect: () => {
                             this.success('Set WalletConnect account: ' + this.activeAccount)
                         },
                         onDisconnect: () => {
@@ -82,11 +83,33 @@ const state = reactive({
             this.log('Loading app into contract tool...');
             this.currentApp = await this.algonaut.getAppInfo(appIndex);
             this.currentApp.balance = await this.algonaut.getAlgoBalance(this.algonaut.getAppEscrowAccount(appIndex));
+            let moreAppDeets = await this.getMoreAppData(appIndex);
+            this.currentApp.approvalDecompiled = moreAppDeets.params['decompiled-approval-program'];
+            this.currentApp.clearDecompiled = moreAppDeets.params['decompiled-clear-state-program'];
         } catch (e) {
             console.log(e);
             this.error('Error loading app.');
         }
         this.toolLoading = false;
+    },
+
+    // temp method, gets decompiled teal from algoexplorer (indexer will have decompiled get soon)
+    async getMoreAppData(appIndex: number) {
+        // `https://indexer.algoexplorerapi.io/v2/applications/740582846?include-all=true`
+        // `https://indexer.testnet.algoexplorerapi.io/v2/applications/740582846?include-all=true`
+        const url = `https://indexer${this.algonaut.config?.LEDGER == 'testnet' ? '.testnet' : ''}.algoexplorerapi.io/v2/applications/${appIndex}?include-all=true`;
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error('err getMoreAppData res');
+        }
+        const json = await res.json();
+        // console.log('json', json);
+
+        const app = json.application;
+        if (!app) {
+            throw new Error('err getMoreAppData no app');
+        }
+        return app;
     },
 
     /**
@@ -162,11 +185,11 @@ const state = reactive({
         this.terminal.unshift({ type: 'error', message });
     },
 
-    log: function(message: string) {
+    log: function (message: string) {
         this.terminal.unshift({ type: 'normal', message });
     },
 
-    logRoute: function(message: string, route: string) {
+    logRoute: function (message: string, route: string) {
         this.terminal.unshift({ type: 'link', message, route });
     },
 
