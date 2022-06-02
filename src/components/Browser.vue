@@ -194,6 +194,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import state from '../state';
+import { bus } from '../bus';
 import Modal from './Modal.vue';
 
 export default defineComponent({
@@ -212,16 +213,28 @@ export default defineComponent({
         this.$watch(
             () => this.$route.params,
             (toParams: any) => {
-                if (this.$route.name === 'search' || this.$route.name === 'full') {
-                    this.setSearch(toParams.query);
-                }
-                if (this.$route.name === 'contract' || this.$route.name === 'full') {
-                    this.loadApp(parseInt(toParams.contractId));
-                }
+                this.handleParams();
             }
-        )
+        );
+
+        bus.on('signed-in', this.signedInHandler);
+    },
+    beforeUnmount() {
+        bus.off('signed-in', this.signedInHandler);
     },
     methods: {
+        signedInHandler() {
+            this.handleParams();
+        },
+        handleParams() {
+            // happens on page load, route updates + AFTER auth (to get local vars of app for ex)
+            if (this.$route.name === 'search' || this.$route.name === 'full') {
+                this.setSearch(this.$route.params.query);
+            }
+            if (this.$route.name === 'contract' || this.$route.name === 'full') {
+                this.loadApp(parseInt(this.$route.params.contractId as string));
+            }
+        },
         loadApp(appIndex: number) {
             this.$router.push(state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query }));
             state.loadApp(appIndex);

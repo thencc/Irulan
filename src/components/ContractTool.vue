@@ -69,6 +69,7 @@
                 <p class="small muted">Click to copy</p>
                 <pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
             </div>
+            <AppLogsModule :app-id="app.index" />
         </div>
     </div>
 </div>
@@ -80,8 +81,15 @@ import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
 import { copyText } from 'vue3-clipboard';
 import UpdateApp from './UpdateApp.vue';
+import AppLogsModule from './ContractModules/AppLogsModule.vue';
 
 export default defineComponent({
+    components: {
+        ArrayField,
+        LoadingButton,
+        UpdateApp,
+        AppLogsModule
+    },
     data() {
         return {
             state,
@@ -266,10 +274,8 @@ export default defineComponent({
                 }
             });
         }
-    },
-    components: { ArrayField, LoadingButton, UpdateApp }
-})
-
+    }
+});
 </script>
 <style lang="scss" scoped>
 @import '../assets/variables';
@@ -309,7 +315,7 @@ h2 {
 
     .left-col, .right-col {
         flex: 1 1 45%;
-        margin: 5px;
+        margin: 0 5px;
     }
 }
 
