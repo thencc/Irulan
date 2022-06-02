@@ -1,11 +1,18 @@
 <template>
     <div class="field" v-for="(field, index) in modelValue" xxkey="field.value.toString()" :key="index">
         <input type="text" v-model="field.value" :placeholder="placeholder" nothingenter="updateField(index, field)" :ref="index === modelValue.length-1 ? 'lastItem' : ''" />
-        <button style="position: absolute; top: 0; right: 0;" class="btn-link" @click.stop="removeField(index)">X</button>
+        <button class="delete-button btn-link" @click.stop="removeField(index)">X</button>
     </div>
     <div class="add-new-field">
         <span class="muted small">Add new: </span>
-        <input type="text" v-model="newField.value" :placeholder="placeholder" @keyup.enter.stop="addField(newField)" :ref="'lastItem-2'">
+        <input
+            v-model="newField.value"
+            type="text"
+            :placeholder="placeholder"
+            :ref="'lastItem-2'"
+            @keyup.enter.stop="addField(newField)"
+        >
+        <div v-show="newField.value.length" class="add-icon" @click.stop="addField(newField)">+</div>
     </div>
     <!-- <button @click.stop="removeField(modelValue.length - 1)">X remove last</button> -->
 </template>
@@ -81,10 +88,39 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "../assets/_variables";
 
+.add-new-field {
+    display: flex;
+    align-items: center;
+}
+.add-new-field > input {
+    margin: 0 4px;
+    padding-right: 26px;
+}
 .field {
-    position: relative
+    position: relative;
+    margin-bottom: 1px;
 }
 .field input {
     width: 100%;
+}
+.add-icon {
+    color: rgba(255,255,255,0.5);
+    font-size: 16px;
+    transform: translateX(-30px);
+    padding: 8px;
+    cursor: pointer;
+}
+.add-icon:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+.delete-button {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    color: rgba(255,255,255,0.5);
+}
+.delete-button:hover {
+    color: rgba(255, 255, 255, 1);
 }
 </style>

@@ -219,7 +219,7 @@ export default defineComponent({
                     this.loadApp(parseInt(toParams.contractId));
                 }
             }
-        )        
+        )
     },
     methods: {
         loadApp(appIndex: number) {
@@ -232,7 +232,7 @@ export default defineComponent({
         },
         decode (s: string) {
             return state.algonaut.fromBase64(s);
-        },  
+        },
         async search () {
             const route = state.getNewRoute(this.$route, { query: this.query });
             this.$router.push(route);

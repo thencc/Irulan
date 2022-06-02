@@ -39,7 +39,7 @@ import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
 import state from '../state';
-import { approvalProgram, clearProgram, schema } from './deploy-test';
+// import { approvalProgram, clearProgram, schema } from './deploy-test';
 
 // uncomment to load test contract
 // const TESTDATA = true;
@@ -70,11 +70,11 @@ export default defineComponent({
         }
     },
     mounted () {
-        if (TESTDATA) {
-            this.deployArgs.approvalProgram = approvalProgram;
-            this.deployArgs.clearStateProgram = clearProgram;
-            this.deployArgs.schema = schema;
-        }
+        // if (TESTDATA) {
+        //     this.deployArgs.approvalProgram = approvalProgram;
+        //     this.deployArgs.clearStateProgram = clearProgram;
+        //     this.deployArgs.schema = schema;
+        // }
     },
     methods: {
         close () {
@@ -141,7 +141,7 @@ export default defineComponent({
                     }
 
                     state.success('Successfully deployed! App ID: ' + appId);
-                    
+
                     this.close();
 
                     if (appId) {
