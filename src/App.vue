@@ -1,5 +1,6 @@
 <template>
-
+  <router-view></router-view>
+<!--
 <header class="header">
   <div class="header-left">
     <h1>Irulan</h1>
@@ -31,7 +32,7 @@
     <div class="footer-actions">
     </div>
   </div>
-</main>
+</main> -->
 
 </template>
 

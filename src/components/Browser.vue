@@ -92,19 +92,19 @@
                         </tr>
                         <tr>
                             <td class="key">Creator</td>
-                            <td><a href="" style="" @click.prevent="setSearch(response.object.params.creator)" class="purple">{{ response.object.params.creator }}</a></td>
+                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.creator)">{{ response.object.params.creator }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Manager</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.manager)" class="purple">{{ response.object.params.manager }}</a></td>
+                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.manager)">{{ response.object.params.manager }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Clawback</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.clawback)" class="purple">{{ response.object.params.clawback }}</a></td>
+                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.clawback)">{{ response.object.params.clawback }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Reserve</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.reserve)" class="purple">{{ response.object.params.reserve }}</a></td>
+                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.reserve)">{{ response.object.params.reserve }}</a></td>
                         </tr>
                     </table>
                 </div>
@@ -408,9 +408,9 @@ $space: 10px;
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
-    max-width: 460px;
-    overflow-x: scroll;
-    display: block; /* enables width sizing */
+    // max-width: 460px;
+    // overflow-x: scroll;
+    // display: block; /* enables width sizing */
 
     tr.browser-table-heading {
         background-color: $bg;
@@ -438,6 +438,24 @@ $space: 10px;
 
         &.key {
             color: $yellow;
+        }
+
+        a.long-cell {
+            display: block;
+            max-width: 240px;
+            overflow-x: scroll;
+
+            padding-right: 16px;
+            mask-image: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0) 0px,
+                black 16px
+            );
+            -webkit-mask-image: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0) 0px,
+                black 16px
+            );
         }
     }
 }

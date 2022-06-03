@@ -1,26 +1,15 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import VueClipboard from 'vue3-clipboard';
-import { createRouter, createWebHistory } from 'vue-router';
-
+// app
+import { createApp } from 'vue';
+import App from './App.vue';
 const app = createApp(App);
 
+// clipboard
+import VueClipboard from 'vue3-clipboard';
 app.use(VueClipboard, {});
 
-const router = createRouter({
-    history: createWebHistory(),
-    routes: [{
-        name: 'home', path: '/:ledger', component: App,
-    }, {
-        name: 'search', path: '/:ledger/s/:query', component: App
-    }, {
-        name: 'contract', path: '/:ledger/contract/:contractId', component: App
-    }, {
-        name: 'full', path: '/:ledger/contract/:contractId/s/:query', component: App
-    }]
-});
-
+// router
+import router from './router';
 app.use(router);
 
-
-app.mount('#app')
+// mount to dom
+app.mount('#app');
