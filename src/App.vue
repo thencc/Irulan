@@ -149,7 +149,7 @@ export default defineComponent({
 
 
 .actions button {
-  margin: 5px 5px 0 5px;
+  margin: 5px 0px 0 10px;
 
   &:last-child {
     margin-right: 0;
@@ -188,7 +188,8 @@ header {
   }
 
   .right-col {
-    flex: 1 0 60%;
+    // flex: 1 0 60%;
+    flex: 1 0 min-content;
 
     .module {
       margin-left: 0;

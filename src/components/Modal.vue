@@ -68,6 +68,7 @@ export default defineComponent({
 }
 
 .modal {
+    max-height: 98%;
     background-color: $bg;
     margin: 0 auto;
     padding: 10px;
@@ -75,6 +76,12 @@ export default defineComponent({
     display: block;
     text-align: left;
     z-index: 200;
+
+    .modal-content {
+        overflow-y: scroll;
+        // computed: 100vh - modal margin - title - actions fotter
+        max-height: 80vh;
+    }
 
     .modal-content, .modal-title {
         text-align: left;
