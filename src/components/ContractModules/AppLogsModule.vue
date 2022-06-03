@@ -6,28 +6,41 @@
 				<label for="onlyMyLogs">only my logs?</label>
 			</div>
 			<div>
-				<input v-model.number="options.minRound" type="number" id="minRound">
+				<input v-model.number="options.minRound" :placeholder="roundAtLoad.toString()" type="number" id="minRound">
 				<label for="minRound">min round</label>
 			</div>
 			<div>
-				<input v-model.number="options.maxRound" type="number" id="maxRound">
+				<input v-model.number="options.maxRound" :placeholder="roundAtLoad.toString()" type="number" id="maxRound">
 				<label for="maxRound">max round</label>
 			</div>
 			<div>
 				<input v-model="options.txId" type="text" id="txId">
 				<label for="txId">only this txn</label>
 			</div>
+			<div>
+				<span>
+					decode as
+				</span>
+				<select name="decodeAs" id="decodeAs">
+					<option value="string">
+						string
+					</option>
+					<option value="addr">
+						addr
+					</option>
+				</select>
+			</div>
 		</div>
 
 		<div style="display: flex;">
 			<button @click="getAppLogs">
-				getAppLogs
+				get logs
 			</button>
 			<button @click="startLogsWatcher">
-				startLogsWatcher
+				start
 			</button>
 			<button @click="stopLogsWatcher">
-				stopLogsWatcher
+				stop
 			</button>
 		</div>
 
@@ -39,7 +52,7 @@
 					class="log-txn"
 				>
 					<div style="text-align: left;" class="line">
-						<b>
+						<b style="color: aqua">
 							{{ t.txid }}
 						</b>
 					</div>
@@ -49,6 +62,7 @@
 						class="line"
 						style="text-align: right;"
 					>
+						{{ iL + 1 }}.
 						{{ getReadable(l) }}
 					</div>
 				</div>
@@ -81,18 +95,20 @@ export default defineComponent({
     data() {
 		return {
 			options: {
-				onlyMyLogs: false,
+				onlyMyLogs: true,
 				minRound: null as null | number,
 				maxRound: null as null | number,
 				txId: ''
 			},
-			logTxns: [] as LogEntry[]
+			logTxns: [] as LogEntry[],
+			roundAtLoad: 0
 		}
 	},
 	async mounted() {
 
 		// default minRound to currentRound
-		this.options.minRound = await this.getCurrentRound();
+		// this.options.minRound = await this.getCurrentRound();
+		this.roundAtLoad = await this.getCurrentRound();
 	},
 	methods: {
 		async getCurrentRound() {
@@ -101,7 +117,7 @@ export default defineComponent({
 		},
 		async startLogsWatcher() {
 			console.log('startLogsWatcher');
-			console.warn('TODO');
+			console.warn('TODO intervaled get logs');
 
 			// interval + disable changing options while running
 			// this.getAppLogs();
@@ -122,24 +138,41 @@ export default defineComponent({
 				return;
 			}
 
-			// ex app 93272663 w logs
-			// minRoud = 21924461
-
-			if (!this.options.minRound) {
-				console.warn('you have to set minRound');
+			// ok to get?
+			if (
+				!this.options.onlyMyLogs &&
+				!this.options.minRound &&
+				!this.options.maxRound &&
+				!this.options.txId
+			) {
+				console.warn('need some filter set');
+				alert('some log filters must be set');
 				return;
 			}
 
-			let logsReq = state.algonaut.indexerClient.lookupApplicationLogs(this.appId)
-				.minRound(this.options.minRound);
+			// ex app 93272663 w logs
+			// minRoud = 21924461
 
-			// options
+			let logsReq = state.algonaut.indexerClient.lookupApplicationLogs(this.appId);
+
 			if (this.options.onlyMyLogs) {
 				if (state.algonaut.account) {
 					logsReq = logsReq.sender(state.algonaut.account.addr);
 				} else {
 					alert('you are not logged in, cannot show only my logs...')
 				}
+			}
+
+			if (this.options.minRound) {
+				logsReq = logsReq.minRound(this.options.minRound);
+			}
+
+			if (this.options.maxRound) {
+				logsReq = logsReq.maxRound(this.options.maxRound);
+			}
+
+			if (this.options.txId) {
+				logsReq = logsReq.txid(this.options.txId);
 			}
 
 			const appLogs = await logsReq.do();
@@ -154,8 +187,12 @@ export default defineComponent({
 			this.logTxns = logData as LogEntry[];
 		},
 		getReadable(logVal: string) {
-			return state.algonaut.fromBase64(logVal);
-			// return state.algonaut.fromBase64(logVal.substring(8));
+			let addr = state.algonaut.valueAsAddr(logVal);
+			// console.log(addr);
+			let str = state.algonaut.fromBase64(logVal);
+			// console.log(str);
+
+			return `${addr} | ${str}`;
 		}
 	}
 })
@@ -174,13 +211,17 @@ export default defineComponent({
 }
 
 .code-block {
+	width: 100%;
+	overflow-x: scroll;
+	word-break: break-all;
 	display: flex;
 	flex-direction: column;
     background: #18171a;
     padding: 5px;
+	font-size: 11px;
 }
 .log-txn {
-	padding: 4px 0;
+	padding: 8px 0;
 }
 .code-block .line {
 	/* height: 14px; */

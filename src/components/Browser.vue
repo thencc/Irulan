@@ -16,7 +16,17 @@
                         {{ response.type === 'account' ? response.object.address.substring(0, 20) + '...' : response.object.index }}
                     </span>
                 </h2>
-                <p v-if="response.object.creatorAddress">Creator: <a href="" class="purple" @click.prevent="setSearch(response.object.creatorAddress)">{{ response.object.creatorAddress.substring(0, 20) }}...</a></p>
+                <p
+                    v-if="response.object.creatorAddress">
+                    Creator:
+                    <a
+                        href=""
+                        class="purple"
+                        @click.prevent="setSearch(response.object.creatorAddress)"
+                    >
+                        {{ utils.shortAddr(response.object.creatorAddress) }}
+                    </a>
+                </p>
                 <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button>
 
                 <div class="app" v-if="response.type === 'app'">
@@ -197,6 +207,8 @@ import state from '../state';
 import { bus } from '../bus';
 import Modal from './Modal.vue';
 
+import * as utils from '../utils';
+
 export default defineComponent({
     components: {
         Modal
@@ -204,6 +216,7 @@ export default defineComponent({
     data() {
         return {
             state,
+            utils,
             response: null as any,
             query: '',
             searching: false
