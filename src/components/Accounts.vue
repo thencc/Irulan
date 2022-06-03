@@ -8,7 +8,12 @@
             </div>
         </form>
         <div class="module-content" v-if="acct">
-            <AlgoLink type="address" :address="acct.address">View account on AlgoExplorer</AlgoLink>
+            <AlgoLink
+                type="address"
+                :address="acct.address"
+            >
+                View account on AlgoExplorer
+            </AlgoLink>
             <table>
                 <tr v-if="acct">
                     <td>Balance</td>
@@ -87,7 +92,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue' 
+import { defineComponent } from 'vue'
 import state from '../state';
 import AlgoLink from './AlgoLink.vue';
 
@@ -96,7 +101,7 @@ export default defineComponent({
         AlgoLink
     },
     data() {
-        return { 
+        return {
              address: '',
              loading: false,
              acct: null,
@@ -133,7 +138,7 @@ export default defineComponent({
     display: flex;
     width: 100%;
 
-    button { 
+    button {
         font-size: 0.7em;
     }
 

@@ -13,7 +13,10 @@
             <div class="object" v-if="response.object">
                 <h2>{{ response.type }}
                     <span :class="response.type === 'account' ? 'purple' : 'green'">
-                        {{ response.type === 'account' ? response.object.address.substring(0, 20) + '...' : response.object.index }}
+                        {{ response.type === 'account'
+                            ? utils.shortAddr(response.object.address)
+                            : response.object.index
+                        }}
                     </span>
                 </h2>
                 <p
@@ -89,19 +92,19 @@
                         </tr>
                         <tr>
                             <td class="key">Creator</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.creator)" class="purple">{{ response.object.params.creator.substring(0, 20) }}...</a></td>
+                            <td><a href="" style="" @click.prevent="setSearch(response.object.params.creator)" class="purple">{{ response.object.params.creator }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Manager</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.manager)" class="purple">{{ response.object.params.manager.substring(0, 20) }}...</a></td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.manager)" class="purple">{{ response.object.params.manager }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Clawback</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.clawback)" class="purple">{{ response.object.params.clawback.substring(0, 20) }}...</a></td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.clawback)" class="purple">{{ response.object.params.clawback }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Reserve</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.reserve)" class="purple">{{ response.object.params.reserve.substring(0, 20) }}...</a></td>
+                            <td><a href="" @click.prevent="setSearch(response.object.params.reserve)" class="purple">{{ response.object.params.reserve }}</a></td>
                         </tr>
                     </table>
                 </div>
@@ -133,7 +136,15 @@
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
-                            <td v-if="asset.creator"><a href="" @click.prevent="setSearch(asset.creator)" class="purple">{{ asset.creator.substring(0, 20) }}...</a></td>
+                            <td v-if="asset.creator">
+                                <a
+                                    href=""
+                                    class="purple"
+                                    @click.prevent="setSearch(asset.creator)"
+                                >
+                                    {{ utils.shortAddr(asset.creator) }}
+                                </a>
+                            </td>
                         </tr>
                     </table>
 
@@ -397,6 +408,10 @@ $space: 10px;
     border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
+    max-width: 460px;
+    overflow-x: scroll;
+    display: block; /* enables width sizing */
+
     tr.browser-table-heading {
         background-color: $bg;
 

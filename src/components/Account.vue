@@ -8,7 +8,12 @@
             <div class="account-options" v-if="page === 'options'">
                 <div v-if="state.activeAccount">
                     <p class="green">You are already connected to an account (click to copy):</p>
-                    <p class="purple copy-account" @click="copyAccount">{{ state.activeAccount.substring(0, 20) }}...</p>
+                    <p
+                        class="purple copy-account"
+                        @click="copyAccount"
+                    >
+                        {{ utils.shortAddr(state.activeAccount) }}
+                    </p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
                     <button
                         v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'"
@@ -92,6 +97,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import state from '../state';
+import * as utils from '../utils';
 import Modal from './Modal.vue';
 import { copyText } from 'vue3-clipboard';
 import CryptoJS from 'crypto-js';
@@ -112,6 +118,7 @@ export default defineComponent({
     data() {
         return {
             state,
+            utils,
             showModal: false,
             showRecover: false,
             loginPasscode: '',
@@ -150,7 +157,7 @@ export default defineComponent({
     computed: {
         accountDisplay () {
             if (state.activeAccount && state.activeAccount.length) {
-                return state.activeAccount.toString().substring(0, 20) + '...';
+                return utils.shortAddr(state.activeAccount);
             }
         },
         savedWallet() {

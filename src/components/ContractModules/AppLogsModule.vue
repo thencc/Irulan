@@ -101,7 +101,9 @@ export default defineComponent({
 				txId: ''
 			},
 			logTxns: [] as LogEntry[],
-			roundAtLoad: 0
+
+			roundAtLoad: 0,
+			roundCurrent: 0,
 		}
 	},
 	async mounted() {
@@ -109,6 +111,7 @@ export default defineComponent({
 		// default minRound to currentRound
 		// this.options.minRound = await this.getCurrentRound();
 		this.roundAtLoad = await this.getCurrentRound();
+		this.roundCurrent = this.roundAtLoad;
 	},
 	methods: {
 		async getCurrentRound() {

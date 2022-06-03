@@ -11,7 +11,13 @@
 
             <p class="metadata">
                 <span class="creator">
-                    <span class="muted">Creator:</span> <span class="purple link" @click="browserLink(app.creatorAddress)">{{ app.creatorAddress }}</span>
+                    <span class="muted">Creator: </span>
+                        <span
+                            class="purple link"
+                            @click="browserLink(app.creatorAddress)"
+                        >
+                            {{ utils.shortAddr(app.creatorAddress) }}
+                        </span>
                 </span>
             </p>
         </div>
@@ -58,7 +64,15 @@
                 <h3>Fund App</h3>
                 <p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
                 <form @submit.prevent="fundApp">
-                    <p class="small muted">Escrow address: <span class="purple link" @click="browserLink(escrowAddress || '')">{{ escrowAddress }}</span></p>
+                    <p v-if="escrowAddress" class="small muted">
+                        <span>Escrow address: </span>
+                        <span
+                            class="purple link"
+                            @click="browserLink(escrowAddress || '')"
+                        >
+                            {{ utils.shortAddr(escrowAddress) }}
+                        </span>
+                    </p>
                     <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
                     <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
                     <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
@@ -77,6 +91,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import state from '../state';
+import * as utils from '../utils';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
 import { copyText } from 'vue3-clipboard';
@@ -93,6 +108,7 @@ export default defineComponent({
     data() {
         return {
             state,
+            utils,
             callAppArgs: {
                 operationType: 'callApp',
                 methodName: '',
