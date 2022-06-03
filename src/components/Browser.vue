@@ -260,7 +260,10 @@ export default defineComponent({
             }
         },
         loadApp(appIndex: number) {
-            this.$router.push(state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query }));
+            console.log('loadApp', appIndex);
+            this.$router.push(
+                state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query })
+            );
             state.loadApp(appIndex);
         },
         setSearch(query: any) {
@@ -271,6 +274,7 @@ export default defineComponent({
             return state.algonaut.fromBase64(s);
         },
         async search () {
+            console.log('search');
             const route = state.getNewRoute(this.$route, { query: this.query });
             this.$router.push(route);
             this.searching = true;
@@ -445,18 +449,21 @@ $space: 10px;
             max-width: 240px;
             overflow-x: scroll;
 
-            padding-right: 16px;
+            padding-right: 10px;
+            margin-right: -10px;
             mask-image: linear-gradient(
                 to left,
                 rgba(0, 0, 0, 0) 0px,
-                black 16px
+                black 10px
             );
             -webkit-mask-image: linear-gradient(
                 to left,
                 rgba(0, 0, 0, 0) 0px,
-                black 16px
+                black 10px
             );
         }
     }
+
+
 }
 </style>

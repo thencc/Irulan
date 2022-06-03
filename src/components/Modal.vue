@@ -11,6 +11,13 @@ import { defineComponent, ref } from 'vue';
 import { useKeypress } from 'vue3-keypress';
 
 export default defineComponent({
+    props: {
+        show: Boolean,
+        width: {
+            type: String,
+            default: '40%'
+        }
+    },
     setup(props, ctx) {
         const onEsc = function () {
             ctx.emit('close');
@@ -26,23 +33,17 @@ export default defineComponent({
             ]
         })
     },
-
-    props: {
-        show: Boolean,
-        width: {
-            type: String,
-            default: '40%'
-        }
-    },
     methods: {
         close (data?: any) {
             this.$emit('close', data);
         }
     }
-})
+});
 </script>
+
 <style lang="scss">
 @import '../assets/variables';
+
 .modal-overlay {
     position: fixed;
     top: 0;

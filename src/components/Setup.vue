@@ -78,8 +78,8 @@ export default defineComponent({
     },
     watch: {
         $route(to, from) {
-            // if (to.params && to.params.ledger && 
-            //     from.params && from.params.ledger && 
+            // if (to.params && to.params.ledger &&
+            //     from.params && from.params.ledger &&
             //     to.params.ledger !== from.params.ledger) {
             //         console.log(`We were at ${from.params.ledger}, now we are at ${to.params.ledger}`)
             //         // if we came from a different ledger, update settings
@@ -90,6 +90,7 @@ export default defineComponent({
     },
     methods: {
         async applySettings () {
+            console.log('applySettings');
             // we don't want to check the URL if we are applying settings from the modal
             const path = window.location.pathname.toLowerCase()
             let urlLedger;
@@ -108,11 +109,16 @@ export default defineComponent({
             await state.init(this.config);
 
             this.$router.replace({
+                ...this.$route, // makes sure hash stays in URL
                 name: this.$route.name || 'home',
                 params: {
+                    ...this.$route.params, // makes sure OTHER params stay in URL
                     ledger: this.config.ledger,
                     query: this.$route.params.query || undefined,
                     conract: this.$route.params.contract || undefined
+                },
+                query: {
+                    ...this.$route.query, // makes sure OTHER query params still in URL
                 }
             });
             this.showSetup = false;

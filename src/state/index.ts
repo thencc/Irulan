@@ -1,7 +1,9 @@
 import { reactive, watch } from 'vue';
 import Algonaut from 'algonaut.js';
+import { bus } from '../bus';
 
-import { bus } from './bus';
+// modular states
+import { sModal } from './modules/sModal';
 
 const TESTNET_SERVER = 'https://twinfrogs.ncc.la/atn';
 const TESTNET_APIKEY = '494d49c48f0f55f5d25d86fabb17bee8fbfcbf818ba257670f4ea076672e0fe2';
@@ -9,6 +11,9 @@ const MAINNET_SERVER = 'https://twinfrogs.ncc.la/amn';
 const MAINNET_APIKEY = '3fd53de10f0e2e2b24c4b3a30525a4c94c9b86d7ba9aba64bee01b00ae8b4cc9';
 
 const state = reactive({
+    // modules
+    sModal,
+
     terminal: [] as { type: string, message: string, route?: string }[],
     connected: false,
     connecting: false,
