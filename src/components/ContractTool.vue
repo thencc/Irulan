@@ -1,92 +1,117 @@
 <template>
-<div class="contract-tool" v-if="app">
-    <div class="contract-header">
-        <div class="contract-info">
-            <div style="display: flex; align-items: center;">
-                <h2>App <span class="green link" @click="browserLink(app.index)">{{ app.index }}</span></h2>
-                <div style="flex-grow: 1"></div>
-                <UpdateApp :app="app" />
-                <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
-            </div>
+    <div class="contract-tool" v-if="app">
+        <div class="contract-header">
+            <div class="contract-info">
+                <div style="display: flex; align-items: center;">
+                    <h2>App <span class="green link" @click="browserLink(app.index)">{{ app.index }}</span></h2>
+                    <div style="flex-grow: 1"></div>
+                    <UpdateApp :app="app" />
+                    <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App
+                    </LoadingButton>
+                </div>
 
-            <p class="metadata">
-                <span class="creator">
-                    <span class="muted">Creator: </span>
-                        <span
-                            class="purple link"
-                            @click="browserLink(app.creatorAddress)"
-                        >
+                <p class="metadata">
+                    <span class="creator">
+                        <span class="muted">Creator: </span>
+                        <span class="purple link" @click="browserLink(app.creatorAddress)">
                             {{ utils.shortAddr(app.creatorAddress) }}
                         </span>
-                </span>
-            </p>
-        </div>
-        <!-- <div class="contract-actions">
+                    </span>
+                </p>
+            </div>
+            <!-- <div class="contract-actions">
             <UpdateApp :app="app" />
             <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">Delete App</LoadingButton>
         </div> -->
-    </div>
-    <div class="utilities">
-        <div class="left-col">
-            <div class="utility call-app">
-                <h3>App Operations</h3>
-                <!-- <form @submit.prevent="callApp"> -->
-                <div>
-                    Transaction type:
-                    <select
-                        v-model="callAppArgs.operationType"
-                        name="operationType"
-                        id="operationType"
-                    >
-                        <option value="callApp">Call App</option>
-                        <option value="optInApp">Opt-In App</option>
-                        <option value="closeOutApp">Close Out App</option>
-                    </select>
-                    <div class="method-name" v-if="callAppArgs.operationType === 'callApp'">
-                        <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
-                        <p class="small muted">(method name gets prepended to arguments array)</p>
+        </div>
+        <div class="utilities">
+            <div class="left-col">
+                <div class="utility call-app">
+                    <h3>App Operations</h3>
+                    <!-- <form @submit.prevent="callApp"> -->
+                    <div>
+                        Transaction type:
+                        <select v-model="callAppArgs.operationType" name="operationType" id="operationType">
+                            <option value="callApp">Call App</option>
+                            <option value="optInApp">Opt-In App</option>
+                            <option value="closeOutApp">Close Out App</option>
+                        </select>
+                        <div class="method-name" v-if="callAppArgs.operationType === 'callApp'">
+                            <p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
+                            <p class="small muted">(method name gets prepended to arguments array)</p>
+                        </div>
+                        <h4 class="purple">
+                            <span>
+                                Arguments
+                            </span>
+                            <span v-if="callAppArgs.appArgs.length" class="small muted">
+                                ({{callAppArgs.appArgs.length}})
+                            </span>
+                        </h4>
+                        <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
+                        <h4 class="purple">
+                            <span>
+                                Accounts
+                            </span>
+                            <span v-if="callAppArgs.accounts.length" class="small muted">
+                                ({{ callAppArgs.accounts.length}})
+                            </span>
+                        </h4>
+                        <ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
+                        <h4 class="purple">
+                            <span>
+                                Foreign Applications
+                            </span>
+                            <span v-if="callAppArgs.applications.length" class="small muted">
+                                ({{ callAppArgs.applications.length}})
+                            </span>
+                        </h4>
+                        <ArrayField v-model="callAppArgs.applications" :placeholder="'Add app ID'" />
+                        <h4 class="purple">
+                            <span>
+                                Foreign Assets
+                            </span>
+                            <span v-if="callAppArgs.assets.length" class="small muted">
+                                ({{ callAppArgs.assets.length}})
+                            </span>
+                        </h4>
+                        <ArrayField v-model="callAppArgs.assets" :placeholder="'Add app ID'" />
+                        <p class="align-right">
+                            <LoadingButton @click="callApp" type="submit" :loading="callAppLoading">Call App
+                            </LoadingButton>
+                        </p>
                     </div>
-                    <h4 class="purple">Arguments</h4>
-                    <ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
-                    <h4 class="purple">Accounts</h4>
-                    <ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
-                    <h4 class="purple">Foreign Applications</h4>
-                    <ArrayField v-model="callAppArgs.applications" :placeholder="'Add app ID'" />
-                    <h4 class="purple">Foreign Assets</h4>
-                    <ArrayField v-model="callAppArgs.assets" :placeholder="'Add app ID'" />
-                    <p class="align-right"><LoadingButton @click="callApp" type="submit" :loading="callAppLoading">Call App</LoadingButton></p>
+                    <!-- </form> -->
                 </div>
-                <!-- </form> -->
             </div>
-        </div>
-        <div class="right-col">
-            <div class="utility fund-app">
-                <h3>Fund App</h3>
-                <p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
-                <form @submit.prevent="fundApp">
-                    <p v-if="escrowAddress" class="small muted">
-                        <span>Escrow address: </span>
-                        <span
-                            class="purple link"
-                            @click="browserLink(escrowAddress || '')"
-                        >
-                            {{ utils.shortAddr(escrowAddress) }}
-                        </span>
-                    </p>
-                    <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send" :disabled="fundAppLoading"></p>
-                    <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
-                    <p class="align-right"><LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton></p>
-                </form>
+            <div class="right-col">
+                <div class="utility fund-app">
+                    <h3>Fund App</h3>
+                    <p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
+                    <form @submit.prevent="fundApp">
+                        <p v-if="escrowAddress" class="small muted">
+                            <span>Escrow address: </span>
+                            <span class="purple link" @click="browserLink(escrowAddress || '')">
+                                {{ utils.shortAddr(escrowAddress) }}
+                            </span>
+                        </p>
+                        <p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send"
+                                :disabled="fundAppLoading"></p>
+                        <!-- <p class="align-right"><button type="submit">Fund App</button></p> -->
+                        <p class="align-right">
+                            <LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton>
+                        </p>
+                    </form>
+                </div>
+                <div class="utility algonaut-code">
+                    <h3>Algonaut.js Code</h3>
+                    <p class="small muted">Click to copy</p>
+                    <pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
+                </div>
+                <AppLogsModule :app-id="app.index" />
             </div>
-            <div class="utility algonaut-code">
-                <h3>Algonaut.js Code</h3>
-                <p class="small muted">Click to copy</p>
-                <pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
-            </div>
-            <AppLogsModule :app-id="app.index" />
         </div>
     </div>
-</div>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'

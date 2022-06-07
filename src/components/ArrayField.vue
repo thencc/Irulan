@@ -1,7 +1,26 @@
 <template>
-    <div class="field" v-for="(field, index) in modelValue" xxkey="field.value.toString()" :key="index">
-        <input type="text" v-model="field.value" :placeholder="placeholder" nothingenter="updateField(index, field)" :ref="index === modelValue.length-1 ? 'lastItem' : ''" />
-        <button class="delete-button btn-link" @click.stop="removeField(index)">X</button>
+    <div
+        v-for="(field, index) in modelValue"
+        :key="index"
+        xxkey="field.value.toString()"
+        class="field"
+        >
+        <div class="field-label">
+            {{ index }}.
+        </div>
+        <input
+            v-model="field.value"
+            type="text"
+            :placeholder="placeholder"
+            nothingenter="updateField(index, field)"
+            :ref="index === modelValue.length-1 ? 'lastItem' : ''"
+        />
+        <button
+            class="delete-button btn-link"
+            @click.stop="removeField(index)"
+        >
+            X
+        </button>
     </div>
     <div class="add-new-field">
         <span class="muted small">Add new: </span>
@@ -101,7 +120,9 @@ export default defineComponent({
     margin-bottom: 1px;
 }
 .field input {
-    width: 100%;
+    // width: 100%;
+    width: calc(100% - 20px);
+    margin-left: 20px;
 }
 .add-icon {
     color: rgba(255,255,255,0.5);
@@ -113,7 +134,17 @@ export default defineComponent({
 .add-icon:hover {
     color: rgba(255, 255, 255, 1);
 }
-
+.field-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    line-height: 40px;
+    font-size: 85%;
+    color: #777079;
+    text-align: right;
+    padding-right: 2px;
+    width: 20px;
+}
 .delete-button {
     position: absolute;
     top: 2px;

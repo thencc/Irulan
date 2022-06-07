@@ -1,72 +1,134 @@
 <template>
-    <BaseModule title="App Logs">
-		<div class="log-options">
-			<div style="display: flex; align-items: center; padding: 4px 0;">
-				<input v-model="options.onlyMyLogs" type="checkbox" id="onlyMyLogs">
-				<label for="onlyMyLogs">only my logs?</label>
-			</div>
-			<div>
-				<input v-model.number="options.minRound" :placeholder="roundAtLoad.toString()" type="number" id="minRound">
-				<label for="minRound">min round</label>
-			</div>
-			<div>
-				<input v-model.number="options.maxRound" :placeholder="roundAtLoad.toString()" type="number" id="maxRound">
-				<label for="maxRound">max round</label>
-			</div>
-			<div>
-				<input v-model="options.txId" type="text" id="txId">
-				<label for="txId">only this txn</label>
-			</div>
-			<div>
-				<span>
-					decode as
-				</span>
-				<select name="decodeAs" id="decodeAs">
-					<option value="string">
-						string
-					</option>
-					<option value="addr">
-						addr
-					</option>
-				</select>
-			</div>
-		</div>
-
-		<div style="display: flex;">
-			<button @click="getAppLogs">
-				get logs
-			</button>
-			<button @click="startLogsWatcher">
-				start
-			</button>
-			<button @click="stopLogsWatcher">
-				stop
+	<BaseModule title="App Logs">
+		<div class="tab-items">
+			<button v-for="t of tabItems" :class="`tab-item ${tabActive == t.id ? 'active' : ''}`"
+				@click="tabActive = t.id">
+				{{ t.text }}
 			</button>
 		</div>
 
-		<div class="logs-output">
-			<div class="code-block">
-				<div
-					v-for="(t, iT) of logTxns"
-					:key="t.txid"
-					class="log-txn"
-				>
-					<div style="text-align: left;" class="line">
-						<b style="color: aqua">
-							{{ t.txid }}
-						</b>
+		<div class="tab-content">
+			<template v-if="tabActive == 'realtime'">
+				<div class="log-options">
+					<!-- <div style="display: flex; align-items: center; padding: 4px 0;">
+						<input v-model="options.onlyMyLogs" type="checkbox" id="onlyMyLogs">
+						<label for="onlyMyLogs">only my logs?</label>
+					</div> -->
+
+					<!-- <div>
+						<input v-model.number="options.minRound" :placeholder="roundAtLoad.toString()" type="number"
+							id="minRound">
+						<label for="minRound">min round</label>
 					</div>
-					<div
-						v-for="(l, iL) of t.logs"
-						:key="iL"
-						class="line"
-						style="text-align: right;"
-					>
-						{{ iL + 1 }}.
-						{{ getReadable(l) }}
+					<div>
+						<input v-model.number="options.maxRound" :placeholder="roundAtLoad.toString()" type="number"
+							id="maxRound">
+						<label for="maxRound">max round</label>
+					</div>
+					<div>
+						<input v-model="options.txId" type="text" id="txId">
+						<label for="txId">only this txn</label>
+					</div> -->
+					<div>
+						<span>
+							decode as
+						</span>
+						<select v-model="decodeAs" name="decodeAs" id="decodeAs">
+							<option v-for="dO of decodeOptions" :value="dO.id">
+								{{ dO.text }}
+							</option>
+						</select>
 					</div>
 				</div>
-			</div>
+
+				<div style="display: flex;">
+					<button @click="getAppLogs">
+						get logs
+					</button>
+					<button @click="startLogsWatcher">
+						start
+					</button>
+					<button @click="stopLogsWatcher">
+						stop
+					</button>
+				</div>
+
+				<div class="logs-output">
+					<div class="code-block">
+						<div v-for="(t, iT) of logTxns" :key="t.txid" class="log-txn">
+							<div style="text-align: left;" class="line">
+								<b style="color: aqua">
+									{{ t.txid }}
+								</b>
+							</div>
+							<div v-for="(l, iL) of t.logs" :key="iL" class="line" style="text-align: right;">
+								{{ iL + 1 }}.
+								{{ getReadable(l) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+			<template v-else-if="tabActive == 'history'">
+				<div class="log-options">
+					<div style="display: flex; align-items: center; padding: 4px 0;">
+						<input v-model="options.onlyMyLogs" type="checkbox" id="onlyMyLogs">
+						<label for="onlyMyLogs">only my logs?</label>
+					</div>
+					<div>
+						<input v-model.number="options.minRound" :placeholder="roundAtLoad.toString()" type="number"
+							id="minRound">
+						<label for="minRound">min round</label>
+					</div>
+					<div>
+						<input v-model.number="options.maxRound" :placeholder="roundAtLoad.toString()" type="number"
+							id="maxRound">
+						<label for="maxRound">max round</label>
+					</div>
+					<div>
+						<input v-model="options.txId" type="text" id="txId">
+						<label for="txId">only this txn</label>
+					</div>
+					<div>
+						<span>
+							decode as
+						</span>
+						<select v-model="decodeAs" name="decodeAs" id="decodeAs">
+							<option v-for="dO of decodeOptions" :value="dO.id">
+								{{ dO.text }}
+							</option>
+						</select>
+					</div>
+				</div>
+
+				<div style="display: flex;">
+					<button @click="getAppLogs">
+						get logs
+					</button>
+					<button @click="startLogsWatcher">
+						start
+					</button>
+					<button @click="stopLogsWatcher">
+						stop
+					</button>
+				</div>
+
+				<div class="logs-output">
+					<div class="code-block">
+						<div v-for="(t, iT) of logTxns" :key="t.txid" class="log-txn">
+							<div style="text-align: left;" class="line">
+								<b style="color: aqua">
+									{{ t.txid }}
+								</b>
+							</div>
+							<div v-for="(l, iL) of t.logs" :key="iL" class="line" style="text-align: right;">
+								{{ iL + 1 }}.
+								{{ getReadable(l) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
 		</div>
 	</BaseModule>
 </template>
@@ -94,6 +156,18 @@ export default defineComponent({
 	},
     data() {
 		return {
+			tabItems: [
+				{
+					id: 'realtime',
+					text: 'Realtime'
+				},
+				{
+					id: 'history',
+					text: 'History'
+				}
+			],
+			tabActive: 'realtime',
+
 			options: {
 				onlyMyLogs: true,
 				minRound: null as null | number,
@@ -101,6 +175,22 @@ export default defineComponent({
 				txId: ''
 			},
 			logTxns: [] as LogEntry[],
+
+			decodeAs: 'string',
+			decodeOptions: [
+				{
+					id: 'string',
+					text: 'String'
+				},
+				{
+					id: 'addr',
+					text: 'Address'
+				},
+				{
+					id: 'none',
+					text: 'None'
+				}
+			],
 
 			roundAtLoad: 0,
 			roundCurrent: 0,
@@ -190,12 +280,21 @@ export default defineComponent({
 			this.logTxns = logData as LogEntry[];
 		},
 		getReadable(logVal: string) {
-			let addr = state.algonaut.valueAsAddr(logVal);
-			// console.log(addr);
-			let str = state.algonaut.fromBase64(logVal);
-			// console.log(str);
+			if (this.decodeAs == 'string') {
+				return state.algonaut.fromBase64(logVal);
+			} else if (this.decodeAs == 'addr') {
+				return state.algonaut.valueAsAddr(logVal);
+			} else if (this.decodeAs == 'none') {
+				return logVal;
+			} else {
+				return logVal;
+			}
 
-			return `${addr} | ${str}`;
+			// let addr = state.algonaut.valueAsAddr(logVal);
+			// // console.log(addr);
+			// let str = state.algonaut.fromBase64(logVal);
+			// // console.log(str);
+			// return `${addr} | ${str}`;
 		}
 	}
 })
@@ -228,5 +327,22 @@ export default defineComponent({
 }
 .code-block .line {
 	/* height: 14px; */
+}
+
+.tab-items {
+	display: flex;
+	padding: 4px 0;
+}
+.tab-item {
+	background-color: transparent;
+	border: 1px solid transparent;
+}
+.tab-item.active {
+	background-color: #273541;
+	border: 1px solid transparent;
+	border-bottom: 1px solid #3D4D5B;
+}
+.tab-item:hover {
+	background-color: #314251;
 }
 </style>
