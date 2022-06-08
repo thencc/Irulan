@@ -1,15 +1,34 @@
 <template>
 	<BaseModule title="App Logs">
-		<div class="tab-items">
-			<button v-for="t of tabItems" :class="`tab-item ${tabActive == t.id ? 'active' : ''}`"
-				@click="tabActive = t.id">
-				{{ t.text }}
-			</button>
+		<div style="display: flex; align-items: center; padding: 8px 0;">
+			<!-- <div class="tab-items">
+				<button v-for="t of tabItems" :class="`tab-item ${tabActive == t.id ? 'active' : ''}`"
+					@click="tabActive = t.id">
+					{{ t.text }}
+				</button>
+			</div> -->
+			<!-- temp putting this option here while history mode is TBD -->
+			<div>
+				<span>
+					decode method:
+				</span>
+				<select v-model="decodeAs" name="decodeAs" id="decodeAs">
+					<option v-for="dO of decodeOptions" :value="dO.id">
+						{{ dO.text }}
+					</option>
+				</select>
+			</div>
+
+			<div style="flex-grow: 1;"></div>
+			<div class="roundCurrentIndicator yellow" title="Current Block">
+				{{ roundCurrent }}
+			</div>
 		</div>
+
 
 		<div class="tab-content">
 			<template v-if="tabActive == 'realtime'">
-				<div class="log-options">
+				<div v-if="false" class="log-options">
 					<!-- <div style="display: flex; align-items: center; padding: 4px 0;">
 						<input v-model="options.onlyMyLogs" type="checkbox" id="onlyMyLogs">
 						<label for="onlyMyLogs">only my logs?</label>
@@ -31,7 +50,7 @@
 					</div> -->
 					<div>
 						<span>
-							decode as
+							decode method:
 						</span>
 						<select v-model="decodeAs" name="decodeAs" id="decodeAs">
 							<option v-for="dO of decodeOptions" :value="dO.id">
@@ -41,33 +60,34 @@
 					</div>
 				</div>
 
-				<div style="display: flex;">
-					<button @click="getAppLogs">
-						get logs
-					</button>
-					<button @click="startLogsWatcher">
-						start
-					</button>
-					<button @click="stopLogsWatcher">
-						stop
-					</button>
-				</div>
-
 				<div class="logs-output">
-					<div class="code-block">
-						<div v-for="(t, iT) of logTxns" :key="t.txid" class="log-txn">
-							<div style="text-align: left;" class="line">
-								<b style="color: aqua">
-									{{ t.txid }}
-								</b>
+					<div class="code-block" ref="codeOutput">
+						<div v-for="b of realtimeLogs" :key="b.round" class="round-group">
+							<div>
+								<span class="dimmed">Round: </span>
+								<span class="yellow">{{ b.round }}</span>
 							</div>
-							<div v-for="(l, iL) of t.logs" :key="iL" class="line" style="text-align: right;">
-								{{ iL + 1 }}.
-								{{ getReadable(l) }}
+
+							<div v-for="(t, iT) of b.txnsLogs" :key="t.txid" class="txn-logs">
+								<div class="txn-line">
+									<span class="dimmed">Txn:&nbsp;</span>
+									<span class="txn-id blue">
+										{{ t.txid }}
+									</span>
+								</div>
+								<div v-for="(l, iL) of t.logs" :key="iL" class="log-line">
+									<span class="dimmed">
+										{{ iL + 1 }}.
+									</span>
+									<span>
+										{{ getReadable(l) }}
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+
 			</template>
 			<template v-else-if="tabActive == 'history'">
 				<div class="log-options">
@@ -115,7 +135,7 @@
 
 				<div class="logs-output">
 					<div class="code-block">
-						<div v-for="(t, iT) of logTxns" :key="t.txid" class="log-txn">
+						<div v-for="(t, iT) of logTxns" :key="t.txid" class="txn-logs">
 							<div style="text-align: left;" class="line">
 								<b style="color: aqua">
 									{{ t.txid }}
@@ -138,6 +158,7 @@ import { defineComponent } from 'vue';
 import BaseModule from './BaseModule.vue';
 
 import state from '../../state';
+import { bus } from '../../bus';
 
 interface LogEntry {
 	logs: string[];
@@ -166,15 +187,22 @@ export default defineComponent({
 					text: 'History'
 				}
 			],
+			// tabActive: 'realtime' as 'realtime' | 'history',
 			tabActive: 'realtime',
 
 			options: {
 				onlyMyLogs: true,
+				sender: '',
 				minRound: null as null | number,
 				maxRound: null as null | number,
 				txId: ''
 			},
 			logTxns: [] as LogEntry[],
+
+			realtimeLogs: [] as {
+				round: number;
+				txnsLogs: LogEntry[];
+			}[],
 
 			decodeAs: 'string',
 			decodeOptions: [
@@ -194,35 +222,131 @@ export default defineComponent({
 
 			roundAtLoad: 0,
 			roundCurrent: 0,
+			logsTimer: 0 as any,
+			roundTimer: 0,
+
+			// lastRoundGot: 0,
+		}
+	},
+	computed: {
+		canWatchRealtimeLogs() {
+			return !!(state.algonaut.account && this.tabActive == 'realtime');
+		}
+	},
+	watch: {
+		tabActive: {
+			handler(t: 'realtime' | 'history') {
+				// console.log('t', t);
+				if (t == 'realtime') {
+					// reset logs + set get options
+					this.options.onlyMyLogs = true;
+					this.options.txId = '';
+				} else if (t == 'history') {
+					console.warn('TODO - history mode');
+				}
+			},
+			immediate: true
+		},
+		roundCurrent: {
+			async handler(roundC: number, roundLast: number) {
+				// console.log('roundCurrent updated', roundC);
+
+				if (roundLast !== roundC) {
+					if (this.tabActive == 'realtime') {
+						await this.getRealtimeLogs(roundC);
+					}
+				}
+			}
 		}
 	},
 	async mounted() {
+		console.log('mounted');
 
-		// default minRound to currentRound
-		// this.options.minRound = await this.getCurrentRound();
-		this.roundAtLoad = await this.getCurrentRound();
-		this.roundCurrent = this.roundAtLoad;
+		this.startRoundWatcher();
+		this.setCurrentRound(); // once on load + watch/interval
+
+		this.startAppCallWatcher();
+	},
+	beforeUnmount() {
+		this.stopRoundWatcher();
+		this.stopAppCallWatcher();
 	},
 	methods: {
-		async getCurrentRound() {
-			const txnParams = await state.algonaut.algodClient.getTransactionParams().do();
-			return txnParams.firstRound;
+		startRoundWatcher() {
+			console.log('watchCurrentRound');
+			this.roundTimer = setInterval(this.setCurrentRound, 4000); // get round every 4s so we get ALL rounds + occasionally dup round but only get more inside if round is different
 		},
+		stopRoundWatcher() {
+			console.log('stopRoundWatcher');
+			if (this.roundTimer) {
+				console.log('clearing roundTimer');
+				clearInterval(this.roundTimer);
+			}
+		},
+		async setCurrentRound() {
+			try {
+				const status = await state.algonaut.algodClient.status().do();
+				this.roundCurrent = status['last-round'];
+			} catch(e) {
+				console.warn('err getting currentRound');
+				console.log(e);
+			}
+		},
+
+		startAppCallWatcher() {
+			bus.on('app-call-completed', this.appCallCompleted);
+		},
+		stopAppCallWatcher() {
+			bus.off('app-call-completed', this.appCallCompleted);
+		},
+		async appCallCompleted(round?: number) {
+			// console.log('appCallCompleted', round);
+			if (round && typeof round == 'number' && round > this.roundCurrent) {
+				this.roundCurrent = round;
+			} else {
+				await this.setCurrentRound();
+			}
+		},
+
+		async getRealtimeLogs(round: number) {
+			// console.log('getRealtimeLogs', round);
+
+			this.options.minRound = round;
+			this.options.maxRound = round;
+
+			let txnLogs = await this.getAppLogs();
+			if (txnLogs) {
+				this.realtimeLogs.push({
+					round: round,
+					txnsLogs: txnLogs
+				});
+
+				await this.$nextTick();
+				this.scrollToLatest();
+			}
+		},
+
 		async startLogsWatcher() {
 			console.log('startLogsWatcher');
-			console.warn('TODO intervaled get logs');
 
-			// interval + disable changing options while running
-			// this.getAppLogs();
+			// interval (+ disable changing options while running?)
+			this.logsTimer = setInterval(this.getAppLogs, 3000);
+			await this.getAppLogs();
 		},
 		stopLogsWatcher() {
 			console.log('stopLogsWatcher');
-			console.warn('TODO');
+			if (this.logsTimer) {
+				console.log('stopping logsTimer');
+				clearInterval(this.logsTimer);
+			}
 		},
-		async getAppLogs() {
-			console.log('getAppLogs');
 
-			if (!state.algonaut)  {
+		// ex app 93272663 w logs
+		// minRoud = 21924461
+		async getAppLogs() {
+			// console.log('getAppLogs started');
+
+			if (!state.algonaut) {
 				console.warn('no algonaut');
 				return;
 			}
@@ -242,9 +366,7 @@ export default defineComponent({
 				alert('some log filters must be set');
 				return;
 			}
-
-			// ex app 93272663 w logs
-			// minRoud = 21924461
+			// console.log('getAppLogs options:', this.options);
 
 			let logsReq = state.algonaut.indexerClient.lookupApplicationLogs(this.appId);
 
@@ -252,7 +374,7 @@ export default defineComponent({
 				if (state.algonaut.account) {
 					logsReq = logsReq.sender(state.algonaut.account.addr);
 				} else {
-					alert('you are not logged in, cannot show only my logs...')
+					console.warn('you are not logged in, cannot show only my logs...')
 				}
 			}
 
@@ -269,15 +391,15 @@ export default defineComponent({
 			}
 
 			const appLogs = await logsReq.do();
-			console.log('appLogs', appLogs);
+			// console.log('appLogs', appLogs);
 
 			if (!appLogs) {
 				console.warn('no appLogs');
 				return;
 			}
 
-			const logData = appLogs['log-data'];
-			this.logTxns = logData as LogEntry[];
+			const logData = appLogs['log-data'] as LogEntry[];
+			return logData;
 		},
 		getReadable(logVal: string) {
 			if (this.decodeAs == 'string') {
@@ -289,13 +411,15 @@ export default defineComponent({
 			} else {
 				return logVal;
 			}
-
-			// let addr = state.algonaut.valueAsAddr(logVal);
-			// // console.log(addr);
-			// let str = state.algonaut.fromBase64(logVal);
-			// // console.log(str);
-			// return `${addr} | ${str}`;
-		}
+		},
+		scrollToLatest() {
+			// console.log('scrollToLatest');
+			(this.$refs.codeOutput as Element).scrollTo({
+				left: 0,
+				top: (this.$refs.codeOutput as Element).scrollHeight,
+				behavior: 'smooth'
+			});
+		},
 	}
 })
 </script>
@@ -321,28 +445,61 @@ export default defineComponent({
     background: #18171a;
     padding: 5px;
 	font-size: 11px;
+	max-height: 240px;
+	overflow-y: scroll;
 }
-.log-txn {
+.round-group {
 	padding: 8px 0;
 }
-.code-block .line {
-	/* height: 14px; */
+.log-line {
+	/* text-align: right; */
+	padding: 2px 0;
+	padding-left: calc(6.6px * 4);
 }
+.txn-line {
+	text-align: left;
+	padding: 6px 0 2px 0;
+	padding-left: calc(6.6px * 2);
+}
+
+
 
 .tab-items {
 	display: flex;
-	padding: 4px 0;
 }
 .tab-item {
 	background-color: transparent;
-	border: 1px solid transparent;
+	/* background-color: #273541; */
+	/* border: 1px solid transparent; */
+	border: 1px solid #3D4D5B;
+	/* border */
+	/* border-bottom: 3px solid #3D4D5B; */
 }
 .tab-item.active {
 	background-color: #273541;
-	border: 1px solid transparent;
-	border-bottom: 1px solid #3D4D5B;
+	/* border: 1px solid transparent; */
+	border: 1px solid #3D4D5B;
+	border-bottom: 2px solid #3D4D5B;
 }
 .tab-item:hover {
 	background-color: #314251;
+}
+
+.yellow {
+	color: #FFD866;
+}
+.blue {
+	color: #ABD0D8;
+}
+
+.roundCurrentIndicator {
+	background: #ffd9661e;
+	color: #FFD866;
+	font-size: 12px;
+	border: 1px solid #ffd96652;
+	padding: 8px 12px;
+}
+.dimmed {
+	color: rgba(255, 255, 255, 0.5)
 }
 </style>

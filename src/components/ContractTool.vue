@@ -117,9 +117,12 @@
 import { defineComponent } from 'vue'
 import state from '../state';
 import * as utils from '../utils';
+import { bus } from '../bus';
+import { copyText } from 'vue3-clipboard';
+
+// components
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
-import { copyText } from 'vue3-clipboard';
 import UpdateApp from './UpdateApp.vue';
 import AppLogsModule from './ContractModules/AppLogsModule.vue';
 
@@ -241,6 +244,7 @@ export default defineComponent({
                     state.error(res.message);
                 } else {
                     state.log(res.message);
+                    bus.emit('app-call-completed', parseInt(res.message.substring(res.message.length - 9)));
                 }
             } catch (e) {
                 console.log(e);

@@ -8,6 +8,7 @@ import TypedEmitter from 'typed-emitter';
 // type EmitterEvents = ToastEvents & {
 type EmitterEvents = {
 	'signed-in': () => void;
+	'app-call-completed': (round?: number) => void;
 };
 
 export const bus = new EventEmitter() as TypedEmitter<EmitterEvents>;
