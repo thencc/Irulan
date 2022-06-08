@@ -20,7 +20,7 @@
 			</div>
 
 			<div style="flex-grow: 1;"></div>
-			<div class="roundCurrentIndicator yellow" title="Current Block">
+			<div class="roundCurrentIndicator yellow" title="Current Round">
 				{{ roundCurrent }}
 			</div>
 		</div>
