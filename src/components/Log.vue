@@ -13,8 +13,8 @@ import state from '../state';
 
 export default defineComponent({
     data() {
-        return { 
-            state 
+        return {
+            state
         }
     }
 })

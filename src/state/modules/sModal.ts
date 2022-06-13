@@ -9,7 +9,7 @@ export const sModal = reactive({
 watch(
 	() => router.currentRoute.value,
 	(rc) => {
-		console.log('router changed:', rc);
+		// console.log('router changed:', rc);
 
 		if (rc.query.m) {
 			if (typeof rc.query.m == 'string') {

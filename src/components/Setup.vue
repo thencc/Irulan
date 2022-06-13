@@ -73,20 +73,33 @@ export default defineComponent({
             }
         }
     },
+    created() {
+        // this.$watch(
+        //     () => this.$route.params,
+        //     (toParams: any) => {
+        //         this.fetchCachedConfig();
+        //     },
+        //     {
+        //         immediate: true
+        //     }
+        // );
+    },
     mounted() {
+        state.init(this.config);
+        console.log('mounted');
         this.fetchCachedConfig();
     },
     watch: {
-        $route(to, from) {
-            // if (to.params && to.params.ledger &&
-            //     from.params && from.params.ledger &&
-            //     to.params.ledger !== from.params.ledger) {
-            //         console.log(`We were at ${from.params.ledger}, now we are at ${to.params.ledger}`)
-            //         // if we came from a different ledger, update settings
-            //         this.config.ledger = state.getLedgerFromUrl(this.$route);
-            //         state.init(this.config);
-            // }
-        }
+        // $route(to, from) {
+        //     // if (to.params && to.params.ledger &&
+        //     //     from.params && from.params.ledger &&
+        //     //     to.params.ledger !== from.params.ledger) {
+        //     //         console.log(`We were at ${from.params.ledger}, now we are at ${to.params.ledger}`)
+        //     //         // if we came from a different ledger, update settings
+        //     //         this.config.ledger = state.getLedgerFromUrl(this.$route);
+        //     //         state.init(this.config);
+        //     // }
+        // }
     },
     methods: {
         async applySettings () {

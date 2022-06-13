@@ -4,15 +4,19 @@ import { bus } from '../bus';
 
 // modular states
 import { sModal } from './modules/sModal';
+import { sSearch } from './modules/sSearch';
+import { sAlgo } from './modules/sAlgo';
 
 const TESTNET_SERVER = 'https://twinfrogs.ncc.la/atn';
 const TESTNET_APIKEY = '494d49c48f0f55f5d25d86fabb17bee8fbfcbf818ba257670f4ea076672e0fe2';
 const MAINNET_SERVER = 'https://twinfrogs.ncc.la/amn';
 const MAINNET_APIKEY = '3fd53de10f0e2e2b24c4b3a30525a4c94c9b86d7ba9aba64bee01b00ae8b4cc9';
 
-const state = reactive({
+export const state = reactive({
     // modules
     sModal,
+    sSearch,
+    sAlgo,
 
     terminal: [] as { type: string, message: string, route?: string }[],
     connected: false,
@@ -22,7 +26,7 @@ const state = reactive({
     isAccount: false,
     indexer: {} as any,
     activeAccount: null as any,
-    algonaut: {} as Algonaut,
+    algonaut: {} as Algonaut, // initing this way break during hmr dev
     algonautJSCode: '',
     defaultTxnFee: 1000, // 0.001 algo
 
@@ -87,6 +91,7 @@ const state = reactive({
 
     loadApp: async function (appIndex: number) {
         this.toolLoading = true;
+        console.log(this);
         try {
             this.log('Loading app into contract tool...');
             this.currentApp = await this.algonaut.getAppInfo(appIndex);
@@ -126,6 +131,7 @@ const state = reactive({
      * @param toParams Params to update
      */
     getNewRoute(currentRoute: any, toParams: { query?: string, contractId?: string, ledger?: string }) {
+        console.log('getNewRoute');
         let route = '/' + (currentRoute.params.ledger?.toLowerCase() || 'testnet');
 
         // replace ledger parameter
@@ -210,8 +216,13 @@ const state = reactive({
 watch(
     () => state.algonaut.account,
     () => {
-        // console.log('account changed');
-        bus.emit('signed-in');
+        console.log('account changed', state.algonaut.account);
+        if (state.algonaut.account) {
+            bus.emit('signed-in');
+        }
+    },
+    {
+        immediate: true
     }
 )
 

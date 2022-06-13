@@ -46,16 +46,16 @@ export default defineComponent({
         }
     },
     setup() {
-        
+
     },
     methods: {
         async deploy () {
             this.deployLoading = true;
             this.deployStatus = 'Waiting for signature...';
-            let res = await state.algonaut.createAsset(this.assetArgs, { 
-                onSign: this.onSign, 
-                onSend: this.onSend, 
-                onConfirm: this.onConfirm 
+            let res = await state.algonaut.createAsset(this.assetArgs, {
+                onSign: this.onSign,
+                onSend: this.onSend,
+                onConfirm: this.onConfirm
             });
             let assetId;
             if (res.createdIndex) {

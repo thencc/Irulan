@@ -130,6 +130,9 @@ export default defineComponent({
             newAccount: {} as { address: string, mnemonic: string },
         }
     },
+    setup(props, ctx) {
+        console.log('setup');
+    },
     mounted() {
         const wcData = state.getAccount('walletconnect');
         if (wcData) {

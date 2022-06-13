@@ -31,6 +31,8 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
+	console.log('r befo', from, to);
+
 	// check auth for example if naving to /account...
 	next(); // approve
 });
