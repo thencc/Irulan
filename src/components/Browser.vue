@@ -1,8 +1,8 @@
 <template>
     <div class="search">
         <form @submit.prevent="search" class="search-form">
-            <input type="text" v-model="query" placeholder="Account / App ID / Asset ID">
-            <button class="btn-gray">Search</button>
+            <input type="text" v-model="query" placeholder="Account / App ID / Asset ID" ref="searchInput">
+            <button class="btn-gray" title="&#8984; K">Search</button>
         </form>
     </div>
     <div class="browser">
@@ -14,19 +14,14 @@
                 <h2>{{ response.type }}
                     <span :class="response.type === 'account' ? 'purple' : 'green'">
                         {{ response.type === 'account'
-                            ? utils.shortAddr(response.object.address)
-                            : response.object.index
+                        ? utils.shortAddr(response.object.address)
+                        : response.object.index
                         }}
                     </span>
                 </h2>
-                <p
-                    v-if="response.object.creatorAddress">
+                <p v-if="response.object.creatorAddress">
                     Creator:
-                    <a
-                        href=""
-                        class="purple"
-                        @click.prevent="setSearch(response.object.creatorAddress)"
-                    >
+                    <a href="" class="purple" @click.prevent="setSearch(response.object.creatorAddress)">
                         {{ utils.shortAddr(response.object.creatorAddress) }}
                     </a>
                 </p>
@@ -34,7 +29,8 @@
 
                 <div class="app" v-if="response.type === 'app'">
                     <h3 class="purple">Global State</h3>
-                    <table class="browser-table state-table" v-if="response.object.globals && response.object.globals.length">
+                    <table class="browser-table state-table"
+                        v-if="response.object.globals && response.object.globals.length">
                         <tr class="browser-table-heading">
                             <th>Key</th>
                             <th>Value</th>
@@ -46,10 +42,12 @@
                             <td>{{ item.address }}</td>
                         </tr>
                     </table>
-                    <p class="muted" v-if="!response.object.globals || !response.object.globals.length">No global state schema.</p>
+                    <p class="muted" v-if="!response.object.globals || !response.object.globals.length">No global state
+                        schema.</p>
 
                     <h3 class="purple">Local State</h3>
-                    <table class="browser-table state-table" v-if="response.object.locals && response.object.locals.length">
+                    <table class="browser-table state-table"
+                        v-if="response.object.locals && response.object.locals.length">
                         <tr class="browser-table-heading">
                             <th>Key</th>
                             <th>Value</th>
@@ -61,7 +59,8 @@
                             <td>{{ item.address }}</td>
                         </tr>
                     </table>
-                    <p class="muted" v-if="!response.object.locals || !response.object.locals.length">No local state schema.</p>
+                    <p class="muted" v-if="!response.object.locals || !response.object.locals.length">No local state
+                        schema.</p>
                 </div>
 
                 <div class="asset" v-if="response.type === 'asset'">
@@ -80,7 +79,8 @@
                         </tr>
                         <tr>
                             <td class="key">URL</td>
-                            <td class="small"><a :href="response.object.params.url" target="_blank">{{ response.object.params.url }}</a></td>
+                            <td class="small"><a :href="response.object.params.url" target="_blank">{{
+                                    response.object.params.url }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Frozen</td>
@@ -92,19 +92,27 @@
                         </tr>
                         <tr>
                             <td class="key">Creator</td>
-                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.creator)">{{ response.object.params.creator }}</a></td>
+                            <td><a href="" class="long-cell purple"
+                                    @click.prevent="setSearch(response.object.params.creator)">{{
+                                    response.object.params.creator }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Manager</td>
-                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.manager)">{{ response.object.params.manager }}</a></td>
+                            <td><a href="" class="long-cell purple"
+                                    @click.prevent="setSearch(response.object.params.manager)">{{
+                                    response.object.params.manager }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Clawback</td>
-                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.clawback)">{{ response.object.params.clawback }}</a></td>
+                            <td><a href="" class="long-cell purple"
+                                    @click.prevent="setSearch(response.object.params.clawback)">{{
+                                    response.object.params.clawback }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Reserve</td>
-                            <td><a href="" class="long-cell purple" @click.prevent="setSearch(response.object.params.reserve)">{{ response.object.params.reserve }}</a></td>
+                            <td><a href="" class="long-cell purple"
+                                    @click.prevent="setSearch(response.object.params.reserve)">{{
+                                    response.object.params.reserve }}</a></td>
                         </tr>
                     </table>
                 </div>
@@ -113,11 +121,13 @@
                     <div class="balances">
                         <div class="balance">
                             <p class="balance-caption muted">Balance</p>
-                            <p class="balance-amount yellow">{{ (response.object.amount / 1000000).toFixed(4) }} ALGO</p>
+                            <p class="balance-amount yellow">{{ (response.object.amount / 1000000).toFixed(4) }} ALGO
+                            </p>
                         </div>
                         <div class="balance">
                             <p class="balance-caption muted">Rewards</p>
-                            <p class="balance-amount yellow">{{ (response.object.rewards / 1000000).toFixed(4) }} ALGO</p>
+                            <p class="balance-amount yellow">{{ (response.object.rewards / 1000000).toFixed(4) }} ALGO
+                            </p>
                         </div>
                     </div>
 
@@ -132,16 +142,13 @@
                         </tr>
                         <tr v-for="asset in response.object.assets" :key="asset['asset-id']">
                             <td class="key">
-                                <a href="" @click.prevent="setSearch(asset['asset-id'])" class="yellow">{{ asset['asset-id'] }}</a>
+                                <a href="" @click.prevent="setSearch(asset['asset-id'])" class="yellow">{{
+                                    asset['asset-id'] }}</a>
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
                             <td v-if="asset.creator">
-                                <a
-                                    href=""
-                                    class="purple"
-                                    @click.prevent="setSearch(asset.creator)"
-                                >
+                                <a href="" class="purple" @click.prevent="setSearch(asset.creator)">
                                     {{ utils.shortAddr(asset.creator) }}
                                 </a>
                             </td>
@@ -149,7 +156,9 @@
                     </table>
 
                     <h3 class="purple">Created Assets</h3>
-                    <p class="muted" v-if="!response.object['created-assets'] || !response.object['created-assets'].length">No created assets.</p>
+                    <p class="muted"
+                        v-if="!response.object['created-assets'] || !response.object['created-assets'].length">No
+                        created assets.</p>
                     <table class="browser-table" v-if="response.object['created-assets'].length">
                         <tr class="browser-table-heading">
                             <th>Asset ID</th>
@@ -170,7 +179,9 @@
                     </table>
 
                     <h3 class="purple">Local State</h3>
-                    <p class="muted" v-if="!response.object['apps-local-state'] || !response.object['apps-local-state'].length">No local state.</p>
+                    <p class="muted"
+                        v-if="!response.object['apps-local-state'] || !response.object['apps-local-state'].length">No
+                        local state.</p>
 
                     <div class="local-state-app" v-for="app in response.object['apps-local-state']" :key="app.id">
                         <h4>App <a href="" @click.prevent="setSearch(app.id)" class="green">{{ app.id }}</a></h4>
@@ -189,7 +200,8 @@
                     </div>
 
                     <h3 class="purple">Created Apps</h3>
-                    <p class="muted" v-if="!response.object['created-apps'] || !response.object['created-apps'].length">No created apps.</p>
+                    <p class="muted" v-if="!response.object['created-apps'] || !response.object['created-apps'].length">
+                        No created apps.</p>
                     <table class="browser-table" v-if="response.object['created-apps'].length">
                         <tr class="browser-table-heading">
                             <th>App ID</th>
@@ -213,7 +225,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue';
+import { useKeypress } from 'vue3-keypress';
 import state from '../state';
 import { bus } from '../bus';
 import Modal from './Modal.vue';
@@ -232,6 +245,26 @@ export default defineComponent({
             query: '',
             searching: false
         }
+    },
+    setup(props, ctx) {
+        const searchInput = ref<HTMLInputElement>();
+
+        useKeypress({
+            keyEvent: 'keydown',
+            keyBinds: [
+                {
+                    keyCode: 75, // K. keycode as int (https://github.com/lupas/vue3-keypress#key-binds)
+                    modifiers: ['metaKey'],
+                    success: () => {
+                        console.log('meta+K pressed');
+                        searchInput.value?.focus();
+                        searchInput.value?.select();
+                    }
+                }
+            ]
+        });
+
+        return { searchInput }; // expose
     },
     created () {
         this.$watch(
