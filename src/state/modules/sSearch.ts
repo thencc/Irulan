@@ -3,6 +3,7 @@ import router from '../../router';
 
 import state from '../index';
 import { bus } from '../../bus';
+import { debounce } from '../../utils';
 
 export const sSearch = reactive({
 	query: '',
@@ -13,7 +14,12 @@ export const sSearch = reactive({
 
 const parseQuery = async (q: string) => {
 	console.log('parseQuery', q);
-	console.log(sSearch);
+
+	if (!sSearch.query && q) {
+		// can also account for this using a custom debounce timer like in tables/Account.ts/watch/usernameNew
+		console.warn('dont do a delayed search because there nothing to search for (user likely deleted last char in search input)');
+		return;
+	}
 
 	// const route = state.getNewRoute(this.$route, { query: this.query });
 	// this.$router.push(route);
@@ -65,7 +71,7 @@ const parseQuery = async (q: string) => {
 			sSearch.response = {
 				type: 'app',
 				object: response
-			}
+			};
 		} catch (e) {
 			// try asset
 			try {
@@ -75,7 +81,7 @@ const parseQuery = async (q: string) => {
 				sSearch.response = {
 					type: 'asset',
 					object: response
-				}
+				};
 			} catch (e) {
 				// this means query was an int, but not a valid one...
 				console.warn(e);
@@ -85,7 +91,7 @@ const parseQuery = async (q: string) => {
 				sSearch.response = {
 					type: 'empty',
 					message: 'Nothing found.'
-				}
+				};
 				state.error(sSearch.response.message);
 			}
 		}
@@ -146,20 +152,51 @@ watch(
 	}
 );
 
+// debounced version of search so we dont send a bunch of unnecessary requests
+const parseQueryDb = debounce(parseQuery, 1000);
 
 //
 watch(
 	() => sSearch.query,
-	(q) => {
+	async (q, qOld) => {
 		if (q) {
-			parseQuery(q);
+			if (q !== qOld) {
+				parseQuery(q);
+
+				// test w: http://localhost:3000/testnet?s=93272663&another=things#testing
+				let x = await router.nonDestructivePush({
+					// params: {},
+					query: {
+						s: q
+						// s: [q, q, q] // works too
+					}
+				});
+				console.log('post nonDestructivePush', x);
+			}
+
+			// old: (good for human input typing, but doesnt account for necessary immediate changes like clicking a link. moved debounce to seperate v-model vue watcher)
+			// if (qOld) {
+			// 	// debounce search
+			// 	if (q !== qOld) {
+			// 		parseQueryDb(q)
+			// 	}
+			// } else {
+			// 	// first load, so req immediately
+			// 	console.log('first load, so req immediately');
+			// 	parseQuery(q);
+			// }
+		} else {
+			// reset
+			sSearch.response = null;
 		}
 	},
 	{
 		immediate: true
 	}
 );
+
 // shim (can remove this assuming we connect to a node like testnet.)
+// TODO remove this, but do final local vars for app somehow
 bus.on('signed-in', () => {
 	parseQuery(sSearch.query);
 });

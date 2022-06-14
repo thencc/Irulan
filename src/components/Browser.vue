@@ -1,7 +1,9 @@
 <template>
     <div class="search">
         <form @submit.prevent="" class="search-form">
-            <input v-model="state.sSearch.query" type="text" placeholder="Account / App ID / Asset ID" ref="searchInput">
+            <!-- <input v-model="state.sSearch.query" type="text" placeholder="Account / App ID / Asset ID" ref="searchInput"> -->
+            <input v-model="searchQueryInputVal" type="text" placeholder="Account / App ID / Asset ID"
+                ref="searchInput">
             <button class="btn-gray" title="&#8984; K">Search</button>
         </form>
     </div>
@@ -84,7 +86,7 @@
                         <tr>
                             <td class="key">URL</td>
                             <td class="small"><a :href="response.object.params.url" target="_blank">{{
-                            response.object.params.url }}</a></td>
+                                    response.object.params.url }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Frozen</td>
@@ -147,7 +149,7 @@
                         <tr v-for="asset in response.object.assets" :key="asset['asset-id']">
                             <td class="key">
                                 <a href="" @click.prevent="setSearch(asset['asset-id'])" class="yellow">{{
-                                asset['asset-id'] }}</a>
+                                    asset['asset-id'] }}</a>
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
@@ -229,7 +231,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { useKeypress } from 'vue3-keypress';
 import * as utils from '../utils';
 import { bus } from '../bus';
@@ -251,7 +253,10 @@ export default defineComponent({
             // response: null as any,
             // response: state.sSearch.response,
             query: '',
-            searching: false
+            searching: false,
+
+            searchQueryInputVal: '',
+            queryTimer: 0
         }
     },
     setup(props, ctx) {
@@ -285,10 +290,38 @@ export default defineComponent({
             }
         );
 
+        watch(
+            () => state.sSearch.query,
+            (q) => {
+                this.searchQueryInputVal = q;
+            },
+            { immediate: true }
+        )
+
         bus.on('signed-in', this.signedInHandler);
     },
     beforeUnmount() {
         bus.off('signed-in', this.signedInHandler);
+    },
+    watch: {
+        searchQueryInputVal: {
+            handler(queryNew, queryOld) {
+                console.log('queryNew', queryNew);
+
+                // if it wasnt set programmatically like from clicking a link, then debounce typed search for less req/s
+                if (queryNew !== state.sSearch.query) {
+                    clearTimeout(this.queryTimer);
+
+                    this.queryTimer = setTimeout(() => {
+                        // console.log('timeouted');
+                        state.sSearch.query = queryNew;
+                        // this.checkingUsername = false;
+                    }, 1000);
+                } else {
+                    console.warn('dont queryNew debounce');
+                }
+            }
+        }
     },
     methods: {
         signedInHandler() {
@@ -308,12 +341,15 @@ export default defineComponent({
             // this.$router.push(
             //     state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query })
             // );
+
             state.loadApp(appIndex);
         },
         setSearch(query: any) {
-            this.query = query;
+            state.sSearch.query = query;
+            // old:
+            // this.query = query;
             // this.search();
-            // sSearch.parseQuery(query);
+            // sSearch.parseQuery(query); // happen automatically when changing sSearch.query
         },
         decode (s: string) {
             return state.algonaut.fromBase64(s);
