@@ -25,8 +25,8 @@ const parseQuery = async (q: string) => {
 	// TODO add back in... (make this an emit?)
 	// state.logRoute(`Searching: ${this.query}`, route);
 
-	console.log('pre-lookup', state.algonaut.sdk);
-	console.log('pre-lookup', state.sAlgo.algonaut.config?.BASE_SERVER);
+	// console.log('pre-lookup', state.algonaut.sdk);
+	console.log('pre-lookup:', state.sAlgo.algonaut.config?.BASE_SERVER);
 
 	// look account?
 	// if (state.algonaut.sdk?.isValidAddress(q)) { // old
@@ -104,6 +104,24 @@ const parseQuery = async (q: string) => {
 	sSearch.loading = false;
 };
 
+
+// op1
+// import('./UserCtx').then((file) => {
+// 	const uCtx = file.default;
+
+// 	watch(
+
+
+// op2 (doesnt work)
+// (
+// 	async () => {
+// 		router.isReady().then(() => {
+
+// 		});
+
+// 	}
+// )();
+
 // sync route w sSearch state
 watch(
 	() => router.currentRoute.value,
@@ -127,6 +145,7 @@ watch(
 		// deep: false // not needed
 	}
 );
+
 
 //
 watch(

@@ -1,21 +1,20 @@
 <template>
     <div class="search">
         <form @submit.prevent="" class="search-form">
-            <input
-                v-model="query"
-                type="text"
-                placeholder="Account / App ID / Asset ID"
-                ref="searchInput"
-            >
+            <input v-model="state.sSearch.query" type="text" placeholder="Account / App ID / Asset ID" ref="searchInput">
             <button class="btn-gray" title="&#8984; K">Search</button>
         </form>
     </div>
     <div class="browser">
-        <div class="searching" v-if="searching">Searching...</div>
-        <div class="results" v-if="response">
-            <p class="pink empty align-center" v-if="response.type === 'empty'">{{ response.message }}</p>
+        <div class="searching" v-if="state.sSearch.loading">Searching...</div>
+        <!-- dev: {{ state.sSearch.response }} -->
 
-            <div class="object" v-if="response.object">
+        <div class="results" v-if="state.sSearch.response">
+            <p class="pink empty align-center" v-if="state.sSearch.response.type === 'empty'">
+                {{ state.sSearch.response.message }}
+            </p>
+
+            <div class="object" v-else-if="response && response.object">
                 <h2>{{ response.type }}
                     <span :class="response.type === 'account' ? 'purple' : 'green'">
                         {{ response.type === 'account'
@@ -85,7 +84,7 @@
                         <tr>
                             <td class="key">URL</td>
                             <td class="small"><a :href="response.object.params.url" target="_blank">{{
-                                    response.object.params.url }}</a></td>
+                            response.object.params.url }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Frozen</td>
@@ -148,7 +147,7 @@
                         <tr v-for="asset in response.object.assets" :key="asset['asset-id']">
                             <td class="key">
                                 <a href="" @click.prevent="setSearch(asset['asset-id'])" class="yellow">{{
-                                    asset['asset-id'] }}</a>
+                                asset['asset-id'] }}</a>
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
@@ -232,12 +231,14 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useKeypress } from 'vue3-keypress';
-import state from '../state';
-import { bus } from '../bus';
-import Modal from './Modal.vue';
-
 import * as utils from '../utils';
-import { sSearch } from '@/state/modules/sSearch';
+import { bus } from '../bus';
+
+// states
+import state from '../state';
+
+// components
+import Modal from './Modal.vue';
 
 export default defineComponent({
     components: {
@@ -247,7 +248,8 @@ export default defineComponent({
         return {
             state,
             utils,
-            response: null as any,
+            // response: null as any,
+            // response: state.sSearch.response,
             query: '',
             searching: false
         }
@@ -262,7 +264,7 @@ export default defineComponent({
                     keyCode: 75, // K. keycode as int (https://github.com/lupas/vue3-keypress#key-binds)
                     modifiers: ['metaKey'],
                     success: () => {
-                        console.log('meta+K pressed');
+                        // console.log('meta+K pressed');
                         searchInput.value?.focus();
                         searchInput.value?.select();
                     }
@@ -388,11 +390,12 @@ export default defineComponent({
         // }
     },
     computed: {
-        globalState: function () {
-            if (this.response && this.response.object && this.response.type === 'app') {
-                return state.algonaut.stateArrayToObject((this as any).response.object.globals);
-            }
-        }
+        response: () => state.sSearch.response
+        // globalState: function () {
+        //     if (this.response && this.response.object && this.response.type === 'app') {
+        //         return state.algonaut.stateArrayToObject((this as any).response.object.globals);
+        //     }
+        // }
     }
 });
 </script>
