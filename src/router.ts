@@ -9,43 +9,90 @@ interface RouterExt {
 	}): Promise<void | NavigationFailure | undefined>;
 }
 
-// components
+// pages
 import Main from './components/pages/Main.vue';
-import ViewApp from './components/pages/Main.vue';
+import Dashboard from './components/pages/Dashboard.vue';
+import About from './components/pages/About.vue';
+import Terms from './components/pages/Terms.vue';
+// panels (for main dashboard view)
+import AppPanel from './components/panels/AppPanel.vue';
 
 const router = createRouter({
 	history: createWebHistory(),
 	routes: [
 		{
-			name: 'home',
+			path: '/',
+			redirect: '/testnet'
+		},
+		{
+			path: '/about',
+			components: {
+				default: About,
+				header: AppPanel
+			}
+		},
+		{
+			path: '/terms',
+			// component: Terms
+			components: {
+				default: Terms,
+				header: AppPanel
+				// DONT include header component
+			}
+		},
+		{
+			name: 'Dashboard',
 			path: '/:ledger',
-			component: Main,
+			// component: Dashboard,
+			components: {
+				header: AppPanel,
+				default: Dashboard
+			},
+			beforeEnter: (to, from, next) => {
+				// FYI only triggers on first load, not params.ledger update
+				let leg = to.params.ledger;
+				if (typeof leg !== 'string') {
+					console.warn('bad ledger param 1, go home.');
+					next('/');
+					return;
+				} else if (leg !== 'testnet' && leg !== 'mainnet') {
+					console.warn('bad ledger param 2, go home.');
+					next('/');
+					return;
+				} else {
+					next(); // pass
+					return;
+				}
+			},
 			children: [
+				{
+					// because smart-contracts are apps, assets or addresses
+					name: 'AppPanel',
+					path: 'app/:appId',
+					// component: AppPanel
+					components: {
+						default: AppPanel,
+						// header: AppPanel
+					}
+				},
+
+				// {
+				// 	name: 'search',
+				// 	path: 's/:query',
+				// 	component: Main
+				// },
 				// {
 				// 	// TODO rename to app/:appId
 				// 	// because smart-contracts are apps, assets or addresses
-				// 	name: 'vApp',
-				// 	path: '/app/:appId',
-				// 	component: ViewApp
+				// 	name: 'contract',
+				// 	path: 'contract/:contractId',
+				// 	component: Main // TODO change to sidebar: Browser, main: AppContract.vue
 				// },
-
-				{
-					name: 'search',
-					path: 's/:query',
-					component: Main
-				},
-				{
-					// TODO rename to app/:appId
-					// because smart-contracts are apps, assets or addresses
-					name: 'contract',
-					path: 'contract/:contractId',
-					component: Main // TODO change to sidebar: Browser, main: AppContract.vue
-				},
-				{
-					name: 'full',
-					path: 'contract/:contractId/s/:query',
-					component: Main
-				}
+				// {
+				// 	name: 'full',
+				// 	path: 'contract/:contractId/s/:query',
+				// 	component: Main
+				// }
 			]
 		}
 	]

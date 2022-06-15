@@ -1,29 +1,58 @@
 <template>
-	<router-view name="header"></router-view>
-	<router-view name="default"></router-view>
+	<!-- need an outer div container to apply transition correctly -->
+	<div>
+		<header class="header">
+			<div class="header-left">
+				<h1>Irulan</h1>
+				<button class="about-link btn-link-muted" @click="showAbout = true">What is this?</button>
+				<Modal :show="showAbout" @close="showAbout = false">
+					<h3 class="modal-title">About Irulan</h3>
+					<div class="modal-content">
+						<p>Irulan is a general purpose utility to interact with Algorand contracts, powered by <a
+								href="https://thencc.github.io/algonautjs/" target="_blank">Algonaut.js</a>.</p>
+						<p>It's also <a href="https://github.com/thencc/Irulan" target="_blank">open source</a>!</p>
+					</div>
+				</Modal>
+			</div>
+			<div style="flex-grow: 1"></div>
+			<div class="header-right">
+				<CreateAsset />
+				<Deploy />
+				<Account />
+				<!-- <Setup /> -->
+			</div>
+		</header>
 
-	<!-- appear still happens...? -->
-	<!-- <transition name="fade" mode="out-in">
-		<router-view name="default"></router-view>
-	</transition> -->
+		<main class="container">
+			Dashboard
 
-	<!-- <div :class="`modal ${modal ? 'is-active' : ''}`">
-		<div class="modal-background" @click="$root.closeModal()"></div>
-		<div id="modal-content" class="modal-content"></div>
-	</div> -->
+			<router-view name="default"></router-view>
+
+			<!-- <div class="left-col">
+			<Browser />
+			<Log />
+		</div>
+		<div class="right-col">
+			<ContractTool />
+			<div class="footer-actions">
+			</div>
+		</div> -->
+		</main>
+	</div>
 </template>
+
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import state from './state';
-import Setup from './components/Setup.vue';
-import Log from './components/Log.vue';
-import Browser from './components/Browser.vue';
-import ContractTool from './components/ContractTool.vue';
-import Account from './components/Account.vue';
-import Modal from './components/Modal.vue';
-import Deploy from './components/Deploy.vue';
-import CreateAsset from './components/CreateAsset.vue';
+import state from '../../state';
+import Setup from '../Setup.vue';
+import Log from '../Log.vue';
+import Browser from '../Browser.vue';
+import ContractTool from '../ContractTool.vue';
+import Account from '../Account.vue';
+import Modal from '../Modal.vue';
+import Deploy from '../Deploy.vue';
+import CreateAsset from '../CreateAsset.vue';
 
 export default defineComponent({
 	components: {
@@ -37,14 +66,13 @@ export default defineComponent({
 		CreateAsset
 	},
 	setup() {
-
 	},
 	mounted() {
 		state.log('The real universe is always one step beyond logic.');
 	},
 	created() {
 		this.$watch(
-			() => this.$route.params,
+		() => this.$route.params,
 			(toParams: any) => {
 				//console.log(toParams);
 			}
@@ -58,12 +86,12 @@ export default defineComponent({
 	},
 	methods: {
 	}
-})
+});
 </script>
 
 <style lang="scss">
-@import 'assets/_variables.scss';
-@import 'assets/basics.scss';
+@import '../../assets/_variables.scss';
+@import '../../assets/basics.scss';
 
 .header {
 	background-color: $bgdark;
@@ -73,7 +101,7 @@ export default defineComponent({
 
 	h1 {
 		flex: 0 0 auto;
-	background: linear-gradient(45deg, #FFD78A 0%, #EC66AA 16%, #7B4CDE 33%, #69DEE6 56%, #7B4DDF 70%, #FF6188 85%, #FFD866 100%);
+		background: linear-gradient(45deg, #FFD78A 0%, #EC66AA 16%, #7B4CDE 33%, #69DEE6 56%, #7B4DDF 70%, #FF6188 85%, #FFD866 100%);
 		font-weight: bold;
 		font-size: 1.5em;
 		margin: 0;
@@ -118,11 +146,6 @@ export default defineComponent({
 	}
 }
 
-
-
-
-
-
 .actions button {
 	margin: 5px 0px 0 10px;
 
@@ -132,7 +155,6 @@ export default defineComponent({
 }
 
 header {
-
 	.header-info {
 		flex: 0 0 75%;
 		text-align: right;
@@ -183,12 +205,12 @@ header {
 
 // LOG
 .terminal {
-		background: #000;
-		color: white;
-		height: 300px;
-		overflow-y: scroll;
-		padding: 5px;
-		font-size: 0.8em;
+	background: #000;
+	color: white;
+	height: 300px;
+	overflow-y: scroll;
+	padding: 5px;
+	font-size: 0.8em;
 }
 
 .line.success {
@@ -209,42 +231,5 @@ th {
 
 table {
 	margin-bottom: 15px;
-}
-
-/* --- VUE CSS TRANSITIONS --- */
-/** FADE */
-
-/*
-.fade-enter-active,
-.fade-leave-active {
-	// transition: opacity 0.2s linear;
-	transition: opacity 20s linear;
-}
-// .fade-enter-from,
-// .fade-leave-to {
-// 	opacity: 0;
-// }
-.fade-enter-from {
-	opacity: 0;
-}
-.fade-leave-to {
-	opacity: 0;
-}
-*/
-
-// animations also work!
-.fade-enter-active {
-	animation: fade-in 0.3s;
-}
-.fade-leave-active {
-	animation: fade-in 0.2s reverse;
-}
-@keyframes fade-in {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
 }
 </style>
