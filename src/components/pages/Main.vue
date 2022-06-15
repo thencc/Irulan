@@ -26,6 +26,7 @@
 			<Log />
 		</div>
 		<div class="right-col">
+			<!-- TODO make Viewer.vue + sViewer (where response lives + loadApp etc) -->
 			<ContractTool />
 			<div class="footer-actions">
 			</div>

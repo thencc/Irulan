@@ -5,6 +5,7 @@ import { bus } from '../bus';
 // modular states
 import { sModal } from './modules/sModal';
 import { sSearch } from './modules/sSearch';
+import { sViewer } from './modules/sViewer';
 import { sAlgo } from './modules/sAlgo';
 
 const TESTNET_SERVER = 'https://twinfrogs.ncc.la/atn';
@@ -16,6 +17,7 @@ export const state = reactive({
     // modules
     sModal,
     sSearch,
+    sViewer,
     sAlgo,
 
     terminal: [] as { type: string, message: string, route?: string }[],

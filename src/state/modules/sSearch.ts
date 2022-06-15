@@ -171,7 +171,7 @@ watch(
 						// s: [q, q, q] // works too
 					}
 				});
-				console.log('post nonDestructivePush', x);
+				// console.log('post nonDestructivePush', x);
 			}
 
 			// old: (good for human input typing, but doesnt account for necessary immediate changes like clicking a link. moved debounce to seperate v-model vue watcher)
@@ -188,6 +188,12 @@ watch(
 		} else {
 			// reset
 			sSearch.response = null;
+			// removes just s query param
+			router.nonDestructivePush({
+				query: {
+					s: undefined
+				}
+			});
 		}
 	},
 	{

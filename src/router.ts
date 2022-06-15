@@ -4,13 +4,14 @@ import { createRouter, createWebHistory } from 'vue-router';
 import type { Router, NavigationFailure } from 'vue-router';
 interface RouterExt {
 	nonDestructivePush(opts: {
-		params?: Record<string, string>,
-		query?: Record<string, string | string[]>
+		params?: Record<string, string>, // TODO test if | undefined works here too
+		query?: Record<string, string | string[] | undefined> // setting a qs to undefined removes just this one
 	}): Promise<void | NavigationFailure | undefined>;
 }
 
 // components
 import Main from './components/pages/Main.vue';
+import ViewApp from './components/pages/Main.vue';
 
 const router = createRouter({
 	history: createWebHistory(),
@@ -20,15 +21,25 @@ const router = createRouter({
 			path: '/:ledger',
 			component: Main,
 			children: [
+				// {
+				// 	// TODO rename to app/:appId
+				// 	// because smart-contracts are apps, assets or addresses
+				// 	name: 'vApp',
+				// 	path: '/app/:appId',
+				// 	component: ViewApp
+				// },
+
 				{
 					name: 'search',
 					path: 's/:query',
 					component: Main
 				},
 				{
+					// TODO rename to app/:appId
+					// because smart-contracts are apps, assets or addresses
 					name: 'contract',
 					path: 'contract/:contractId',
-					component: Main
+					component: Main // TODO change to sidebar: Browser, main: AppContract.vue
 				},
 				{
 					name: 'full',

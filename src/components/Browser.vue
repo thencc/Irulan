@@ -1,8 +1,7 @@
 <template>
     <div class="search">
         <form @submit.prevent="" class="search-form">
-            <!-- <input v-model="state.sSearch.query" type="text" placeholder="Account / App ID / Asset ID" ref="searchInput"> -->
-            <input v-model="searchQueryInputVal" type="text" placeholder="Account / App ID / Asset ID"
+            <input v-model="searchQueryInputVal" type="search" placeholder="Account / App ID / Asset ID"
                 ref="searchInput">
             <button class="btn-gray" title="&#8984; K">Search</button>
         </form>
@@ -329,12 +328,13 @@ export default defineComponent({
         },
         handleParams() {
             // happens on page load, route updates + AFTER auth (to get local vars of app for ex)
-            if (this.$route.name === 'search' || this.$route.name === 'full') {
-                this.setSearch(this.$route.params.query);
-            }
-            if (this.$route.name === 'contract' || this.$route.name === 'full') {
-                this.loadApp(parseInt(this.$route.params.contractId as string));
-            }
+
+            // if (this.$route.name === 'search' || this.$route.name === 'full') {
+            //     this.setSearch(this.$route.params.query);
+            // }
+            // if (this.$route.name === 'contract' || this.$route.name === 'full') {
+            //     this.loadApp(parseInt(this.$route.params.contractId as string));
+            // }
         },
         loadApp(appIndex: number) {
             console.log('loadApp', appIndex);
@@ -474,6 +474,19 @@ $space: 10px;
         flex: 1 1 90%;
         padding: 5px 10px;
     }
+    input::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        cursor: pointer;
+
+        background-color: rgba(255, 255, 255, 0.5);
+        -webkit-mask-image: url(https://fonts.gstatic.com/s/i/materialicons/cancel/v16/24px.svg);
+        mask-image: url(https://fonts.gstatic.com/s/i/materialicons/cancel/v16/24px.svg);
+        -webkit-mask-size: contain;
+        mask-size: contain;
+    }
 
     button {
         flex: 1 1 100px;
@@ -532,11 +545,10 @@ $space: 10px;
 
         a.long-cell {
             display: block;
-            max-width: 240px;
+            max-width: 260px;
             overflow-x: scroll;
-
             padding-right: 10px;
-            margin-right: -10px;
+            margin-right: -48px;
             mask-image: linear-gradient(
                 to left,
                 rgba(0, 0, 0, 0) 0px,
