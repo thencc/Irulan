@@ -24,10 +24,13 @@
 
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineAsyncComponent, defineComponent } from 'vue';
+
 import state from '../../state';
-import Setup from '../Setup.vue';
-import Log from '../Log.vue';
+
+// components
+// import Setup from '../Setup.vue';
+// import Log from '../Log.vue';
 import Browser from '../Browser.vue';
 import ContractTool from '../ContractTool.vue';
 import Account from '../Account.vue';
@@ -37,8 +40,12 @@ import CreateAsset from '../CreateAsset.vue';
 
 export default defineComponent({
 	components: {
-		Setup,
-		Log,
+		// Setup,
+		Setup: defineAsyncComponent(
+			// () => '../Setup.vue'
+			() => import('../Setup.vue')
+		),
+		// Log,
 		Account,
 		Modal,
 		Browser,
@@ -46,24 +53,14 @@ export default defineComponent({
 		Deploy,
 		CreateAsset
 	},
-	setup() {
-	},
-	mounted() {
-		state.log('The real universe is always one step beyond logic.');
-	},
-	created() {
-		this.$watch(
-		() => this.$route.params,
-			(toParams: any) => {
-				//console.log(toParams);
-			}
-		)
-	},
 	data() {
 		return {
-			showAbout: false,
-			currentApp: NaN
+			showAbout: false
 		}
+	},
+	// setup() {
+	// },
+	mounted() {
 	},
 	methods: {
 	}

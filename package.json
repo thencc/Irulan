@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
+    "@types/node": "^18.0.0",
     "@vitejs/plugin-vue": "^2.0.0",
     "sass": "^1.49.0",
     "typed-emitter": "^2.1.0",

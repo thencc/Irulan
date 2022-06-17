@@ -1,12 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // types
-import type { Router, NavigationFailure } from 'vue-router';
+import type { Router } from 'vue-router';
 interface RouterExt {
 	nonDestructivePush(opts: {
+		name?: string;
 		params?: Record<string, string>, // TODO test if | undefined works here too
 		query?: Record<string, string | string[] | undefined> // setting a qs to undefined removes just this one
-	}): Promise<void | NavigationFailure | undefined>;
+	}): ReturnType<Router['push']>;
+
+	nonDestructiveResolve(opts: {
+		name?: string;
+		params?: Record<string, string>, // TODO test if | undefined works here too
+		query?: Record<string, string | string[] | undefined> // setting a qs to undefined removes just this one
+	}): ReturnType<Router['resolve']>;
 }
 
 // pages
@@ -15,6 +22,7 @@ import Dashboard from './components/pages/Dashboard.vue';
 import About from './components/pages/About.vue';
 import Terms from './components/pages/Terms.vue';
 // panels (for main dashboard view)
+import Header from './components/panels/Header.vue';
 import AppPanel from './components/panels/AppPanel.vue';
 
 const router = createRouter({
@@ -28,7 +36,7 @@ const router = createRouter({
 			path: '/about',
 			components: {
 				default: About,
-				header: AppPanel
+				// header: AppPanel
 			}
 		},
 		{
@@ -36,8 +44,7 @@ const router = createRouter({
 			// component: Terms
 			components: {
 				default: Terms,
-				header: AppPanel
-				// DONT include header component
+				header: AppPanel // TODO remove this. // DONT include header component
 			}
 		},
 		{
@@ -45,7 +52,7 @@ const router = createRouter({
 			path: '/:ledger',
 			// component: Dashboard,
 			components: {
-				header: AppPanel,
+				header: Header,
 				default: Dashboard
 			},
 			beforeEnter: (to, from, next) => {
@@ -67,7 +74,7 @@ const router = createRouter({
 			children: [
 				{
 					// because smart-contracts are apps, assets or addresses
-					name: 'AppPanel',
+					name: 'DashApp',
 					path: 'app/:appId',
 					// component: AppPanel
 					components: {
@@ -160,6 +167,7 @@ const nonDestructivePush: RouterExt['nonDestructivePush'] = async (opts) => {
 	// console.log('router.nonDestructivePush', opts);
 	return await router.push({
 		...router.currentRoute.value, // keeps hash in route/URL
+		name: opts.name || router.currentRoute.value.name || undefined,
 		params: {
 			...router.currentRoute.value.params, // keeps prev params
 			...opts.params || {}
@@ -172,5 +180,23 @@ const nonDestructivePush: RouterExt['nonDestructivePush'] = async (opts) => {
 	});
 };
 router.nonDestructivePush = nonDestructivePush;
+
+const nonDestructiveResolve: RouterExt['nonDestructiveResolve'] = (opts) => {
+	console.log('router.nonDestructiveResolve', opts);
+	return router.resolve({
+		...router.currentRoute.value, // keeps hash in route/URL
+		name: opts.name || router.currentRoute.value.name || undefined,
+		params: {
+			...router.currentRoute.value.params, // keeps prev params
+			...opts.params || {}
+		},
+		query: {
+			...router.currentRoute.value.query, // keeps prev query strings
+			...opts.query || {}
+		},
+		// hash: opts.hash, // needed?
+	});
+};
+router.nonDestructiveResolve = nonDestructiveResolve;
 
 export default router;

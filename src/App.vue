@@ -1,11 +1,13 @@
 <template>
-	<router-view name="header"></router-view>
-	<router-view name="default"></router-view>
+	<!-- <router-view name="header"></router-view> -->
+	<!-- <router-view name="default"></router-view> -->
 
-	<!-- appear still happens...? -->
-	<!-- <transition name="fade" mode="out-in">
+	<transition :name="fadeDelay" mode="out-in">
+		<router-view name="header"></router-view>
+	</transition>
+	<transition :name="fadeDelay" mode="out-in">
 		<router-view name="default"></router-view>
-	</transition> -->
+	</transition>
 
 	<!-- <div :class="`modal ${modal ? 'is-active' : ''}`">
 		<div class="modal-background" @click="$root.closeModal()"></div>
@@ -36,25 +38,19 @@ export default defineComponent({
 		Deploy,
 		CreateAsset
 	},
-	setup() {
-
-	},
-	mounted() {
-		state.log('The real universe is always one step beyond logic.');
-	},
-	created() {
-		this.$watch(
-			() => this.$route.params,
-			(toParams: any) => {
-				//console.log(toParams);
-			}
-		)
-	},
 	data() {
 		return {
-			showAbout: false,
-			currentApp: NaN
+			fadeDelay: '',
 		}
+	},
+	setup() {
+	},
+	mounted() {
+		// only set transition name after page load (solution for NO initial page load fade-in, but fade trans all further router moves)
+		// add in if you want a router trans
+		setTimeout(() => this.fadeDelay = 'fade', 1000);
+	},
+	created() {
 	},
 	methods: {
 	}
@@ -213,28 +209,10 @@ table {
 
 /* --- VUE CSS TRANSITIONS --- */
 /** FADE */
-
-/*
-.fade-enter-active,
-.fade-leave-active {
-	// transition: opacity 0.2s linear;
-	transition: opacity 20s linear;
-}
-// .fade-enter-from,
-// .fade-leave-to {
-// 	opacity: 0;
-// }
-.fade-enter-from {
-	opacity: 0;
-}
-.fade-leave-to {
-	opacity: 0;
-}
-*/
-
-// animations also work!
+// fyi css transitions + animations both work
 .fade-enter-active {
-	animation: fade-in 0.3s;
+	// animation: fade-in 0.2s;
+	animation: fade-in 2s;
 }
 .fade-leave-active {
 	animation: fade-in 0.2s reverse;

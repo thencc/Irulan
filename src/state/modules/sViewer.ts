@@ -9,9 +9,15 @@ import { bus } from '../../bus';
 import { sApp } from './sApp';
 
 export const sViewer = reactive({
+	// TODO make type a computed field like tables/PresenceCtx.ts reactive ...toRefs trick
+	// + can make computed currentViewObj?
 	type: '' as '' | 'contract', // 'app' | 'asset' | 'block' | 'transaction' | 'address' , // etc...
 
+	// viewers
+	sApp,
+
 	contractId: null as null | number, // not null IF type=='contract'
+	appId: null as null | number, // not null IF type=='contract'
 
 	query: '',
 	// queryFound: '' as string | number, // appId / address / etc (or use response below?)
@@ -129,20 +135,40 @@ watch(
 	(rc) => {
 		console.log('router changed (in sViewer):', rc, router);
 
-		// TODO rename contractId -> appId
-		if (rc.params.contractId) {
-			if (typeof rc.params.contractId == 'string') {
-				console.log('got params contractId', rc.params.contractId, parseInt(rc.params.contractId));
+		/*
+		if (rc.params.appId) {
+			if (typeof rc.params.appId == 'string') {
+				console.log('got params appId', rc.params.appId, parseInt(rc.params.appId));
 				// sViewer.type = 'contract'; // in watcher
-				sViewer.contractId = parseInt(rc.params.contractId) || null;
+				sViewer.appId = parseInt(rc.params.appId) || null;
+				sApp.appId = parseInt(rc.params.appId) || null;
 			} else {
 				// its an array of strings or something...
 				console.warn('param is arr, not string');
-				sViewer.contractId = null;
+				sViewer.appId = null;
+				sApp.appId = null;
 			}
 		} else {
-			sViewer.contractId = null;
+			sViewer.appId = null;
+			sApp.appId = null;
 		}
+		*/
+
+
+		// TODO rename contractId -> appId
+		// if (rc.params.contractId) {
+		// 	if (typeof rc.params.contractId == 'string') {
+		// 		console.log('got params contractId', rc.params.contractId, parseInt(rc.params.contractId));
+		// 		// sViewer.type = 'contract'; // in watcher
+		// 		sViewer.contractId = parseInt(rc.params.contractId) || null;
+		// 	} else {
+		// 		// its an array of strings or something...
+		// 		console.warn('param is arr, not string');
+		// 		sViewer.contractId = null;
+		// 	}
+		// } else {
+		// 	sViewer.contractId = null;
+		// }
 
 		// else if (rc.params.appId) {
 		// 	console.warn('TODO');
@@ -166,12 +192,12 @@ watch(
 
 //
 watch(
-	() => sViewer.contractId,
-	async (cId, cIdOld) => {
-		if (cId) {
-			sViewer.type = 'contract';
+	() => sViewer.appId,
+	async (appId, appIdOld) => {
+		if (appId) {
+			sViewer.type = 'contract'; // TODO update
 
-			if (cId !== cIdOld) {
+			if (appId !== appIdOld) {
 				console.warn('TODO loadContract');
 
 				// TODO
@@ -180,7 +206,7 @@ watch(
 
 				router.nonDestructivePush({
 					params: {
-						contractId: cId.toString()
+						appId: appId.toString()
 					},
 				});
 			}

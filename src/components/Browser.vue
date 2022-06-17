@@ -30,7 +30,11 @@
                         {{ utils.shortAddr(response.object.creatorAddress) }}
                     </a>
                 </p>
-                <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button>
+                <!-- <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button> -->
+                <router-link v-if="response.type === 'app'" :to="getDashAppRoute(response.object.index)"
+                    v-slot="{ route }">
+                    <button>Load Contract</button>
+                </router-link>
 
                 <div class="app" v-if="response.type === 'app'">
                     <h3 class="purple">Global State</h3>
@@ -216,7 +220,11 @@
                             <td class="key">{{ app.id }}</td>
                             <td>
                                 <button class="btn-link pink" @click="setSearch(app.id)">View in Browser</button>
-                                <button @click="loadApp(app.id)">Load Contract</button>
+
+                                <!-- <button @click="loadApp(app.id)">Load Contract</button> -->
+                                <router-link :to="getDashAppRoute(app.id)">
+                                    <button>Load Contract</button>
+                                </router-link>
                             </td>
                         </tr>
                     </table>
@@ -234,6 +242,8 @@ import { defineComponent, ref, watch } from 'vue';
 import { useKeypress } from 'vue3-keypress';
 import * as utils from '../utils';
 import { bus } from '../bus';
+import router from '../router';
+// import router from '@/router'; // both work, but this is less vscode dependant
 
 // states
 import state from '../state';
@@ -255,7 +265,7 @@ export default defineComponent({
             searching: false,
 
             searchQueryInputVal: '',
-            queryTimer: 0
+            queryTimer: 0 as number | NodeJS.Timeout
         }
     },
     setup(props, ctx) {
@@ -336,13 +346,49 @@ export default defineComponent({
             //     this.loadApp(parseInt(this.$route.params.contractId as string));
             // }
         },
+        getDashAppRoute(appId: number) {
+            console.log('getDashAppRoute', appId);
+
+            let r = router.nonDestructiveResolve({
+                name: 'DashApp',
+                params: {
+                    appId: appId.toString()
+                }
+            });
+            return r.fullPath;
+        },
         loadApp(appIndex: number) {
             console.log('loadApp', appIndex);
             // this.$router.push(
             //     state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query })
             // );
 
-            state.loadApp(appIndex);
+            // router.nonDestructivePush({
+            //     params: {
+            //         appId: appIndex.toString()
+            //     }
+            // });
+
+            // let r = router.nonDestructiveResolve({
+            //     params: {
+            //         appId: appIndex.toString()
+            //     }
+            // });
+            // console.log('r', r);
+            // console.log('f', r.fullPath);
+
+            // works
+            // let params = {...this.$route.params};
+            // params['appId'] = appIndex.toString();
+            // this.$router.push({ name: 'AppPanel', params: params, query: { ...this.$route.query } });
+
+            // this.$router.push({
+            //     path: '' // testnet/app/123 + querystrings
+            // })
+
+            // DashApp
+
+            // state.loadApp(appIndex);
         },
         setSearch(query: any) {
             state.sSearch.query = query;
@@ -486,6 +532,9 @@ $space: 10px;
         mask-image: url(https://fonts.gstatic.com/s/i/materialicons/cancel/v16/24px.svg);
         -webkit-mask-size: contain;
         mask-size: contain;
+    }
+    input::-webkit-search-cancel-button:hover {
+        background-color: rgba(255, 255, 255, 0.75);
     }
 
     button {

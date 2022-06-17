@@ -16,6 +16,9 @@ export default defineComponent({
         return {
             state
         }
+    },
+    mounted() {
+        state.log('The real universe is always one step beyond logic.');
     }
 })
 </script>

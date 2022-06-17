@@ -113,6 +113,8 @@ export const sApp = reactive({
 
 
 
+// TODO move route watchers to individual state files?
+// so no voodoo is happening as to where the other logic for this file is.
 
 // sync route w sViewer state
 // watch(
@@ -166,5 +168,25 @@ watch(
 	},
 	{
 		immediate: true
+	}
+);
+
+// watch route
+watch(
+	() => router.currentRoute.value.params.appId,
+	(appId) => {
+		if (appId) {
+			if (typeof appId == 'string') {
+				console.log('sApp got appId from route watcher', appId, parseInt(appId));
+
+				sApp.appId = parseInt(appId) || null;
+			} else {
+				// its an array of strings or something...
+				console.warn('param is arr, not string.');
+				sApp.appId = null;
+			}
+		} else {
+			sApp.appId = null;
+		}
 	}
 );

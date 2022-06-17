@@ -1,51 +1,26 @@
 <template>
-	<!-- need an outer div container to apply transition correctly -->
-	<div>
-		<header class="header">
-			<div class="header-left">
-				<h1>Irulan</h1>
-				<button class="about-link btn-link-muted" @click="showAbout = true">What is this?</button>
-				<Modal :show="showAbout" @close="showAbout = false">
-					<h3 class="modal-title">About Irulan</h3>
-					<div class="modal-content">
-						<p>Irulan is a general purpose utility to interact with Algorand contracts, powered by <a
-								href="https://thencc.github.io/algonautjs/" target="_blank">Algonaut.js</a>.</p>
-						<p>It's also <a href="https://github.com/thencc/Irulan" target="_blank">open source</a>!</p>
-					</div>
-				</Modal>
-			</div>
-			<div style="flex-grow: 1"></div>
-			<div class="header-right">
-				<CreateAsset />
-				<Deploy />
-				<Account />
-				<!-- <Setup /> -->
-			</div>
-		</header>
-
-		<main class="container">
-			Dashboard
-
-			<router-view name="default"></router-view>
-
-			<!-- <div class="left-col">
+	<!-- need 1 outer container to apply transition correctly -->
+	<main class="container">
+		<div class="left-col">
 			<Browser />
 			<Log />
 		</div>
 		<div class="right-col">
-			<ContractTool />
-			<div class="footer-actions">
-			</div>
-		</div> -->
-		</main>
-	</div>
-</template>
+			<transition :name="'fade'" mode="out-in">
+				<router-view name="default"></router-view>
+			</transition>
 
+			<!-- <ContractTool /> -->
+			<!-- <div class="footer-actions"></div> -->
+		</div>
+	</main>
+</template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import state from '../../state';
-import Setup from '../Setup.vue';
+
+// import Setup from '../Setup.vue';
 import Log from '../Log.vue';
 import Browser from '../Browser.vue';
 import ContractTool from '../ContractTool.vue';
@@ -56,7 +31,7 @@ import CreateAsset from '../CreateAsset.vue';
 
 export default defineComponent({
 	components: {
-		Setup,
+		// Setup,
 		Log,
 		Account,
 		Modal,
@@ -65,23 +40,22 @@ export default defineComponent({
 		Deploy,
 		CreateAsset
 	},
-	setup() {
-	},
+	// setup() {
+	// },
 	mounted() {
-		state.log('The real universe is always one step beyond logic.');
 	},
-	created() {
-		this.$watch(
-		() => this.$route.params,
-			(toParams: any) => {
-				//console.log(toParams);
-			}
-		)
-	},
+	// created() {
+	// 	this.$watch(
+	// 	() => this.$route.params,
+	// 		(toParams: any) => {
+	// 			//console.log(toParams);
+	// 		}
+	// 	)
+	// },
 	data() {
 		return {
-			showAbout: false,
-			currentApp: NaN
+			// showAbout: false,
+			// currentApp: NaN
 		}
 	},
 	methods: {

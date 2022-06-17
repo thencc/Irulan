@@ -61,7 +61,6 @@ export default defineComponent({
 	setup() {
 	},
 	mounted() {
-		state.log('The real universe is always one step beyond logic.');
 	},
 	created() {
 		this.$watch(
