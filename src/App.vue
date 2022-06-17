@@ -155,7 +155,7 @@ header {
 	.left-col {
 		flex: 0 0 40%;
 		display: flex;
-		max-width: 600px;
+		max-width: 420px;
 	}
 
 	.right-col {

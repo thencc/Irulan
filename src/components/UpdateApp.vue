@@ -28,14 +28,22 @@
     </Modal>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
+import state from '../state';
+
+// comps
 import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
-import state from '../state';
 
 export default defineComponent({
+    components: {
+        Modal,
+        ArrayField,
+        LoadingButton
+    },
     props: {
+        // TODO type this / just use sApp state
         app: {} as any
     },
     data() {
@@ -57,13 +65,13 @@ export default defineComponent({
         }
     },
     watch: {
-        'state.currentApp.approvalDecompiled': {
+        'app.approvalDecompiled': {
             immediate: true,
             handler(c) {
                 this.deployArgs.approvalProgram = (c || '').replaceAll('\t','');
             }
         },
-        'state.currentApp.clearDecompiled': {
+        'app.clearDecompiled': {
             immediate: true,
             handler(c) {
                 this.deployArgs.clearStateProgram = (c || '').replaceAll('\t','');
@@ -132,13 +140,9 @@ export default defineComponent({
             this.deployLoading = false;
         }
     },
-    components: {
-        Modal,
-        ArrayField,
-        LoadingButton
-    },
 })
 </script>
+
 <style lang="scss" scoped>
 .modal-content {
     display: flex;

@@ -170,11 +170,11 @@ header {
 	left: 0;
 	right: 0;
 
-	.left-col {
-		flex: 0 0 40%;
-		display: flex;
-		max-width: 600px;
-	}
+	// .left-col {
+	// 	flex: 0 0 40%;
+	// 	display: flex;
+	// 	max-width: 600px;
+	// }
 
 	.right-col {
 		// flex: 1 0 60%;

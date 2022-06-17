@@ -15,6 +15,7 @@
                 {{ state.sSearch.response.message }}
             </p>
 
+            <!-- TODO finish switching over response -> sSearch.response -->
             <div class="object" v-else-if="response && response.object">
                 <h2>{{ response.type }}
                     <span :class="response.type === 'account' ? 'purple' : 'green'">
@@ -446,6 +447,7 @@ export default defineComponent({
         // }
     },
     computed: {
+        // < !--TODO finish switching over response -> sSearch.response-- >
         response: () => state.sSearch.response
         // globalState: function () {
         //     if (this.response && this.response.object && this.response.type === 'app') {
@@ -471,6 +473,8 @@ $space: 10px;
     flex: 1 1 70%;
     border: 2px solid $border;
     overflow-y: scroll;
+    overflow-x: scroll;
+    // max-width: 420px;
 
     h3 {
         margin-top: 2em;

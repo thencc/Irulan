@@ -10,6 +10,22 @@ export const sSearch = reactive({
 	// queryFound: '' as string | number, // appId / address / etc (or use response below?)
 	response: null as null | any, // TODO type... something like: { type: 'account' | 'asset' | 'app', object: AppState, Account, Asset }
 	loading: false,
+
+	getSearchRoute(query: string) {
+		return router.nonDestructiveResolve({
+			query: {
+				s: query
+			}
+		});
+	},
+	getSearchPath(query: string) {
+		return router.nonDestructiveResolve({
+			query: {
+				s: query
+			}
+		}).fullPath;
+	},
+
 });
 
 const parseQuery = async (q: string) => {

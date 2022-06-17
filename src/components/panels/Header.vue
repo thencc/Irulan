@@ -148,39 +148,6 @@ header {
 	color: $textlight;
 }
 
-.container {
-	display: flex;
-	position: absolute;
-	top: $headerheight;
-	bottom: 0;
-	left: 0;
-	right: 0;
-
-	.left-col {
-		flex: 0 0 40%;
-		display: flex;
-		max-width: 600px;
-	}
-
-	.right-col {
-		// flex: 1 0 60%;
-		flex: 1 0 min-content;
-
-		.module {
-			margin-left: 0;
-		}
-	}
-}
-
-.left-col, .right-col {
-	display: flex;
-	flex-direction: column;
-
-	.module {
-		flex: 1 1 25%;
-	}
-}
-
 // LOG
 .terminal {
 	background: #000;

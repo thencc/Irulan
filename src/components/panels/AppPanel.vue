@@ -8,111 +8,37 @@
 							App
 						</span>
 						<!-- keeps browser url preview + doesnt reload page w a.href -->
-						<router-link class="green link" :to="browserLink(app.index)">
+						<router-link class="green link" :to="state.sSearch.getSearchPath(app.index)">
 							{{ app.index }}
 						</router-link>
 					</h2>
 					<div style="flex-grow: 1"></div>
-					<!-- <UpdateApp :app="app" /> -->
-					<!-- <LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">
+					<UpdateApp :app="app" />
+					<LoadingButton @click="deleteApp" class="btn-danger" :loading="deleteAppLoading">
 						Delete App
-					</LoadingButton> -->
+					</LoadingButton>
 				</div>
 
 				<p class="metadata">
 					<span class="creator">
 						<span class="muted">Creator: </span>
-						<span class="purple link" @click="browserLink(app.creatorAddress)">
+						<router-link class="purple link" :to="state.sSearch.getSearchPath(app.creatorAddress)">
 							{{ utils.shortAddr(app.creatorAddress) }}
-						</span>
+						</router-link>
 					</span>
 				</p>
 			</div>
 		</div>
-		<!-- <div class="utilities">
+		<div class="utilities">
 			<div class="left-col">
-				<div class="utility call-app">
-					<h3>App Operations</h3>
-					<div>
-						Transaction type:
-						<select v-model="callAppArgs.operationType" name="operationType" id="operationType">
-							<option value="callApp">Call App</option>
-							<option value="optInApp">Opt-In App</option>
-							<option value="closeOutApp">Close Out App</option>
-						</select>
-						<div class="method-name" v-if="callAppArgs.operationType === 'callApp'">
-							<p><input type="text" v-model="callAppArgs.methodName" placeholder="Method name"></p>
-							<p class="small muted">(method name gets prepended to arguments array)</p>
-						</div>
-						<h4 class="purple">
-							<span>
-								Arguments
-							</span>
-							<span v-if="callAppArgs.appArgs.length" class="small muted">
-								({{ callAppArgs.appArgs.length }})
-							</span>
-						</h4>
-						<ArrayField v-model="callAppArgs.appArgs" :placeholder="'Add argument'" />
-						<h4 class="purple">
-							<span>
-								Accounts
-							</span>
-							<span v-if="callAppArgs.accounts.length" class="small muted">
-								({{ callAppArgs.accounts.length }})
-							</span>
-						</h4>
-						<ArrayField v-model="callAppArgs.accounts" :placeholder="'Add account'" />
-						<h4 class="purple">
-							<span>
-								Foreign Applications
-							</span>
-							<span v-if="callAppArgs.applications.length" class="small muted">
-								({{ callAppArgs.applications.length }})
-							</span>
-						</h4>
-						<ArrayField v-model="callAppArgs.applications" :placeholder="'Add app ID'" />
-						<h4 class="purple">
-							<span>
-								Foreign Assets
-							</span>
-							<span v-if="callAppArgs.assets.length" class="small muted">
-								({{ callAppArgs.assets.length }})
-							</span>
-						</h4>
-						<ArrayField v-model="callAppArgs.assets" :placeholder="'Add app ID'" />
-						<p class="align-right">
-							<LoadingButton @click="callApp" type="submit" :loading="callAppLoading">Call App
-							</LoadingButton>
-						</p>
-					</div>
-				</div>
+				<AppOperationsModule />
 			</div>
 			<div class="right-col">
-				<div class="utility fund-app">
-					<h3>Fund App</h3>
-					<p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
-					<form @submit.prevent="fundApp">
-						<p v-if="escrowAddress" class="small muted">
-							<span>Escrow address: </span>
-							<span class="purple link" @click="browserLink(escrowAddress || '')">
-								{{ utils.shortAddr(escrowAddress) }}
-							</span>
-						</p>
-						<p><input type="number" v-model="fundAppAmt" placeholder="ALGO to send"
-								:disabled="fundAppLoading"></p>
-						<p class="align-right">
-							<LoadingButton type="submit" :loading="fundAppLoading">Fund App</LoadingButton>
-						</p>
-					</form>
-				</div>
-				<div class="utility algonaut-code">
-					<h3>Algonaut.js Code</h3>
-					<p class="small muted">Click to copy</p>
-					<pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
-				</div>
+				<FundAppModule />
+				<CopyAlgoCodeModule />
 				<AppLogsModule :app-id="app.index" />
 			</div>
-		</div> -->
+		</div>
 	</div>
 </template>
 
@@ -123,19 +49,36 @@ import state from '../../state';
 import { sApp } from '../../state/modules/sApp';
 import router from '../../router';
 
+// components
+import ArrayField from '../ArrayField.vue';
+import LoadingButton from '../LoadingButton.vue';
+import UpdateApp from '../UpdateApp.vue';
+import FundAppModule from '../ContractModules/FundAppModule.vue';
+import AppLogsModule from '../ContractModules/AppLogsModule.vue';
+import CopyAlgoCodeModule from '../ContractModules/CopyAlgoCodeModule.vue';
+import AppOperationsModule from '../ContractModules/AppOperationsModule.vue';
+
 export default defineComponent({
 	components: {
-	},
+    ArrayField,
+    LoadingButton,
+    UpdateApp,
+    FundAppModule,
+    AppLogsModule,
+    CopyAlgoCodeModule,
+    AppOperationsModule
+},
 	data() {
 		return {
 			state,
-			utils
+			utils,
+
+			deleteAppLoading: false
 		}
 	},
 	computed: {
 		app: function () {
-			return sApp.currentApp;
-
+			return sApp.currentApp; // works
 			// also works IF import(router).then approach used
 			// if (sApp.currentApp && sApp.currentApp.index) {
 			// 	return sApp.currentApp;
@@ -152,13 +95,26 @@ export default defineComponent({
 	mounted() {
 	},
 	methods: {
-		browserLink(query: string) {
-			let r = router.nonDestructiveResolve({
-				query: {
-					s: query
+		async deleteApp() {
+			if (!state.algonaut.account) return state.error('No account connected.');
+			if (state.activeAccount !== this.app.creatorAddress) {
+				state.log('The connected account is not the creator of the app, but we will attempt to delete the application anyway.');
+			}
+			if (window.confirm('Are you sure you want to delete this application? You may only do so if you are the creator.')) {
+				this.deleteAppLoading = true;
+				try {
+					const res = await state.algonaut.deleteApplication(state.currentApp.index);
+					if (res.status === 'fail') {
+						state.error(res.message);
+					} else {
+						state.log(res.message);
+					}
+				} catch (e) {
+					console.log(e);
+					state.error('Error deleting application. Most likely, you do not have permission to delete it.')
 				}
-			});
-			return r.fullPath;
+			}
+			this.deleteAppLoading = false;
 		},
 	}
 });
@@ -167,79 +123,51 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import '../../assets/variables';
 .contract-tool {
-    padding: 10px;
+	padding: 10px;
 }
 
 h2 {
-    margin-top: 0;
-    padding-top: 10px;
+	margin-top: 0;
+	padding-top: 10px;
 }
 
 .contract-header {
-    display: flex;
+	display: flex;
 
-    .contract-info {
-        flex: 1 0 70%;
+	.contract-info {
+		flex: 1 0 70%;
 
-        button {
-            margin: 0 5px 0 10px;
-        }
-    }
+		button {
+			margin: 0 5px 0 10px;
+		}
+	}
 
-    // .contract-actions {
-    //     flex: 0 0 30%;
-    //     text-align: right;
+	// .contract-actions {
+	//     flex: 0 0 30%;
+	//     text-align: right;
 
-    //     button {
-    //         margin: 10px;
-    //     }
-    // }
+	//     button {
+	//         margin: 10px;
+	//     }
+	// }
 }
 
 .utilities {
-    display: flex;
-    flex-wrap: wrap;
+	display: flex;
+	flex-wrap: wrap;
 
-    .left-col, .right-col {
-        flex: 1 1 45%;
-        margin: 0 5px;
-    }
-}
-
-.utility {
-    //flex: 0 0 50%;
-    border: 2px solid $border;
-    padding: 10px;
-    margin-bottom: 10px;
-
-    h3 {
-        color: $pink;
-        margin: 0;
-        padding: 0;
-        text-transform: uppercase;
-    }
-
-    input {
-        width: 100%;
-    }
-}
-
-.code-block {
-    background: $bgdark;
-    padding: 5px;
-
-    &:hover {
-        background-color: lighten($bgdark, 5%);
-        cursor: pointer;
-    }
+	.left-col, .right-col {
+		flex: 1 1 45%;
+		margin: 0 5px;
+	}
 }
 
 .link {
-    text-decoration: underline;
-    cursor: pointer;
+	text-decoration: underline;
+	cursor: pointer;
 
-    &:hover {
-        opacity: 0.8;
-    }
+	&:hover {
+		opacity: 0.8;
+	}
 }
 </style>
