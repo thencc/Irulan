@@ -212,7 +212,7 @@ table {
 // fyi css transitions + animations both work
 .fade-enter-active {
 	// animation: fade-in 0.2s;
-	animation: fade-in 2s;
+	animation: fade-in 1s;
 }
 .fade-leave-active {
 	animation: fade-in 0.2s reverse;

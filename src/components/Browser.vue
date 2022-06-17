@@ -31,7 +31,7 @@
                     </a>
                 </p>
                 <!-- <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button> -->
-                <router-link v-if="response.type === 'app'" :to="getDashAppRoute(response.object.index)"
+                <router-link v-if="response.type === 'app'" :to="getDashAppPath(response.object.index)"
                     v-slot="{ route }">
                     <button>Load Contract</button>
                 </router-link>
@@ -222,7 +222,7 @@
                                 <button class="btn-link pink" @click="setSearch(app.id)">View in Browser</button>
 
                                 <!-- <button @click="loadApp(app.id)">Load Contract</button> -->
-                                <router-link :to="getDashAppRoute(app.id)">
+                                <router-link :to="getDashAppPath(app.id)">
                                     <button>Load Contract</button>
                                 </router-link>
                             </td>
@@ -346,9 +346,8 @@ export default defineComponent({
             //     this.loadApp(parseInt(this.$route.params.contractId as string));
             // }
         },
-        getDashAppRoute(appId: number) {
-            console.log('getDashAppRoute', appId);
-
+        getDashAppPath(appId: number) {
+            // console.log('getDashAppPath', appId);
             let r = router.nonDestructiveResolve({
                 name: 'DashApp',
                 params: {
@@ -357,39 +356,14 @@ export default defineComponent({
             });
             return r.fullPath;
         },
-        loadApp(appIndex: number) {
-            console.log('loadApp', appIndex);
-            // this.$router.push(
-            //     state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query })
-            // );
+        // loadApp(appIndex: number) {
+        //     console.log('loadApp', appIndex);
+        //     // this.$router.push(
+        //     //     state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query })
+        //     // );
 
-            // router.nonDestructivePush({
-            //     params: {
-            //         appId: appIndex.toString()
-            //     }
-            // });
-
-            // let r = router.nonDestructiveResolve({
-            //     params: {
-            //         appId: appIndex.toString()
-            //     }
-            // });
-            // console.log('r', r);
-            // console.log('f', r.fullPath);
-
-            // works
-            // let params = {...this.$route.params};
-            // params['appId'] = appIndex.toString();
-            // this.$router.push({ name: 'AppPanel', params: params, query: { ...this.$route.query } });
-
-            // this.$router.push({
-            //     path: '' // testnet/app/123 + querystrings
-            // })
-
-            // DashApp
-
-            // state.loadApp(appIndex);
-        },
+        //     // state.loadApp(appIndex);
+        // },
         setSearch(query: any) {
             state.sSearch.query = query;
             // old:

@@ -109,7 +109,14 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 	console.log('r befo', from, to);
-	next();
+
+	if (to.params.contract == 'undefined') {
+		console.warn('contract undefined!');
+		console.warn('TODO come back and fix this'); // TODO
+		delete to.params.contract;
+	}
+
+	next(); // assumes next(to) so previous delete obj kv pairs are heard
 
 	// this.$router.replace({
 	// 	...this.$route, // makes sure hash stays in URL
@@ -118,7 +125,7 @@ router.beforeEach(async (to, from, next) => {
 	// 		...this.$route.params, // makes sure OTHER params stay in URL
 	// 		ledger: this.config.ledger,
 	// 		query: this.$route.params.query || undefined,
-	// 		conract: this.$route.params.contract || undefined
+	// 		contract: this.$route.params.contract || undefined
 	// 	},
 	// 	query: {
 	// 		...this.$route.query, // makes sure OTHER query params still in URL

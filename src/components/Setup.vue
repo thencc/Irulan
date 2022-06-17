@@ -127,8 +127,8 @@ export default defineComponent({
                 params: {
                     ...this.$route.params, // makes sure OTHER params stay in URL
                     ledger: this.config.ledger,
-                    query: this.$route.params.query || undefined,
-                    conract: this.$route.params.contract || undefined
+                    // query: this.$route.params.query || undefined,
+                    // contract: this.$route.params.contract || undefined
                 },
                 query: {
                     ...this.$route.query, // makes sure OTHER query params still in URL

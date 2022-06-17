@@ -118,9 +118,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import state from '../../state';
 import * as utils from '../../utils';
-
+import state from '../../state';
+import { sApp } from '../../state/modules/sApp';
 import router from '../../router';
 
 export default defineComponent({
@@ -134,9 +134,17 @@ export default defineComponent({
 	},
 	computed: {
 		app: function () {
-			if (state.currentApp && state.currentApp.index) {
-				return state.currentApp;
-			}
+			return sApp.currentApp;
+
+			// also works IF import(router).then approach used
+			// if (sApp.currentApp && sApp.currentApp.index) {
+			// 	return sApp.currentApp;
+			// }
+
+			// works
+			// if (state.currentApp && state.currentApp.index) {
+			// 	return state.currentApp;
+			// }
 		},
 	},
 	setup() {
