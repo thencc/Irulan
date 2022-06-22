@@ -75,7 +75,7 @@ export const sAlgo = reactive({
 	showSetup: false,
 	connected: false,
 	connecting: false,
-	activeAccount: null as any,
+	activeAccount: null as null | string,
 	hasLocalStorageAcct: false,
 	defaultTxnFee: 1000, // 0.001 algo
 	algonautJSCode: '',

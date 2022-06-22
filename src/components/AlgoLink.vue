@@ -13,7 +13,7 @@ export default defineComponent({
     computed: {
         link: function () {
             let baseUrl = 'https://testnet.algoexplorer.io/';
-            if (state.algonaut.config.LEDGER === 'MainNet') {
+            if (state.sAlgo.algonaut.config.LEDGER === 'MainNet') {
                 baseUrl = 'https://mainnet.algoexplorer.io/'
             }
             return baseUrl + this.type + '/' + this.address;

@@ -28,6 +28,7 @@ import { defineComponent } from 'vue'
 import Modal from './Modal.vue'
 import LoadingButton from './LoadingButton.vue'
 import state from '../state';
+import router from '../router';
 
 export default defineComponent({
     data() {
@@ -52,7 +53,7 @@ export default defineComponent({
         async deploy () {
             this.deployLoading = true;
             this.deployStatus = 'Waiting for signature...';
-            let res = await state.algonaut.createAsset(this.assetArgs, {
+            let res = await state.sAlgo.algonaut.createAsset(this.assetArgs, {
                 onSign: this.onSign,
                 onSend: this.onSend,
                 onConfirm: this.onConfirm
@@ -65,7 +66,11 @@ export default defineComponent({
             }
             state.success(`Created asset: ${assetId}`);
             this.close();
-            this.$router.push(state.getNewRoute(this.$route, { query: assetId }));
+            router.nonDestructivePush({
+                query: {
+                    s: assetId
+                }
+            });
         },
         onSign() {
             this.deployStatus = 'Sending transaction...'

@@ -96,7 +96,9 @@ export default defineComponent({
 	},
 	methods: {
 		async callApp() {
-			if (!state.algonaut.account) return state.error('No account connected.');
+			if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
+			if (!sApp.currentApp) return state.error('No app loaded');
+
 			this.callAppLoading = true;
 			state.sAlgo.algonautJSCode = '';
 
@@ -138,28 +140,28 @@ export default defineComponent({
 			try {
 				let res;
 				if (this.callAppArgs.operationType === 'callApp') {
-					// res = await state.algonaut.callApp({
+					// res = await state.sAlgo.algonaut.callApp({
 					//     appIndex: sApp.currentApp.index,
 					//     appArgs: args,
 					//     optionalFields: optionalFields
 					// });
 
 					// defaultTxnFee test (sometime unusual fees are needed to test contract-to-contract calls where sender covers inner txn fee. this will also need to be implemented in deploy app etc)
-					const txn = await state.algonaut.atomicCallApp({
+					const txn = await state.sAlgo.algonaut.atomicCallApp({
 						appIndex: sApp.currentApp.index,
 						appArgs: args,
 						optionalFields: optionalFields
 					});
 					txn.transaction.fee = state.sAlgo.defaultTxnFee;
-					res = await state.algonaut.sendTransaction(txn);
+					res = await state.sAlgo.algonaut.sendTransaction(txn);
 				} else if (this.callAppArgs.operationType === 'optInApp') {
-					res = await state.algonaut.optInApp({
+					res = await state.sAlgo.algonaut.optInApp({
 						appIndex: sApp.currentApp.index,
 						appArgs: args,
 						optionalFields: optionalFields
 					});
 				} else if (this.callAppArgs.operationType === 'closeOutApp') {
-					res = await state.algonaut.closeOutApp({
+					res = await state.sAlgo.algonaut.closeOutApp({
 						appIndex: sApp.currentApp.index,
 						appArgs: args,
 						optionalFields: optionalFields

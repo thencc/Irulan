@@ -48,21 +48,18 @@ const parseQuery = async (q: string) => {
 		return;
 	}
 
-	// const route = state.getNewRoute(this.$route, { query: this.query });
-	// this.$router.push(route);
 	sSearch.loading = true;
-
 	sSearch.response = null; // reset
 	var response = {} as any;
 
 	// TODO add back in... (make this an emit?)
 	// state.logRoute(`Searching: ${this.query}`, route);
 
-	// console.log('pre-lookup', state.algonaut.sdk);
+	// console.log('pre-lookup', state.sAlgo.algonaut.sdk);
 	console.log('pre-lookup:', state.sAlgo.algonaut.config?.BASE_SERVER);
 
 	// look account?
-	// if (state.algonaut.sdk?.isValidAddress(q)) { // old
+	// if (state.sAlgo.algonaut.sdk?.isValidAddress(q)) { // old
 	if (state.sAlgo.algonaut.sdk?.isValidAddress(q)) { // new
 		console.log('doing account lookup');
 
@@ -165,7 +162,6 @@ watch(
 			if (typeof searchQuery == 'string') {
 				// console.log('got search param', rc.query.s);
 
-				// TODO update getNewRoute to not override params + query like in Setup.vue > .applySettings()
 				sSearch.query = searchQuery;
 			} else {
 				// its an array of strings or something...

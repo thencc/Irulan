@@ -230,7 +230,7 @@ export default defineComponent({
 	},
 	computed: {
 		canWatchRealtimeLogs() {
-			return !!(state.algonaut.account && this.tabActive == 'realtime');
+			return !!(state.sAlgo.algonaut.account && this.tabActive == 'realtime');
 		}
 	},
 	watch: {
@@ -285,7 +285,7 @@ export default defineComponent({
 		},
 		async setCurrentRound() {
 			try {
-				const status = await state.algonaut.algodClient.status().do();
+				const status = await state.sAlgo.algonaut.algodClient.status().do();
 				this.roundCurrent = status['last-round'];
 			} catch(e) {
 				console.warn('err getting currentRound');
@@ -346,11 +346,11 @@ export default defineComponent({
 		async getAppLogs() {
 			// console.log('getAppLogs started');
 
-			if (!state.algonaut) {
+			if (!state.sAlgo.algonaut) {
 				console.warn('no algonaut');
 				return;
 			}
-			if (!state.algonaut.indexerClient) {
+			if (!state.sAlgo.algonaut.indexerClient) {
 				console.warn('no indexerClient');
 				return;
 			}
@@ -368,11 +368,11 @@ export default defineComponent({
 			}
 			// console.log('getAppLogs options:', this.options);
 
-			let logsReq = state.algonaut.indexerClient.lookupApplicationLogs(this.appId);
+			let logsReq = state.sAlgo.algonaut.indexerClient.lookupApplicationLogs(this.appId);
 
 			if (this.options.onlyMyLogs) {
-				if (state.algonaut.account) {
-					logsReq = logsReq.sender(state.algonaut.account.addr);
+				if (state.sAlgo.algonaut.account) {
+					logsReq = logsReq.sender(state.sAlgo.algonaut.account.addr);
 				} else {
 					console.log('FYI - you are not logged in, cannot show only my logs...')
 				}
@@ -403,9 +403,9 @@ export default defineComponent({
 		},
 		getReadable(logVal: string) {
 			if (this.decodeAs == 'string') {
-				return state.algonaut.fromBase64(logVal);
+				return state.sAlgo.algonaut.fromBase64(logVal);
 			} else if (this.decodeAs == 'addr') {
-				return state.algonaut.valueAsAddr(logVal);
+				return state.sAlgo.algonaut.valueAsAddr(logVal);
 			} else if (this.decodeAs == 'none') {
 				return logVal;
 			} else {

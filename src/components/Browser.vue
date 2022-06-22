@@ -269,6 +269,15 @@ export default defineComponent({
             queryTimer: 0 as number | NodeJS.Timeout
         }
     },
+    computed: {
+        // < !--TODO finish switching over response -> sSearch.response-- >
+        response: () => state.sSearch.response
+        // globalState: function () {
+        //     if (this.response && this.response.object && this.response.type === 'app') {
+        //         return state.sAlgo.algonaut.stateArrayToObject((this as any).response.object.globals);
+        //     }
+        // }
+    },
     setup(props, ctx) {
         const searchInput = ref<HTMLInputElement>();
 
@@ -357,14 +366,6 @@ export default defineComponent({
             });
             return r.fullPath;
         },
-        // loadApp(appIndex: number) {
-        //     console.log('loadApp', appIndex);
-        //     // this.$router.push(
-        //     //     state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query })
-        //     // );
-
-        //     // state.loadApp(appIndex);
-        // },
         setSearch(query: any) {
             state.sSearch.query = query;
             // old:
@@ -373,88 +374,9 @@ export default defineComponent({
             // sSearch.parseQuery(query); // happen automatically when changing sSearch.query
         },
         decode (s: string) {
-            return state.algonaut.fromBase64(s);
+            return state.sAlgo.algonaut.fromBase64(s);
         },
-        // async search () {
-        //     console.log('search');
-        //     console.log(state);
-        //     console.log(this.state);
-
-
-        //     const route = state.getNewRoute(this.$route, { query: this.query });
-        //     this.$router.push(route);
-        //     this.searching = true;
-        //     this.response = null
-        //     var response = {} as any;
-        //     state.logRoute(`Searching: ${this.query}`, route);
-        //     if (state.algonaut.sdk?.isValidAddress(this.query)) {
-        //         state.success('Account found.');
-        //         response = await state.algonaut.getAccountInfo(this.query);
-        //         this.searching = false;
-        //         this.response = {
-        //             type: 'account',
-        //             object: response
-        //         }
-
-
-        //         // get asset info
-        //         if (this.response.object.assets) {
-        //             this.response.object.assets.map((asset: any) => {
-        //                 state.algonaut.getAssetInfo(asset['asset-id']).then(assetInfo => {
-        //                     console.log(assetInfo);
-        //                     asset.creator = assetInfo.params.creator;
-        //                     return asset;
-        //                 })
-        //             })
-        //         }
-        //     } else if (parseInt(this.query)) {
-        //         // attempt to find app
-        //         try {
-        //             response = await state.algonaut.getAppInfo(parseInt(this.query));
-        //             state.success('App found.');
-        //             this.searching = false;
-        //             this.response = {
-        //                 type: 'app',
-        //                 object: response
-        //             }
-        //         } catch (e) {
-        //             try {
-        //                 response = await state.algonaut.getAssetInfo(parseInt(this.query));
-        //                 state.success('Asset found: ' + response.params.name);
-        //                 this.searching = false;
-        //                 this.response = {
-        //                     type: 'asset',
-        //                     object: response
-        //                 }
-        //             } catch (e) {
-        //                 console.error(e);
-        //                 this.searching = false;
-        //                 this.response = {
-        //                     type: 'empty',
-        //                     message: 'Nothing found.'
-        //                 }
-        //                 state.error(this.response.message);
-        //             }
-        //         }
-        //     } else {
-        //         this.response = {
-        //             type: 'empty',
-        //             message: 'Not a valid resource.'
-        //         };
-        //         state.error(this.response.message);
-        //         this.searching = false;
-        //     }
-        // }
     },
-    computed: {
-        // < !--TODO finish switching over response -> sSearch.response-- >
-        response: () => state.sSearch.response
-        // globalState: function () {
-        //     if (this.response && this.response.object && this.response.type === 'app') {
-        //         return state.algonaut.stateArrayToObject((this as any).response.object.globals);
-        //     }
-        // }
-    }
 });
 </script>
 

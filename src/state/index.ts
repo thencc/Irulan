@@ -15,44 +15,6 @@ export const state = reactive({
     sAlgo,
 
     terminal: [] as { type: string, message: string, route?: string }[],
-    connected: false,
-    connecting: false,
-    toolLoading: false,
-    isAccount: false,
-    indexer: {} as any,
-    activeAccount: null as any,
-    algonaut: sAlgo.algonaut,
-
-    /**
-     * Returns a new route to navigate to
-     * @param currentRoute Current route object
-     * @param toParams Params to update
-     */
-    getNewRoute(currentRoute: any, toParams: { query?: string, contractId?: string, ledger?: string }) {
-        console.log('getNewRoute');
-        let route = '/' + (currentRoute.params.ledger?.toLowerCase() || 'testnet');
-
-        // replace ledger parameter
-        if (toParams.ledger) {
-            route = '/' + toParams.ledger;
-        }
-
-        // add contract parameter
-        if (toParams.contractId) {
-            route += '/contract/' + toParams.contractId;
-        } else if (currentRoute.name === 'contract' || currentRoute.name === 'full') {
-            route += '/contract/' + currentRoute.params.contractId;
-        }
-
-        // add search parameter
-        if (toParams.query) {
-            route += '/s/' + toParams.query;
-        } else if (currentRoute.name === 'search' || currentRoute.name === 'full') {
-            route += '/s/' + currentRoute.params.query;
-        }
-
-        return route;
-    },
 
     // TODO move to sLog
     error: function (message: string) {
@@ -74,10 +36,10 @@ export const state = reactive({
 
 // account watcher
 watch(
-    () => state.algonaut.account,
+    () => state.sAlgo.algonaut.account,
     () => {
-        console.log('account changed', state.algonaut.account);
-        if (state.algonaut.account) {
+        console.log('account changed', state.sAlgo.algonaut.account);
+        if (state.sAlgo.algonaut.account) {
             bus.emit('signed-in');
         }
     },

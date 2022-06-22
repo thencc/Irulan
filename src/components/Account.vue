@@ -1,18 +1,18 @@
 <template>
     <button class="btn-purple" @click="showModal = true">
-        {{ state.activeAccount ? accountDisplay : 'Connect Account' }}
+        {{ state.sAlgo.activeAccount ? accountDisplay : 'Connect Account' }}
     </button>
     <Modal :show="showModal" @close="close">
         <h3 class="modal-title">Account</h3>
         <div class="modal-content">
             <div class="account-options" v-if="page === 'options'">
-                <div v-if="state.activeAccount">
+                <div v-if="state.sAlgo.activeAccount">
                     <p class="green">You are already connected to an account (click to copy):</p>
                     <p class="purple copy-account" @click="copyAccount">
-                        {{ utils.shortAddr(state.activeAccount) }}
+                        {{ utils.shortAddr(state.sAlgo.activeAccount) }}
                     </p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
-                    <button v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'"
+                    <button v-if="state.sAlgo.algonaut.config && state.sAlgo.algonaut.config.SIGNING_MODE === 'walletconnect'"
                         class="danger" @click="wcLogout">
                         Disconnect WalletConnect
                     </button>
@@ -43,7 +43,7 @@
                 <button @click="page = 'recover'">Recover from mnemonic</button>
                 <button @click="createNew">Create new account</button>
 
-                <div v-if="savedWallet && !(state.activeAccount)" style="padding-top: 12px">
+                <div v-if="savedWallet && !(state.sAlgo.activeAccount)" style="padding-top: 12px">
                     <div class="recover-with-passcode">
                         <hr />
                         <p>You have an account in local storage. Type in your passcode to login or click <span
@@ -133,9 +133,9 @@ export default defineComponent({
             const parseData = JSON.parse(wcData ? wcData.toString() : '');
             if (parseData.connected) {
                 console.log('WC data found.');
-                //state.algonaut.setWalletConnectAccount(parseData.accounts[0]);
-                if (state.algonaut.config) state.algonaut.config.SIGNING_MODE = 'walletconnect';
-                state.activeAccount = parseData.accounts[0];
+                //state.sAlgo.algonaut.setWalletConnectAccount(parseData.accounts[0]);
+                if (state.sAlgo.algonaut.config) state.sAlgo.algonaut.config.SIGNING_MODE = 'walletconnect';
+                state.sAlgo.activeAccount = parseData.accounts[0];
                 //this.wcLogin();
             } else {
                 console.log('No WC data');
@@ -144,8 +144,8 @@ export default defineComponent({
     },
     computed: {
         accountDisplay () {
-            if (state.activeAccount && state.activeAccount.length) {
-                return utils.shortAddr(state.activeAccount);
+            if (state.sAlgo.activeAccount && state.sAlgo.activeAccount.length) {
+                return utils.shortAddr(state.sAlgo.activeAccount);
             }
         },
         savedWallet() {
@@ -173,19 +173,19 @@ export default defineComponent({
     methods: {
         createNew () {
             this.error = '';
-            const acct = state.algonaut.createWallet();
+            const acct = state.sAlgo.algonaut.createWallet();
             state.log('Created new account: ' + acct.address);
             this.newAccount = acct;
             this.page = 'new-account';
         },
         recoverAccount (mnemonic: string) {
             this.error = '';
-            const acct = state.algonaut.recoverAccount(mnemonic);
+            const acct = state.sAlgo.algonaut.recoverAccount(mnemonic);
             if (acct) {
                 console.log(acct);
-                state.algonaut.setAccount(acct as any);
-                state.activeAccount = (acct as any).addr;
-                state.success('Connected to account: ' + state.activeAccount);
+                state.sAlgo.algonaut.setAccount(acct as any);
+                state.sAlgo.activeAccount = (acct as any).addr;
+                state.success('Connected to account: ' + state.sAlgo.activeAccount);
 
                 // store account in local storage
                 if (this.recoveryPhrasePasscode) {
@@ -203,20 +203,21 @@ export default defineComponent({
             const encryptedMnemonic = state.sAlgo.getAccount('local');
             if (!encryptedMnemonic) return this.loginError = 'No wallet saved.';
             try {
-                const acct = state.algonaut.recoverAccount(decrypt(encryptedMnemonic, this.loginPasscode));
+                const acct = state.sAlgo.algonaut.recoverAccount(decrypt(encryptedMnemonic, this.loginPasscode));
                 if (!acct) return this.loginError = 'Incorrect passcode.';
-                state.algonaut.setAccount(acct as any);
-                state.activeAccount = (acct as any).addr;
-                state.success('Connected to account: ' + state.activeAccount);
+                state.sAlgo.algonaut.setAccount(acct as any);
+                state.sAlgo.activeAccount = (acct as any).addr;
+                state.success('Connected to account: ' + state.sAlgo.activeAccount);
                 this.closeRecover();
+                this.showModal = false;
             } catch (e: any) {
                 this.loginError = e.toString();
             }
         },
         clearSavedWallet() {
             state.sAlgo.removeAccount('local');
-            state.activeAccount = '';
-            state.algonaut.account = undefined;
+            state.sAlgo.activeAccount = '';
+            state.sAlgo.algonaut.account = undefined;
             state.success('Local storage wallet cleared.')
             state.sAlgo.checkForLocalStorageWallet();
             this.closeRecover();
@@ -231,7 +232,7 @@ export default defineComponent({
             this.loginPasscode = '';
         },
         async wcLogin() {
-            await state.algonaut.connectAlgoWallet({
+            await state.sAlgo.algonaut.connectAlgoWallet({
                 onConnect: this.onConnect,
                 onDisconnect: this.onDisconnect,
                 onSessionUpdate: this.onSessionUpdate
@@ -239,27 +240,27 @@ export default defineComponent({
         },
         async wcLogout() {
             state.sAlgo.removeAccount('walletconnect');
-            state.activeAccount = '';
-            state.algonaut.account = undefined;
+            state.sAlgo.activeAccount = '';
+            state.sAlgo.algonaut.account = undefined;
         },
         onConnect(payload: any) {
             const { accounts } = payload.params[0];
-            state.activeAccount = accounts[0];
-            state.algonaut.setWalletConnectAccount(accounts[0]);
-            state.success('Connected to account: ' + state.activeAccount);
+            state.sAlgo.activeAccount = accounts[0];
+            state.sAlgo.algonaut.setWalletConnectAccount(accounts[0]);
+            state.success('Connected to account: ' + state.sAlgo.activeAccount);
             this.close();
         },
         onDisconnect() {
-            state.activeAccount = null;
+            state.sAlgo.activeAccount = null;
             state.error('Disconnected from account.');
         },
         onSessionUpdate(accounts: any) {
-            state.activeAccount = accounts[0];
-            state.algonaut.setWalletConnectAccount(accounts[0]);
-            state.success('Connected to account: ' + state.activeAccount);
+            state.sAlgo.activeAccount = accounts[0];
+            state.sAlgo.algonaut.setWalletConnectAccount(accounts[0]);
+            state.success('Connected to account: ' + state.sAlgo.activeAccount);
         },
         copyAccount () {
-            copyText(state.activeAccount, undefined, (error: any, event: any) => {
+            copyText(state.sAlgo.activeAccount, undefined, (error: any, event: any) => {
                 if (error) {
                     state.error(error);
                 } else {

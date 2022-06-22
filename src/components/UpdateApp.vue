@@ -86,8 +86,8 @@ export default defineComponent({
 
             // reset form
             this.deployArgs = {
-                approvalProgram: (state.currentApp.approvalDecompiled || '').replaceAll('\t',''),
-                clearStateProgram: (state.currentApp.clearDecompiled || '').replaceAll('\t',''),
+                approvalProgram: (this.app.approvalDecompiled || '').replaceAll('\t',''),
+                clearStateProgram: (this.app.clearDecompiled || '').replaceAll('\t',''),
                 args: [],
                 optionalFields: {
                     accounts: [],
@@ -97,12 +97,12 @@ export default defineComponent({
             }
         },
         async deploy () {
-            if (!state.algonaut.account) return state.error('No account connected.');
+            if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
             this.deployLoading = true;
             this.deployError = '';
             state.log('Deploying application...');
             try {
-                let res = await state.algonaut.updateApp({
+                let res = await state.sAlgo.algonaut.updateApp({
                     appIndex: this.app.index,
                     tealApprovalCode: this.deployArgs.approvalProgram,
                     tealClearCode: this.deployArgs.clearStateProgram,

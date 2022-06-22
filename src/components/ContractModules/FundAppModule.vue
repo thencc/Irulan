@@ -1,6 +1,6 @@
 <template>
 	<BaseModule title="Fund App">
-		<div>
+		<div v-if="app">
 			<p>Current Balance: {{ app.balance ? app.balance / 1000000 : 0 }} ALGO</p>
 			<form @submit.prevent="fundApp">
 				<p v-if="escrowAddress" class="small muted">
@@ -60,7 +60,8 @@ export default defineComponent({
 	methods: {
 		async fundApp() {
 			if (!this.escrowAddress || !this.fundAppAmt) return false;
-			if (!state.algonaut.account) return state.error('No account connected.');
+			if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
+			if (!sApp.currentApp) return state.error('No app loaded');
 
 			if (this.fundAppAmt < 1000 || window.confirm('Are you sure you want to send this many ALGO?')) {
 				this.fundAppLoading = true;
@@ -68,13 +69,13 @@ export default defineComponent({
 				state.log(`Sending ${this.fundAppAmt} to ${this.escrowAddress}`);
 
 				try {
-					const res = await state.algonaut.sendAlgo({ to: this.escrowAddress, amount: this.fundAppAmt * 1000000 });
+					const res = await state.sAlgo.algonaut.sendAlgo({ to: this.escrowAddress, amount: this.fundAppAmt * 1000000 });
 					if (res.status === 'fail') {
 						state.error(res.message);
 					} else {
 						state.log(res.message);
 						this.fundAppAmt = null;
-						this.app.balance = await state.algonaut.getAlgoBalance(this.escrowAddress);
+						sApp.currentApp.balance = await state.sAlgo.algonaut.getAlgoBalance(this.escrowAddress);
 						state.success('Application funded');
 					}
 				} catch (e) {

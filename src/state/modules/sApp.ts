@@ -3,9 +3,13 @@ import router from '../../router';
 import state from '../index';
 import { sAlgo } from './sAlgo';
 
+// types
+import { AlgonautAppState } from 'algonaut.js/dist/AlgonautTypes';
+type CurrentApp = AlgonautAppState & { approvalDecompiled?: string, clearDecompiled?: string, balance?: number };
+
 export const sApp = reactive({
 	appId: null as null | number,
-	currentApp: null as null | any,
+	currentApp: null as null | CurrentApp,
 	loading: false,
 
 	reset() {
@@ -20,9 +24,13 @@ export const sApp = reactive({
 			state.log('Loading app into contract tool...');
 			this.currentApp = await state.sAlgo.algonaut.getAppInfo(appId);
 			this.currentApp.balance = await state.sAlgo.algonaut.getAlgoBalance(state.sAlgo.algonaut.getAppEscrowAccount(appId));
-			let moreAppDeets = await this.getMoreAppData(appId);
-			this.currentApp.approvalDecompiled = moreAppDeets.params['decompiled-approval-program'];
-			this.currentApp.clearDecompiled = moreAppDeets.params['decompiled-clear-state-program'];
+			try {
+				let moreAppDeets = await this.getMoreAppData(appId);
+				this.currentApp.approvalDecompiled = moreAppDeets.params['decompiled-approval-program'];
+				this.currentApp.clearDecompiled = moreAppDeets.params['decompiled-clear-state-program'];
+			} catch (e) {
+				console.log('couldnt getMoreAppData - likely just deployed app and no cache exists...');
+			}
 		} catch (e) {
 			console.log(e);
 			state.error('Error loading app.');
@@ -112,7 +120,7 @@ import('../../router').then((routerFile) => {
 	// reload app + search + everything on ledger/net change
 	// works only after router import is loaded (and using state.sAlgo not sAlgo)
 	watch(
-		// () => sAlgo.connected, // doesnt work - breaks vue reactivity
+		// () => sAlgo.connected, // doesnt work - breaks vue reactivity even tho ts is ok w it
 		() => state.sAlgo.connected, // works
 		async (isConnected) => {
 			// console.log('sAlgo isConnected', isConnected);

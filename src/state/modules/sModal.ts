@@ -15,7 +15,6 @@ watch(
 			if (typeof rc.query.m == 'string') {
 				console.log('got modal param', rc.query.m);
 
-				// TODO update getNewRoute to not override params + query like in Setup.vue > .applySettings()
 				sModal.modalId = rc.query.m;
 			} else {
 				// its an array of strings or something...

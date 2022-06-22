@@ -8,7 +8,7 @@
 							App
 						</span>
 						<!-- keeps browser url preview + doesnt reload page w a.href -->
-						<router-link class="green link" :to="state.sSearch.getSearchPath(app.index)">
+						<router-link class="green link" :to="state.sSearch.getSearchPath(app.index.toString())">
 							{{ app.index }}
 						</router-link>
 					</h2>
@@ -94,14 +94,16 @@ export default defineComponent({
 	},
 	methods: {
 		async deleteApp() {
-			if (!state.algonaut.account) return state.error('No account connected.');
-			if (state.activeAccount !== this.app.creatorAddress) {
+			if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
+			if (!sApp.currentApp) return state.error('No app loaded');
+
+			if (state.sAlgo.activeAccount !== sApp.currentApp.creatorAddress) {
 				state.log('The connected account is not the creator of the app, but we will attempt to delete the application anyway.');
 			}
 			if (window.confirm('Are you sure you want to delete this application? You may only do so if you are the creator.')) {
 				this.deleteAppLoading = true;
 				try {
-					const res = await state.algonaut.deleteApplication(sApp.currentApp.index);
+					const res = await state.sAlgo.algonaut.deleteApplication(sApp.currentApp.index);
 					if (res.status === 'fail') {
 						state.error(res.message);
 					} else {

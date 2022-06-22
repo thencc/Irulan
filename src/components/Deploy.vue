@@ -39,6 +39,7 @@ import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
 import state from '../state';
+import router from '@/router';
 // import { approvalProgram, clearProgram, schema } from './deploy-test';
 
 // uncomment to load test contract
@@ -101,25 +102,25 @@ export default defineComponent({
             }
         },
         async deploy () {
-            if (!state.algonaut.account) return state.error('No account connected.');
+            if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
             this.deployLoading = true;
             this.deployError = '';
             state.log('Deploying application...');
 
             try {
                 let res;
-                if (state.algonaut.config?.SIGNING_MODE === 'walletconnect') {
+                if (state.sAlgo.algonaut.config?.SIGNING_MODE === 'walletconnect') {
                     // sign via WC
-                    const txn = await state.algonaut.atomicCreateApp({
+                    const txn = await state.sAlgo.algonaut.atomicCreateApp({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
                         schema: this.deployArgs.schema,
                         optionalFields: this.deployArgs.optionalFields
                     });
-                    res = await state.algonaut.sendTransaction([txn]);
+                    res = await state.sAlgo.algonaut.sendTransaction([txn]);
                 } else {
-                    res = await state.algonaut.createApp({
+                    res = await state.sAlgo.algonaut.createApp({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
@@ -146,8 +147,12 @@ export default defineComponent({
 
                     if (appId) {
                         console.log('navigating to contract...')
-                        const route = state.getNewRoute(this.$route, { contractId: appId });
-                        this.$router.push(route);
+                        router.nonDestructivePush({
+                            name: 'DashApp',
+                            params: {
+                                appId
+                            }
+                        });
                     }
                 }
             } catch (e: any) {
