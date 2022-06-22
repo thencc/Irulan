@@ -260,7 +260,7 @@ export default defineComponent({
 		}
 	},
 	async mounted() {
-		console.log('mounted');
+		// console.log('mounted');
 
 		this.startRoundWatcher();
 		this.setCurrentRound(); // once on load + watch/interval
@@ -273,11 +273,11 @@ export default defineComponent({
 	},
 	methods: {
 		startRoundWatcher() {
-			console.log('watchCurrentRound');
+			// console.log('watchCurrentRound');
 			this.roundTimer = setInterval(this.setCurrentRound, 4000); // get round every 4s so we get ALL rounds + occasionally dup round but only get more inside if round is different
 		},
 		stopRoundWatcher() {
-			console.log('stopRoundWatcher');
+			// console.log('stopRoundWatcher');
 			if (this.roundTimer) {
 				console.log('clearing roundTimer');
 				clearInterval(this.roundTimer);
@@ -374,7 +374,7 @@ export default defineComponent({
 				if (state.algonaut.account) {
 					logsReq = logsReq.sender(state.algonaut.account.addr);
 				} else {
-					console.warn('you are not logged in, cannot show only my logs...')
+					console.log('FYI - you are not logged in, cannot show only my logs...')
 				}
 			}
 

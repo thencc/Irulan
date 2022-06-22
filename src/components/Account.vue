@@ -3,7 +3,7 @@
         {{ state.activeAccount ? accountDisplay : 'Connect Account' }}
     </button>
     <Modal :show="showModal" @close="close">
-        <h3 class="modal-title">Connect Account</h3>
+        <h3 class="modal-title">Account</h3>
         <div class="modal-content">
             <div class="account-options" v-if="page === 'options'">
                 <div v-if="state.activeAccount">
@@ -37,12 +37,29 @@
 
                     <hr>
                 </div>
-                <!-- <div v-if="!state.activeAccount"> -->
+
                 <p class="align-center">Choose your fighter:</p>
                 <button @click="wcLogin">Pera Algo Wallet</button>
                 <button @click="page = 'recover'">Recover from mnemonic</button>
                 <button @click="createNew">Create new account</button>
-                <!-- </div> -->
+
+                <div v-if="savedWallet && !(state.activeAccount)" style="padding-top: 12px">
+                    <div class="recover-with-passcode">
+                        <hr />
+                        <p>You have an account in local storage. Type in your passcode to login or click <span
+                                class="pink">clear
+                                account</span> and we'll forget you ever came here.</p>
+                        <p v-if="loginError" class="danger">{{ loginError }}</p>
+                        <form @submit.prevent="recoverWithPasscode">
+                            <input type="password" ref="passcodeInput" tabindex=1 v-model="loginPasscode"
+                                placeholder="Passcode" autocomplete="password">
+                            <div class="buttons">
+                                <a tabindex=3 class="btn btn-danger" @click.prevent="clearSavedWallet">Clear Account</a>
+                                <button tabindex=2 type="submit">Connect</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <div class="recover-account" v-if="page === 'recover'">
@@ -69,24 +86,8 @@
                         Irulan with this account</button></p>
             </div>
         </div>
-        <p class="pink" v-if="error">{{ error }}</p>
-    </Modal>
 
-    <Modal :show="showRecover" @close="closeRecover">
-        <h3 class="modal-title">Log in</h3>
-        <div class="modal-content recover-with-passcode">
-            <p>You have an account in local storage. Type in your passcode to login or click <span class="pink">clear
-                    account</span> and we'll forget you ever came here.</p>
-            <p v-if="loginError" class="danger">{{ loginError }}</p>
-            <form @submit.prevent="recoverWithPasscode">
-                <input type="password" ref="passcodeInput" tabindex=1 v-model="loginPasscode" placeholder="Passcode"
-                    autocomplete="password">
-                <div class="buttons">
-                    <a tabindex=3 class="btn btn-danger" @click.prevent="clearSavedWallet">Clear Account</a>
-                    <button tabindex=2 type="submit">Connect</button>
-                </div>
-            </form>
-        </div>
+        <p class="pink" v-if="error">{{ error }}</p>
     </Modal>
 </template>
 
@@ -126,11 +127,8 @@ export default defineComponent({
             newAccount: {} as { address: string, mnemonic: string },
         }
     },
-    // setup(props, ctx) {
-    //     console.log('setup');
-    // },
     mounted() {
-        const wcData = state.getAccount('walletconnect');
+        const wcData = state.sAlgo.getAccount('walletconnect');
         if (wcData) {
             const parseData = JSON.parse(wcData ? wcData.toString() : '');
             if (parseData.connected) {
@@ -143,15 +141,6 @@ export default defineComponent({
                 console.log('No WC data');
             }
         }
-
-        const mnemonic = state.getAccount('local');
-        if (mnemonic) {
-            this.showRecover = true;
-            console.log('mn', this.$refs.passcodeInput);
-            this.$nextTick(() => {
-                (this.$refs.passcodeInput as any).focus();
-            });
-        }
     },
     computed: {
         accountDisplay () {
@@ -160,8 +149,25 @@ export default defineComponent({
             }
         },
         savedWallet() {
-            if (state.getAccount('local')) return true;
-            return false;
+            // if (state.getAccount('local')) return true;
+            // return false;
+            return state.sAlgo.hasLocalStorageAcct;
+        }
+    },
+    watch: {
+        showModal: {
+            handler(isOpen) {
+                if (isOpen) {
+                    // focus pass input
+                    this.$nextTick(() => {
+                        let passInput = this.$refs.passcodeInput as undefined | HTMLInputElement;
+                        passInput?.focus();
+                    });
+
+                    state.sAlgo.checkForLocalStorageWallet();
+                }
+
+            }
         }
     },
     methods: {
@@ -183,7 +189,7 @@ export default defineComponent({
 
                 // store account in local storage
                 if (this.recoveryPhrasePasscode) {
-                    state.saveAccount('local', encrypt(mnemonic, this.recoveryPhrasePasscode));
+                    state.sAlgo.saveAccount('local', encrypt(mnemonic, this.recoveryPhrasePasscode));
                     state.success('Account saved.');
                 }
 
@@ -194,7 +200,7 @@ export default defineComponent({
         },
         recoverWithPasscode() {
             this.loginError = '';
-            const encryptedMnemonic = state.getAccount('local');
+            const encryptedMnemonic = state.sAlgo.getAccount('local');
             if (!encryptedMnemonic) return this.loginError = 'No wallet saved.';
             try {
                 const acct = state.algonaut.recoverAccount(decrypt(encryptedMnemonic, this.loginPasscode));
@@ -208,10 +214,11 @@ export default defineComponent({
             }
         },
         clearSavedWallet() {
-            state.removeAccount('local');
+            state.sAlgo.removeAccount('local');
             state.activeAccount = '';
             state.algonaut.account = undefined;
             state.success('Local storage wallet cleared.')
+            state.sAlgo.checkForLocalStorageWallet();
             this.closeRecover();
         },
         close() {
@@ -231,7 +238,7 @@ export default defineComponent({
             } as any)
         },
         async wcLogout() {
-            state.removeAccount('walletconnect');
+            state.sAlgo.removeAccount('walletconnect');
             state.activeAccount = '';
             state.algonaut.account = undefined;
         },

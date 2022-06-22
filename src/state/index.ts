@@ -123,26 +123,6 @@ export const state = reactive({
         return route;
     },
 
-    /**
-     * gets account from local storage depending on ledger
-     * @param type local or walletconnect
-     * @returns {any} object corresponding to local account or testnet account
-     */
-    getAccount(type: 'local' | 'walletconnect') {
-        const ledger = this.getCurrentLedger();
-        return localStorage.getItem(`${type}_${ledger}`)
-    },
-
-    saveAccount(type: 'local' | 'walletconnect', account: any) {
-        const ledger = this.getCurrentLedger();
-        localStorage.setItem(`${type}_${ledger}`, account);
-    },
-
-    removeAccount(type: 'local' | 'walletconnect') {
-        const ledger = this.getCurrentLedger();
-        localStorage.removeItem(`${type}_${ledger}`);
-    },
-
     getCurrentLedger() {
         let ledger;
 
@@ -189,7 +169,7 @@ watch(
         }
     },
     {
-        immediate: true
+        immediate: false
     }
 )
 

@@ -76,6 +76,7 @@ export const sAlgo = reactive({
 	connected: false,
 	connecting: false,
 	activeAccount: null as any,
+	hasLocalStorageAcct: false,
 
 	getConfigFor(ledger: NetType) {
 		console.log('getConfigFor:', ledger);
@@ -195,6 +196,41 @@ export const sAlgo = reactive({
 		localStorage.removeItem('config');
 		state.log('Settings cleared');
 	},
+
+	// account logic
+	/**
+	 * gets account from local storage depending on ledger
+	 * @param type local or walletconnect
+	 * @returns {any} object corresponding to local account or testnet account
+	 */
+	getAccount(type: 'local' | 'walletconnect') {
+		let ledger = this.ledger;
+		if (ledger) {
+			return localStorage.getItem(`${type}_${ledger}`)
+		} else {
+			return null;
+		}
+	},
+	saveAccount(type: 'local' | 'walletconnect', account: any) {
+		let ledger = this.ledger;
+		if (ledger) {
+			localStorage.setItem(`${type}_${ledger}`, account);
+		}
+	},
+	removeAccount(type: 'local' | 'walletconnect') {
+		let ledger = this.ledger;
+		if (ledger) {
+			localStorage.removeItem(`${type}_${ledger}`);
+		}
+	},
+	checkForLocalStorageWallet() {
+		let a = this.getAccount('local');
+		if (a) {
+			this.hasLocalStorageAcct = true;
+		} else {
+			this.hasLocalStorageAcct = false;
+		}
+	}
 });
 
 watch(
