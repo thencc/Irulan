@@ -1,13 +1,14 @@
 <template>
-	<!-- <router-view name="header"></router-view> -->
-	<!-- <router-view name="default"></router-view> -->
-
-	<transition :name="fadeDelay" mode="out-in">
-		<router-view name="header"></router-view>
-	</transition>
-	<transition :name="fadeDelay" mode="out-in">
-		<router-view name="default"></router-view>
-	</transition>
+	<router-view name="header" v-slot="{ Component }">
+		<transition :name="fadeDelay" mode="out-in">
+			<component :is="Component" />
+		</transition>
+	</router-view>
+	<router-view name="default" v-slot="{ Component }">
+		<transition :name="fadeDelay" mode="out-in">
+			<component :is="Component" />
+		</transition>
+	</router-view>
 
 	<!-- <div :class="`modal ${modal ? 'is-active' : ''}`">
 		<div class="modal-background" @click="$root.closeModal()"></div>

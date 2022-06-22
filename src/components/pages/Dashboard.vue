@@ -6,12 +6,11 @@
 			<Log />
 		</div>
 		<div class="right-col">
-			<transition :name="'fade'" mode="out-in">
-				<router-view name="default"></router-view>
-			</transition>
-
-			<!-- <ContractTool /> -->
-			<!-- <div class="footer-actions"></div> -->
+			<router-view name="default" v-slot="{ Component }">
+				<transition :name="'fade'" mode="out-in">
+					<component :is="Component" />
+				</transition>
+			</router-view>
 		</div>
 	</main>
 </template>
