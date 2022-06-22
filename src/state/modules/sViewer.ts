@@ -133,7 +133,7 @@ export const sViewer = reactive({
 watch(
 	() => router.currentRoute.value,
 	(rc) => {
-		console.log('router changed (in sViewer):', rc, router);
+		// console.log('router changed (in sViewer):', rc, router);
 
 		/*
 		if (rc.params.appId) {

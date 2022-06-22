@@ -130,9 +130,9 @@ export default defineComponent({
             newAccount: {} as { address: string, mnemonic: string },
         }
     },
-    setup(props, ctx) {
-        console.log('setup');
-    },
+    // setup(props, ctx) {
+    //     console.log('setup');
+    // },
     mounted() {
         const wcData = state.getAccount('walletconnect');
         if (wcData) {
@@ -151,7 +151,7 @@ export default defineComponent({
         const mnemonic = state.getAccount('local');
         if (mnemonic) {
             this.showRecover = true;
-            console.log(this.$refs.passcodeInput);
+            console.log('mn', this.$refs.passcodeInput);
             this.$nextTick(() => {
                 (this.$refs.passcodeInput as any).focus();
             });

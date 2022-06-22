@@ -1,7 +1,6 @@
 <template>
 	<BaseModule title="Algonaut.js Code">
-		<div class="utility algonaut-code">
-			<h3>Algonaut.js Code</h3>
+		<div class="algonaut-code">
 			<p class="small muted">Click to copy</p>
 			<pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
 		</div>

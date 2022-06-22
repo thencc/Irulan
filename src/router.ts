@@ -108,7 +108,7 @@ const router = createRouter({
 }) as Router & RouterExt; // simpler than above
 
 router.beforeEach(async (to, from, next) => {
-	console.log('r befo', from, to);
+	// console.log('r befo', from, to);
 
 	if (to.params.contract == 'undefined') {
 		console.warn('contract undefined!');
@@ -172,24 +172,26 @@ router.beforeEach(async (to, from, next) => {
 // custom push for NOT removing query strings / params
 const nonDestructivePush: RouterExt['nonDestructivePush'] = async (opts) => {
 	// console.log('router.nonDestructivePush', opts);
-	return await router.push({
-		...router.currentRoute.value, // keeps hash in route/URL
-		name: opts.name || router.currentRoute.value.name || undefined,
-		params: {
-			...router.currentRoute.value.params, // keeps prev params
-			...opts.params || {}
-		},
-		query: {
-			...router.currentRoute.value.query, // keeps prev query strings
-			...opts.query || {}
-		},
-		// hash: opts.hash, // needed?
-	});
+	return await router.push(nonDestructiveResolve(opts));
+	//
+	// return await router.push({
+	// 	...router.currentRoute.value, // keeps hash in route/URL
+	// 	name: opts.name || router.currentRoute.value.name || undefined,
+	// 	params: {
+	// 		...router.currentRoute.value.params, // keeps prev params
+	// 		...opts.params || {}
+	// 	},
+	// 	query: {
+	// 		...router.currentRoute.value.query, // keeps prev query strings
+	// 		...opts.query || {}
+	// 	},
+	// 	// hash: opts.hash, // needed?
+	// });
 };
 router.nonDestructivePush = nonDestructivePush;
 
 const nonDestructiveResolve: RouterExt['nonDestructiveResolve'] = (opts) => {
-	console.log('router.nonDestructiveResolve', opts);
+	// console.log('router.nonDestructiveResolve', opts);
 	return router.resolve({
 		...router.currentRoute.value, // keeps hash in route/URL
 		name: opts.name || router.currentRoute.value.name || undefined,

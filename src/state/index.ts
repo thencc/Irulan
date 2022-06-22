@@ -28,7 +28,8 @@ export const state = reactive({
     isAccount: false,
     indexer: {} as any,
     activeAccount: null as any,
-    algonaut: {} as Algonaut, // initing this way break during hmr dev
+    // algonaut: {} as Algonaut, // initing this way break during hmr dev
+    algonaut: sAlgo.algonaut,
     algonautJSCode: '',
     defaultTxnFee: 1000, // 0.001 algo
 
@@ -90,42 +91,6 @@ export const state = reactive({
         }
         this.connecting = false;
     },
-
-    // loadApp: async function (appIndex: number) {
-    //     this.toolLoading = true;
-    //     console.log(this);
-    //     try {
-    //         this.log('Loading app into contract tool...');
-    //         this.currentApp = await this.algonaut.getAppInfo(appIndex);
-    //         this.currentApp.balance = await this.algonaut.getAlgoBalance(this.algonaut.getAppEscrowAccount(appIndex));
-    //         let moreAppDeets = await this.getMoreAppData(appIndex);
-    //         this.currentApp.approvalDecompiled = moreAppDeets.params['decompiled-approval-program'];
-    //         this.currentApp.clearDecompiled = moreAppDeets.params['decompiled-clear-state-program'];
-    //     } catch (e) {
-    //         console.log(e);
-    //         this.error('Error loading app.');
-    //     }
-    //     this.toolLoading = false;
-    // },
-
-    // // temp method, gets decompiled teal from algoexplorer (indexer will have decompiled get soon)
-    // async getMoreAppData(appIndex: number) {
-    //     // `https://indexer.algoexplorerapi.io/v2/applications/740582846?include-all=true`
-    //     // `https://indexer.testnet.algoexplorerapi.io/v2/applications/740582846?include-all=true`
-    //     const url = `https://indexer${this.algonaut.config?.LEDGER == 'testnet' ? '.testnet' : ''}.algoexplorerapi.io/v2/applications/${appIndex}?include-all=true`;
-    //     const res = await fetch(url);
-    //     if (!res.ok) {
-    //         throw new Error('err getMoreAppData res');
-    //     }
-    //     const json = await res.json();
-    //     // console.log('json', json);
-
-    //     const app = json.application;
-    //     if (!app) {
-    //         throw new Error('err getMoreAppData no app');
-    //     }
-    //     return app;
-    // },
 
     /**
      * Returns a new route to navigate to

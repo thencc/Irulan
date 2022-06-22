@@ -29,6 +29,7 @@ export const sSearch = reactive({
 });
 
 const parseQuery = async (q: string) => {
+	if (!q) return;
 	console.log('parseQuery', q);
 
 	if (!sSearch.query && q) {
@@ -146,19 +147,19 @@ const parseQuery = async (q: string) => {
 
 // sync route w sSearch state
 watch(
-	() => router.currentRoute.value,
-	(rc) => {
-		console.log('router changed (in sSearch):', rc, router);
+	() => router.currentRoute.value.query.s,
+	(searchQuery) => {
+		console.log('searchQuery changed:', searchQuery);
 
-		if (rc.query.s) {
-			if (typeof rc.query.s == 'string') {
-				console.log('got modal search param', rc.query.s);
+		if (searchQuery) {
+			if (typeof searchQuery == 'string') {
+				// console.log('got search param', rc.query.s);
 
 				// TODO update getNewRoute to not override params + query like in Setup.vue > .applySettings()
-				sSearch.query = rc.query.s;
+				sSearch.query = searchQuery;
 			} else {
 				// its an array of strings or something...
-				console.warn('bad modal query string');
+				console.warn('bad searchQuery (arr)');
 			}
 		}
 	},
