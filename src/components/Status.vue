@@ -8,7 +8,7 @@
 	</span>
 
 	<span v-if="!state.sAlgo.connected && !state.sAlgo.connecting" class="status disconnected">
-		<span class="status-text">Set Up Node</span>
+		<span class="status-text">Setup Node</span>
 	</span>
 	<span v-if="state.sAlgo.connecting" class="status connecting">
 		Connecting...

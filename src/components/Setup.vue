@@ -12,7 +12,7 @@
                     <div class="ops-container">
                         <div v-for="l of ledgerOptions" :key="l.id" class="radio-op">
                             <input v-model="sAlgo.config.ledger" :value="l.id" type="radio" name="ledger"
-                                :id="`ledger-${l.id}`">
+                                :id="`ledger-${l.id}`" xxdisabled="sAlgo.config.useCustomNode" >
                             <label :for="`ledger-${l.id}`">
                                 {{ l.label }}
                             </label>

@@ -78,6 +78,9 @@ watch(
 	}
 );
 
+// TODO reload app + search + everything on ledger/net change
+// use bus.on for this
+
 // watch route
 // importing router this way gets around using router before initialization err
 import('../../router').then((routerFile) => {

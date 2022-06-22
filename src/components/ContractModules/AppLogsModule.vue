@@ -223,7 +223,7 @@ export default defineComponent({
 			roundAtLoad: 0,
 			roundCurrent: 0,
 			logsTimer: 0 as any,
-			roundTimer: 0,
+			roundTimer: 0 as 0 | NodeJS.Timer,
 
 			// lastRoundGot: 0,
 		}
@@ -344,7 +344,7 @@ export default defineComponent({
 		// ex app 93272663 w logs
 		// minRoud = 21924461
 		async getAppLogs() {
-			// console.log('getAppLogs started');
+			console.log('getAppLogs started');
 
 			if (!state.algonaut) {
 				console.warn('no algonaut');
