@@ -344,7 +344,7 @@ export default defineComponent({
 		// ex app 93272663 w logs
 		// minRoud = 21924461
 		async getAppLogs() {
-			console.log('getAppLogs started');
+			// console.log('getAppLogs started');
 
 			if (!state.algonaut) {
 				console.warn('no algonaut');

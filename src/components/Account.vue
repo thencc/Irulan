@@ -8,24 +8,16 @@
             <div class="account-options" v-if="page === 'options'">
                 <div v-if="state.activeAccount">
                     <p class="green">You are already connected to an account (click to copy):</p>
-                    <p
-                        class="purple copy-account"
-                        @click="copyAccount"
-                    >
+                    <p class="purple copy-account" @click="copyAccount">
                         {{ utils.shortAddr(state.activeAccount) }}
                     </p>
                     <p class="muted">You can connect with a different account by choosing an option below.</p>
-                    <button
-                        v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'"
-                        class="danger"
-                        @click="wcLogout">
-                            Disconnect WalletConnect
+                    <button v-if="state.algonaut.config && state.algonaut.config.SIGNING_MODE === 'walletconnect'"
+                        class="danger" @click="wcLogout">
+                        Disconnect WalletConnect
                     </button>
 
-                    <button
-                        v-if="savedWallet"
-                        class="btn-danger"
-                        @click="clearSavedWallet">
+                    <button v-if="savedWallet" class="btn-danger" @click="clearSavedWallet">
                         Clear Local Storage Wallet
                     </button>
 
@@ -38,29 +30,29 @@
 
                         <div>
                             <label for="defaultFee">Default Txn Fee (mAlgo)</label>
-                            <input
-                                v-model="state.defaultTxnFee"
-                                style="width: 100px; margin-left: 6px"
-                                id="defaultFee" type="number" />
+                            <input v-model="state.defaultTxnFee" style="width: 100px; margin-left: 6px" id="defaultFee"
+                                type="number" />
                         </div>
                     </div>
 
                     <hr>
                 </div>
                 <!-- <div v-if="!state.activeAccount"> -->
-                    <p class="align-center">Choose your fighter:</p>
-                    <button @click="wcLogin">Pera Algo Wallet</button>
-                    <button @click="page = 'recover'">Recover from mnemonic</button>
-                    <button @click="createNew">Create new account</button>
+                <p class="align-center">Choose your fighter:</p>
+                <button @click="wcLogin">Pera Algo Wallet</button>
+                <button @click="page = 'recover'">Recover from mnemonic</button>
+                <button @click="createNew">Create new account</button>
                 <!-- </div> -->
             </div>
 
             <div class="recover-account" v-if="page === 'recover'">
                 <p><a class="modal-back small" @click="page = 'options'">&larr; back</a></p>
-                <p>If you'd like to save this account in local storage for easy recall, provide a passcode to encrypt your mnemonic with (we do not store the passcode).</p>
+                <p>If you'd like to save this account in local storage for easy recall, provide a passcode to encrypt
+                    your mnemonic with (we do not store the passcode).</p>
                 <p>Or, leave the field blank to not store the account.</p>
                 <form @submit.prevent="recoverAccount(recoveryPhrase)">
-                    <input type="text" v-model="recoveryPhrase" placeholder="Type mnemonic here to recover account."><br>
+                    <input type="text" v-model="recoveryPhrase"
+                        placeholder="Type mnemonic here to recover account."><br>
                     <input type="text" v-model="recoveryPhrasePasscode" placeholder="Passcode">
                     <button type="submit">Connect</button>
                 </form>
@@ -71,8 +63,10 @@
                 <p class="purple">{{ newAccount.address }}</p>
                 <p class="mnemonic">{{ newAccount.mnemonic }}</p>
                 <p>Write down this mnemonic if you intend to use this account for more than temporary tests.</p>
-                <p>If you are on TestNet, you can <a href="https://bank.testnet.algorand.network/" target="_blank">fund this account with ALGO at the dispenser</a>.</p>
-                <p class="align-center"><button @click="recoverAccount(newAccount.mnemonic)" class="btn-purple">Use Irulan with this account</button></p>
+                <p>If you are on TestNet, you can <a href="https://bank.testnet.algorand.network/" target="_blank">fund
+                        this account with ALGO at the dispenser</a>.</p>
+                <p class="align-center"><button @click="recoverAccount(newAccount.mnemonic)" class="btn-purple">Use
+                        Irulan with this account</button></p>
             </div>
         </div>
         <p class="pink" v-if="error">{{ error }}</p>
@@ -81,10 +75,12 @@
     <Modal :show="showRecover" @close="closeRecover">
         <h3 class="modal-title">Log in</h3>
         <div class="modal-content recover-with-passcode">
-            <p>You have an account in local storage. Type in your passcode to login or click <span class="pink">clear account</span> and we'll forget you ever came here.</p>
+            <p>You have an account in local storage. Type in your passcode to login or click <span class="pink">clear
+                    account</span> and we'll forget you ever came here.</p>
             <p v-if="loginError" class="danger">{{ loginError }}</p>
             <form @submit.prevent="recoverWithPasscode">
-                <input type="password" ref="passcodeInput" tabindex=1 v-model="loginPasscode" placeholder="Passcode">
+                <input type="password" ref="passcodeInput" tabindex=1 v-model="loginPasscode" placeholder="Passcode"
+                    autocomplete="password">
                 <div class="buttons">
                     <a tabindex=3 class="btn btn-danger" @click.prevent="clearSavedWallet">Clear Account</a>
                     <button tabindex=2 type="submit">Connect</button>

@@ -1,6 +1,7 @@
 import { reactive, watch } from 'vue';
 import router from '../../router';
 import state from '../index';
+import { sAlgo } from './sAlgo';
 
 export const sApp = reactive({
 	appId: null as null | number,
@@ -78,9 +79,6 @@ watch(
 	}
 );
 
-// TODO reload app + search + everything on ledger/net change
-// use bus.on for this
-
 // watch route
 // importing router this way gets around using router before initialization err
 import('../../router').then((routerFile) => {
@@ -108,6 +106,31 @@ import('../../router').then((routerFile) => {
 		},
 		{
 			immediate: true
+		}
+	);
+
+	// reload app + search + everything on ledger/net change
+	// works only after router import is loaded (and using state.sAlgo not sAlgo)
+	watch(
+		// () => sAlgo.connected, // doesnt work - breaks vue reactivity
+		() => state.sAlgo.connected, // works
+		async (isConnected) => {
+			// console.log('sAlgo isConnected', isConnected);
+
+			if (isConnected) {
+				if (sApp.appId) {
+					if (!sApp.loading) {
+						// happen on first page load
+						// reload
+						await sApp.loadApp(sApp.appId);
+					} else {
+						console.log('sApp already loading app');
+					}
+				}
+			} else {
+				// reset
+				sApp.currentApp = null;
+			}
 		}
 	);
 });

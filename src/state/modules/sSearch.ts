@@ -4,6 +4,7 @@ import router from '../../router';
 import state from '../index';
 import { bus } from '../../bus';
 import { debounce } from '../../utils';
+import { sAlgo } from './sAlgo';
 
 export const sSearch = reactive({
 	query: '',
@@ -164,13 +165,13 @@ watch(
 		}
 	},
 	{
-		immediate: true, // happened immediately anyway on first load of router (i think)
+		immediate: false, // happened immediately anyway on first load of router (i think)
 		// deep: false // not needed
 	}
 );
 
 // debounced version of search so we dont send a bunch of unnecessary requests
-const parseQueryDb = debounce(parseQuery, 1000);
+// const parseQueryDb = debounce(parseQuery, 1000);
 
 //
 watch(
@@ -223,3 +224,21 @@ watch(
 bus.on('signed-in', () => {
 	parseQuery(sSearch.query);
 });
+
+watch(
+	() => sAlgo.connected,
+	async (isConnected) => {
+		// console.log('sAlgo isConnected', isConnected);
+
+		if (isConnected) {
+			if (!sSearch.loading) {
+				await parseQuery(sSearch.query);
+			} else {
+				console.log('sSearch already loading.');
+			}
+		} else {
+			// reset
+			sSearch.response = null;
+		}
+	}
+);

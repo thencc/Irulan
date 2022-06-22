@@ -40,6 +40,12 @@
 			</div>
 		</div>
 	</div>
+	<div v-else-if="sApp.loading" style="padding: 20px">
+		loading app...
+	</div>
+	<div v-else style="padding: 20px">
+		app not found ):
+	</div>
 </template>
 
 <script lang="ts">
@@ -70,8 +76,9 @@ export default defineComponent({
 },
 	data() {
 		return {
-			state,
 			utils,
+			state,
+			sApp,
 
 			deleteAppLoading: false
 		}
