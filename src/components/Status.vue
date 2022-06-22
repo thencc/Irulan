@@ -28,7 +28,7 @@ export default defineComponent({
 	computed: {
 		hostname() {
 			const server = state.sAlgo.algonaut.config?.BASE_SERVER;
-			if (server) {
+			if (state.sAlgo.connected && server) {
 				var name = parseDomain(fromUrl(server));
 				if (name.type === 'RESERVED') return name.hostname;
 				return (name as any).domain;

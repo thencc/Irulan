@@ -36,7 +36,7 @@ export interface CustomNodeConfig {
 	apiKey: string,
 	apiKeyHeaderName: string,
 	port: string
-	// useCustomNode: boolean, // if theres a localStorage value, it IS a custom node...
+	useCustomNode: boolean, // if theres a localStorage value, it IS a custom node...
 };
 
 const algonaut = new Algonaut(defaultAlgoConfigTestnet);
@@ -45,7 +45,7 @@ const algonaut = new Algonaut(defaultAlgoConfigTestnet);
 export const sAlgo = reactive({
 	algonaut, // helper lib
 
-	ledger: null as null | 'testnet' | 'mainnet',
+	// ledger: null as null | 'testnet' | 'mainnet',
 
 	// useCustomNode: false,
 	// useCustomNode: JSON.parse(localStorage.getItem('node_config_custom') || 'false') as boolean, // assume false
@@ -56,25 +56,98 @@ export const sAlgo = reactive({
 		useCustomNode: false,
 		apiKey: '',
 		apiKeyHeaderName: 'X-API-Key',
-		ledger: 'testnet',
+		ledger: 'testnet' as 'testnet' | 'mainnet',
 		port: '',
 		server: '',
 		indexer: ''
 	},
+
+	// configLocalStorage: JSON.parse(localStorage.getItem('config') || 'false') as CustomNodeConfig | false, // assume false
+	configLocalStorage: false as false | CustomNodeConfig,
+
 	showSetup: false,
 
 	connected: false,
 	connecting: false,
 	activeAccount: null as any,
 
-	fetchCachedConfig() {
+	async fetchCachedConfig() {
 		console.log('fetchCachedConfig');
+
+		let configFromLS = JSON.parse(localStorage.getItem('config') || 'false') as CustomNodeConfig | false;
+		this.configLocalStorage = configFromLS;
+
 		const cachedConfig = JSON.parse(localStorage.getItem('config') || '{}');
-		if (cachedConfig && cachedConfig.server) {
-			this.config = cachedConfig;
-			state.log('Fetched settings from local storage.');
-			this.applySettings();
+		console.log('cachedConfig', cachedConfig);
+
+		let urlLedger = router.currentRoute.value.params.ledger as 'testnet' | 'mainnet';
+		console.log('urlLedger', urlLedger);
+
+		if (urlLedger == 'mainnet') {
+			// does cached content exist?
+			if (cachedConfig && cachedConfig.apiKeyHeaderName) {
+				this.config = cachedConfig;
+				state.log('Fetched settings from local storage. (mainnet)');
+				if (cachedConfig.ledger == urlLedger) {
+					await sAlgo.init(this.config);
+				} else {
+					console.warn('cached settings are for the wrong ledger, use ncc default (mainnet)');
+					this.config.useCustomNode = false;
+					// this.config = {
+					// 	useCustomNode: false,
+					// 	apiKey: '',
+					// 	ledger: 'mainnet',
+					// 	apiKeyHeaderName: 'X-API-Key',
+					// 	port: '',
+					// 	server: '',
+					// 	indexer: ''
+					// };
+
+					// init w these val, but keep cached vals stored for input elements
+					await sAlgo.init({
+						useCustomNode: false,
+						apiKey: '',
+						ledger: 'mainnet',
+						apiKeyHeaderName: 'X-API-Key',
+						port: '',
+						server: '',
+						indexer: ''
+					});
+				}
+			}
+		} else if (urlLedger == 'testnet') {
+			// does cached content exist?
+			if (cachedConfig && cachedConfig.apiKeyHeaderName) {
+				this.config = cachedConfig;
+				state.log('Fetched settings from local storage. (mainnet)');
+				if (cachedConfig.ledger == urlLedger) {
+					await sAlgo.init(this.config);
+				} else {
+					console.warn('cached settings are for the wrong ledger, use ncc default (testnet)');
+					this.config.useCustomNode = false;
+					// this.config = {
+					// 	useCustomNode: false,
+					// 	apiKey: '',
+					// 	ledger: 'testnet',
+					// 	apiKeyHeaderName: 'X-API-Key',
+					// 	port: '',
+					// 	server: '',
+					// 	indexer: ''
+					// };
+					await sAlgo.init({
+						useCustomNode: false,
+						apiKey: '',
+						ledger: 'testnet',
+						apiKeyHeaderName: 'X-API-Key',
+						port: '',
+						server: '',
+						indexer: ''
+					});
+				}
+			}
 		} else {
+			// default to testnet
+			// perhaps the first page load
 			this.config = {
 				useCustomNode: false,
 				apiKey: '',
@@ -83,41 +156,81 @@ export const sAlgo = reactive({
 				port: '',
 				server: '',
 				indexer: ''
-			}
-			this.applySettings();
+			};
+			await sAlgo.init(this.config);
 		}
+
+		// // does cached content exist?
+		// if (cachedConfig && cachedConfig.apiKeyHeaderName) {
+		// 	this.config = cachedConfig;
+		// 	state.log('Fetched settings from local storage.');
+		// 	// this.applySettings();
+		// 	await sAlgo.init(this.config);
+		// } else {
+		// 	// perhaps the first page load
+		// 	this.config = {
+		// 		useCustomNode: false,
+		// 		apiKey: '',
+		// 		ledger: 'testnet',
+		// 		apiKeyHeaderName: 'X-API-Key',
+		// 		port: '',
+		// 		server: '',
+		// 		indexer: ''
+		// 	}
+		// 	// this.applySettings();
+		// 	await sAlgo.init(this.config);
+		// }
 	},
 	async applySettings() {
-		let urlLedger = sAlgo.ledger;
-		// console.log('urlLedger', urlLedger);
+		console.log('applySettings');
 
-		if (!urlLedger || typeof urlLedger !== 'string') {
-			console.warn('bad ledger param');
-			return;
-		}
+		localStorage.setItem('config', JSON.stringify(sAlgo.config));
 
-		if (urlLedger !== 'testnet' && urlLedger !== 'mainnet') {
-			console.warn('bad ledger type');
-			return;
-		}
-
-		if (this.config.ledger !== urlLedger) {
-			console.log('Route has different ledger than config')
-			urlLedger = sAlgo.config.ledger as any;
-		}
-
-		await sAlgo.init(this.config);
+		// TODO fix case where you switch between custom node + default node on SAME LEDGER (testnet)
 
 		router.nonDestructivePush({
 			params: {
 				// ledger: this.config.ledger
 				// ledger: sAlgo.ledger
-				ledger: urlLedger as any
+				// ledger: urlLedger // works
+				ledger: sAlgo.config.ledger
 			}
 		});
 
 		this.showSetup = false;
 	},
+	// async applySettings() {
+	// 	// let urlLedger = sAlgo.ledger;
+	// 	let urlLedger = sAlgo.config.ledger;
+	// 	console.log('urlLedger', urlLedger);
+
+	// 	if (!urlLedger || typeof urlLedger !== 'string') {
+	// 		console.warn('bad ledger param');
+	// 		return;
+	// 	}
+
+	// 	if (urlLedger !== 'testnet' && urlLedger !== 'mainnet') {
+	// 		console.warn('bad ledger type');
+	// 		return;
+	// 	}
+
+	// 	// if (this.config.ledger !== urlLedger) {
+	// 	// 	console.log('Route has different ledger than config')
+	// 	// 	urlLedger = sAlgo.config.ledger as any;
+	// 	// }
+
+	// 	await sAlgo.init(this.config);
+
+	// 	router.nonDestructivePush({
+	// 		params: {
+	// 			// ledger: this.config.ledger
+	// 			// ledger: sAlgo.ledger
+	// 			ledger: urlLedger
+	// 		}
+	// 	});
+
+	// 	this.showSetup = false;
+	// },
 	clearSettings() {
 		this.config = {
 			useCustomNode: false,
@@ -136,7 +249,6 @@ export const sAlgo = reactive({
 		this.connecting = true;
 		this.connected = false;
 
-		// the
 		let algoConfig = {
 			BASE_SERVER: TESTNET_SERVER,
 			INDEX_SERVER: TESTNET_INDEXER,
@@ -169,7 +281,7 @@ export const sAlgo = reactive({
 				this.connected = true;
 
 				// on success, save config
-				localStorage.setItem('config', JSON.stringify(config))
+				// localStorage.setItem('config', JSON.stringify(config));
 
 				// if we have an account from WC, set it
 				if (this.activeAccount && localStorage.getItem('walletconnect')) {
@@ -403,51 +515,53 @@ export const sAlgo = reactive({
 	// },
 });
 
-watch(
-	() => sAlgo.ledger,
-	(ledger) => {
-		console.log('ledger changed:', ledger);
-		sAlgo.fetchCachedConfig();
+// watch(
+// 	() => sAlgo.ledger,
+// 	(ledger) => {
+// 		console.log('ledger changed:', ledger);
+// 		sAlgo.fetchCachedConfig();
 
-		// let algoNodeConfig = sAlgo.getNodeConfigFor(ledger);
-		// sAlgo.setNode(algoNodeConfig);
-		// // this.config = algoNodeConfig;
+// 		// let algoNodeConfig = sAlgo.getNodeConfigFor(ledger);
+// 		// sAlgo.setNode(algoNodeConfig);
+// 		// // this.config = algoNodeConfig;
 
-		// router.nonDestructivePush({
-		// 	params: {
-		// 		ledger: sAlgo.ledger
-		// 	}
-		// });
+// 		// router.nonDestructivePush({
+// 		// 	params: {
+// 		// 		ledger: sAlgo.ledger
+// 		// 	}
+// 		// });
 
-	},
-	{
-		immediate: false
-	}
-);
+// 	},
+// 	{
+// 		immediate: false
+// 	}
+// );
 
 // watch route for ledger param
 watch(
 	() => router.currentRoute.value.params.ledger,
 	(ledger) => {
-		console.log('router param ledger changed:', ledger);
+		console.log('ledger (router param) changed:', ledger);
 
-		if (ledger) {
-			if (typeof ledger == 'string') {
-				// console.log('got ledger param', ledger);
+		sAlgo.fetchCachedConfig();
 
-				if (ledger !== 'mainnet' && ledger !== 'testnet') {
-					console.warn('bad ledger type in route', ledger);
-					return;
-				}
+		// if (ledger) {
+		// 	if (typeof ledger == 'string') {
+		// 		// console.log('got ledger param', ledger);
 
-				sAlgo.ledger = ledger;
-			} else {
-				console.warn('bad ledger (arr)');
-			}
-		} else {
-			console.log('reset sAlgo');
-			sAlgo.ledger = null;
-		}
+		// 		if (ledger !== 'mainnet' && ledger !== 'testnet') {
+		// 			console.warn('bad ledger type in route', ledger);
+		// 			return;
+		// 		}
+
+		// 		sAlgo.ledger = ledger;
+		// 	} else {
+		// 		console.warn('bad ledger (arr)');
+		// 	}
+		// } else {
+		// 	console.log('reset sAlgo');
+		// 	sAlgo.ledger = null;
+		// }
 	},
 	{
 		immediate: false,
