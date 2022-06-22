@@ -30,7 +30,7 @@
 
                         <div>
                             <label for="defaultFee">Default Txn Fee (mAlgo)</label>
-                            <input v-model="state.defaultTxnFee" style="width: 100px; margin-left: 6px" id="defaultFee"
+                            <input v-model="state.sAlgo.defaultTxnFee" style="width: 100px; margin-left: 6px" id="defaultFee"
                                 type="number" />
                         </div>
                     </div>

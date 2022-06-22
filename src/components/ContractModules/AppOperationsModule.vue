@@ -90,11 +90,6 @@ export default defineComponent({
 			callAppLoading: false,
 		}
 	},
-	computed: {
-		// app() {
-		// 	return sApp.currentApp;
-		// },
-	},
 	watch: {
 	},
 	mounted() {
@@ -103,7 +98,7 @@ export default defineComponent({
 		async callApp() {
 			if (!state.algonaut.account) return state.error('No account connected.');
 			this.callAppLoading = true;
-			state.algonautJSCode = '';
+			state.sAlgo.algonautJSCode = '';
 
 			const convertAppArg = (item: any) => {
 				// we need to decide if this is an integer
@@ -132,9 +127,9 @@ export default defineComponent({
 
 			const unquotedArgs = JSON.stringify(optionalFields).replace(/"([^"]+)":/g, '$1:');
 
-			state.algonautJSCode =
+			state.sAlgo.algonautJSCode =
 				`const response = await algonaut.${this.callAppArgs.operationType}({
-    appIndex: ${state.currentApp.index},
+    appIndex: ${sApp.currentApp.index},
     appArgs: ${JSON.stringify(args)},
     optionalFields: ${unquotedArgs}
 });`;
@@ -144,28 +139,28 @@ export default defineComponent({
 				let res;
 				if (this.callAppArgs.operationType === 'callApp') {
 					// res = await state.algonaut.callApp({
-					//     appIndex: state.currentApp.index,
+					//     appIndex: sApp.currentApp.index,
 					//     appArgs: args,
 					//     optionalFields: optionalFields
 					// });
 
 					// defaultTxnFee test (sometime unusual fees are needed to test contract-to-contract calls where sender covers inner txn fee. this will also need to be implemented in deploy app etc)
 					const txn = await state.algonaut.atomicCallApp({
-						appIndex: state.currentApp.index,
+						appIndex: sApp.currentApp.index,
 						appArgs: args,
 						optionalFields: optionalFields
 					});
-					txn.transaction.fee = state.defaultTxnFee;
+					txn.transaction.fee = state.sAlgo.defaultTxnFee;
 					res = await state.algonaut.sendTransaction(txn);
 				} else if (this.callAppArgs.operationType === 'optInApp') {
 					res = await state.algonaut.optInApp({
-						appIndex: state.currentApp.index,
+						appIndex: sApp.currentApp.index,
 						appArgs: args,
 						optionalFields: optionalFields
 					});
 				} else if (this.callAppArgs.operationType === 'closeOutApp') {
 					res = await state.algonaut.closeOutApp({
-						appIndex: state.currentApp.index,
+						appIndex: sApp.currentApp.index,
 						appArgs: args,
 						optionalFields: optionalFields
 					});

@@ -40,22 +40,10 @@ export default defineComponent({
 		Deploy,
 		CreateAsset
 	},
-	// setup() {
-	// },
 	mounted() {
 	},
-	// created() {
-	// 	this.$watch(
-	// 	() => this.$route.params,
-	// 		(toParams: any) => {
-	// 			//console.log(toParams);
-	// 		}
-	// 	)
-	// },
 	data() {
 		return {
-			// showAbout: false,
-			// currentApp: NaN
 		}
 	},
 	methods: {

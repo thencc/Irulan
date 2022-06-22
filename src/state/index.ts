@@ -1,5 +1,4 @@
 import { reactive, watch } from 'vue';
-import Algonaut from 'algonaut.js';
 import { bus } from '../bus';
 
 // modular states
@@ -7,11 +6,6 @@ import { sModal } from './modules/sModal';
 import { sSearch } from './modules/sSearch';
 import { sViewer } from './modules/sViewer';
 import { sAlgo } from './modules/sAlgo';
-
-const TESTNET_SERVER = 'https://twinfrogs.ncc.la/atn';
-const TESTNET_APIKEY = '494d49c48f0f55f5d25d86fabb17bee8fbfcbf818ba257670f4ea076672e0fe2';
-const MAINNET_SERVER = 'https://twinfrogs.ncc.la/amn';
-const MAINNET_APIKEY = '3fd53de10f0e2e2b24c4b3a30525a4c94c9b86d7ba9aba64bee01b00ae8b4cc9';
 
 export const state = reactive({
     // modules
@@ -24,73 +18,10 @@ export const state = reactive({
     connected: false,
     connecting: false,
     toolLoading: false,
-    currentApp: {} as any,
     isAccount: false,
     indexer: {} as any,
     activeAccount: null as any,
-    // algonaut: {} as Algonaut, // initing this way break during hmr dev
     algonaut: sAlgo.algonaut,
-    algonautJSCode: '',
-    defaultTxnFee: 1000, // 0.001 algo
-
-    init: async function (config: { ledger: string, server: string, apiKey: string, apiKeyHeaderName: string, useCustomNode: boolean, port: string }) {
-        this.connecting = true;
-        this.connected = false;
-
-        // the
-        let algoConfig = {
-            BASE_SERVER: TESTNET_SERVER,
-            INDEX_SERVER: TESTNET_SERVER + 'i',
-            LEDGER: config.ledger,
-            PORT: '',
-            API_TOKEN: { 'X-Algo-API-Token': TESTNET_APIKEY } as any
-        };
-
-        if (config.useCustomNode) {
-            algoConfig.BASE_SERVER = config.server;
-            algoConfig.PORT = config.port;
-            config.apiKeyHeaderName = config.apiKeyHeaderName || 'X-API-Key';
-            algoConfig.API_TOKEN[config.apiKeyHeaderName] = config.apiKey;
-        } else if (!config.useCustomNode && config.ledger && config.ledger === 'mainnet') {
-            algoConfig.BASE_SERVER = MAINNET_SERVER;
-            algoConfig.INDEX_SERVER = MAINNET_SERVER + 'i';
-            algoConfig.API_TOKEN['X-Algo-API-Token'] = MAINNET_APIKEY;
-        }
-        this.algonaut = new Algonaut(algoConfig);
-
-        this.log('Connecting...');
-
-        try {
-            const status = await this.algonaut.checkStatus();
-            if (status['last-round']) {
-                this.success('Connected! Last round: ' + status['last-round'])
-                this.connected = true;
-
-                // on success, save config
-                localStorage.setItem('config', JSON.stringify(config))
-
-                // if we have an account from WC, set it
-                if (this.activeAccount && localStorage.getItem('walletconnect')) {
-                    // this.algonaut.setWalletConnectAccount(this.activeAccount);
-                    this.algonaut.connectAlgoWallet({
-                        onConnect: () => {
-                            this.success('Set WalletConnect account: ' + this.activeAccount)
-                        },
-                        onDisconnect: () => {
-
-                        },
-                        onSessionUpdate: () => {
-
-                        }
-                    })
-                }
-            }
-        } catch (error) {
-            this.error('Error connecting. Check config.');
-            this.connected = false;
-        }
-        this.connecting = false;
-    },
 
     /**
      * Returns a new route to navigate to
@@ -123,25 +54,7 @@ export const state = reactive({
         return route;
     },
 
-    getCurrentLedger() {
-        let ledger;
-
-        // prefer config ledger
-        if (this.algonaut.config) {
-            ledger = this.algonaut.config.LEDGER.toLowerCase();
-        } else {
-            // but if we don't have it, grab it from the url
-            ledger = window.location.pathname.substring(0, 7).toLowerCase();
-        }
-
-        // if something goes wrong, fall back on testnet
-        if (ledger !== 'mainnet' && ledger !== 'testnet') {
-            ledger = 'testnet';
-        }
-
-        return ledger;
-    },
-
+    // TODO move to sLog
     error: function (message: string) {
         this.terminal.unshift({ type: 'error', message });
     },

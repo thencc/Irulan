@@ -77,6 +77,13 @@ export const sAlgo = reactive({
 	connecting: false,
 	activeAccount: null as any,
 	hasLocalStorageAcct: false,
+	defaultTxnFee: 1000, // 0.001 algo
+	algonautJSCode: '',
+
+	// make async isReady field? -- how would it work w stale awaits in various functions + changing net testnet->mainnet etc
+	// async isConnected() {
+	// 	console.log('isConnected?');
+	// },
 
 	getConfigFor(ledger: NetType) {
 		console.log('getConfigFor:', ledger);

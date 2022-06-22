@@ -2,7 +2,7 @@
 	<BaseModule title="Algonaut.js Code">
 		<div class="algonaut-code">
 			<p class="small muted">Click to copy</p>
-			<pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
+			<pre @click="copyAlgoCode" class="code-block">{{ state.sAlgo.algonautJSCode }}</pre>
 		</div>
 	</BaseModule>
 </template>
@@ -28,19 +28,13 @@ export default defineComponent({
 			// utils,
 		}
 	},
-	computed: {
-		// app() {
-		// 	return sApp.currentApp;
-		// },
-	},
 	watch: {
 	},
-	async mounted() {
-		// console.log('mounted');
-	},
+	// mounted() {
+	// },
 	methods: {
 		copyAlgoCode() {
-			copyText(state.algonautJSCode, undefined, (error: any, event: any) => {
+			copyText(state.sAlgo.algonautJSCode, undefined, (error: any, event: any) => {
 				if (error) {
 					state.error(error);
 				} else {

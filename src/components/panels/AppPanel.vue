@@ -85,16 +85,7 @@ export default defineComponent({
 	},
 	computed: {
 		app: function () {
-			return sApp.currentApp; // works
-			// also works IF import(router).then approach used
-			// if (sApp.currentApp && sApp.currentApp.index) {
-			// 	return sApp.currentApp;
-			// }
-
-			// works
-			// if (state.currentApp && state.currentApp.index) {
-			// 	return state.currentApp;
-			// }
+			return sApp.currentApp;
 		},
 	},
 	setup() {
@@ -110,7 +101,7 @@ export default defineComponent({
 			if (window.confirm('Are you sure you want to delete this application? You may only do so if you are the creator.')) {
 				this.deleteAppLoading = true;
 				try {
-					const res = await state.algonaut.deleteApplication(state.currentApp.index);
+					const res = await state.algonaut.deleteApplication(sApp.currentApp.index);
 					if (res.status === 'fail') {
 						state.error(res.message);
 					} else {

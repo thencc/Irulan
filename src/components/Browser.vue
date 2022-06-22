@@ -316,7 +316,7 @@ export default defineComponent({
     watch: {
         searchQueryInputVal: {
             handler(queryNew, queryOld) {
-                console.log('queryNew', queryNew);
+                // console.log('queryNew', queryNew);
 
                 // if it wasnt set programmatically like from clicking a link, then debounce typed search for less req/s
                 if (queryNew !== state.sSearch.query) {
@@ -328,7 +328,7 @@ export default defineComponent({
                         // this.checkingUsername = false;
                     }, 1000);
                 } else {
-                    console.warn('dont queryNew debounce');
+                    // console.log('dont queryNew debounce');
                 }
             }
         }

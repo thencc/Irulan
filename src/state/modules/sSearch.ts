@@ -33,6 +33,15 @@ const parseQuery = async (q: string) => {
 	if (!q) return;
 	console.log('parseQuery', q);
 
+	if (sSearch.loading) {
+		console.log('sSearch loading is parseQuery...');
+	}
+
+	if (!sAlgo.connected) {
+		console.warn('sAlgo not connected but trying parseQuery search');
+		return;
+	}
+
 	if (!sSearch.query && q) {
 		// can also account for this using a custom debounce timer like in tables/Account.ts/watch/usernameNew
 		console.warn('dont do a delayed search because there nothing to search for (user likely deleted last char in search input)');
@@ -215,7 +224,7 @@ watch(
 		}
 	},
 	{
-		immediate: true
+		immediate: false
 	}
 );
 

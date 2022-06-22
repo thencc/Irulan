@@ -106,7 +106,7 @@
                 <div class="utility algonaut-code">
                     <h3>Algonaut.js Code</h3>
                     <p class="small muted">Click to copy</p>
-                    <pre @click="copyAlgoCode" class="code-block">{{ state.algonautJSCode }}</pre>
+                    <pre @click="copyAlgoCode" class="code-block">{{ state.sAlgo.algonautJSCode }}</pre>
                 </div>
                 <AppLogsModule :app-id="app.index" />
             </div>
@@ -114,6 +114,8 @@
     </div>
 </template>
 <script lang="ts">
+// TODO delete this whole file in favor of AppPanel.vue
+
 import { defineComponent } from 'vue'
 import state from '../state';
 import * as utils from '../utils';
@@ -170,7 +172,7 @@ export default defineComponent({
         async callApp() {
             if (!state.algonaut.account) return state.error('No account connected.');
             this.callAppLoading = true;
-            state.algonautJSCode = '';
+            state.sAlgo.algonautJSCode = '';
 
             const convertAppArg = (item: any) => {
                 // we need to decide if this is an integer
@@ -199,7 +201,7 @@ export default defineComponent({
 
             const unquotedArgs = JSON.stringify(optionalFields).replace(/"([^"]+)":/g, '$1:');
 
-            state.algonautJSCode =
+            state.sAlgo.algonautJSCode =
 `const response = await algonaut.${this.callAppArgs.operationType}({
     appIndex: ${state.currentApp.index},
     appArgs: ${JSON.stringify(args)},
@@ -222,7 +224,7 @@ export default defineComponent({
                         appArgs: args,
                         optionalFields: optionalFields
                     });
-                    txn.transaction.fee = state.defaultTxnFee;
+                    txn.transaction.fee = state.sAlgo.defaultTxnFee;
                     res = await state.algonaut.sendTransaction(txn);
                 } else if (this.callAppArgs.operationType === 'optInApp') {
                     res = await state.algonaut.optInApp({
@@ -311,7 +313,7 @@ export default defineComponent({
             this.deleteAppLoading = false;
         },
         copyAlgoCode () {
-            copyText(state.algonautJSCode, undefined, (error: any, event: any) => {
+            copyText(state.sAlgo.algonautJSCode, undefined, (error: any, event: any) => {
                 if (error) {
                     state.error(error);
                 } else {
