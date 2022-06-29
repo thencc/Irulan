@@ -13,7 +13,7 @@ export interface CustomNodeConfig {
 	apiKey: string,
 	apiKeyHeaderName: string,
 	port: string
-	useCustomNode: boolean, // if theres a localStorage value, it IS a custom node...
+	useCustomNode: boolean,
 };
 export type NetType = 'mainnet' | 'testnet';
 

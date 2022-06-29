@@ -1,7 +1,7 @@
 <template>
     <div class="search">
         <form @submit.prevent="" class="search-form">
-            <input v-model="searchQueryInputVal" type="search" placeholder="Account / App ID / Asset ID"
+            <input v-model="searchQueryInputVal" type="search" placeholder="Account/App/Asset ID (&#8984;+K)"
                 ref="searchInput">
             <button class="btn-gray" title="&#8984; K">Search</button>
         </form>
