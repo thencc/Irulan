@@ -14,10 +14,14 @@
 		<div class="modal-background" @click="$root.closeModal()"></div>
 		<div id="modal-content" class="modal-content"></div>
 	</div> -->
+
+	<Modal :show="state.sModal.modalId == 'about'" @close="state.sModal.modalId = ''">
+		<AboutModal />
+	</Modal>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineAsyncComponent, defineComponent } from 'vue';
 import state from './state';
 import Setup from './components/Setup.vue';
 import Log from './components/Log.vue';
@@ -30,18 +34,20 @@ import CreateAsset from './components/CreateAsset.vue';
 
 export default defineComponent({
 	components: {
-		Setup,
-		Log,
-		Account,
-		Modal,
-		Browser,
-		ContractTool,
-		Deploy,
-		CreateAsset
-	},
+    Setup,
+    Log,
+    Account,
+    Modal,
+    Browser,
+    ContractTool,
+    Deploy,
+    CreateAsset,
+	AboutModal: defineAsyncComponent(() => import('./components/modals/AboutModal.vue'))
+},
 	data() {
 		return {
 			fadeDelay: '',
+			state
 		}
 	},
 	setup() {
