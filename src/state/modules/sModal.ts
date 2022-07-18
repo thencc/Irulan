@@ -3,10 +3,12 @@ import router from '../../router';
 
 export const sModal = reactive({
 	modalId: '', // empty is modal closed
+	width: '40%',
 
 	close() {
 		// add resets here
 		sModal.modalId = '';
+		sModal.width = '40%';
 	}
 });
 
@@ -16,9 +18,12 @@ watch(
 		if (mId) {
 			if (mId !== mIdOld) {
 				// do something w the modalId
-				// ...
 
-				//
+				// unique bits
+				if (mId == 'contract-deploy') {
+					sModal.width = '70%';
+				}
+
 				await router.nonDestructivePush({
 					query: {
 						modal: mId

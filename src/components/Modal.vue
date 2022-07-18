@@ -1,6 +1,6 @@
 <template>
     <div v-if="show" :class="`modal-overlay ${show ? 'is-active' : ''}`">
-        <div class="modal vertical-center" :style="{ width: width }">
+        <div class="modal vertical-center" :style="{ width: sModal.width }">
             <div class="close-modal" @click="close">X</div>
             <slot></slot>
         </div>
@@ -15,9 +15,10 @@ import { sModal } from '../state/modules/sModal';
 export default defineComponent({
     props: {
         show: Boolean,
-        width: {
-            type: String,
-            default: '40%'
+    },
+    data() {
+        return {
+            sModal
         }
     },
     setup(props, ctx) {
