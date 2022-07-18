@@ -1,9 +1,9 @@
 <template>
-
-    <button @click="sAlgo.showSetup = true" class="btn-gray">
+    <button @click="sModal.modalId = 'node-setup'" class="btn-gray">
         <Status />
     </button>
-    <Modal id="setup-modal" :show="sAlgo.showSetup" @close="sAlgo.showSetup = false">
+
+    <teleport v-if="sModal.modalId == 'node-setup'" to="#modal-teleport-dest">
         <h3 class="modal-title">Node Configuration</h3>
         <form @submit.stop.prevent="sAlgo.applySettings">
             <div class="module-content">
@@ -12,7 +12,7 @@
                     <div class="ops-container">
                         <div v-for="l of ledgerOptions" :key="l.id" class="radio-op">
                             <input v-model="sAlgo.config.ledger" :value="l.id" type="radio" name="ledger"
-                                :id="`ledger-${l.id}`" xxdisabled="sAlgo.config.useCustomNode" >
+                                :id="`ledger-${l.id}`" xxdisabled="sAlgo.config.useCustomNode">
                             <label :for="`ledger-${l.id}`">
                                 {{ l.label }}
                             </label>
@@ -66,25 +66,26 @@
                 </div>
             </div>
         </form>
-    </Modal>
+    </teleport>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+
 import state from '../state';
+import { sModal } from '../state/modules/sModal';
 // import { sAlgo } from '../state/modules/sAlgo';
 
 // comps
-import Modal from './Modal.vue';
 import Status from './Status.vue';
 
 export default defineComponent({
     components: {
-        Modal,
         Status
     },
     data() {
         return {
+            sModal,
             sAlgo: state.sAlgo, // works, but sAlgo doesnt (load timing issue...)
             // sAlgo: sAlgo,
 
@@ -101,7 +102,6 @@ export default defineComponent({
         }
     },
     mounted() {
-        // sAlgo.fetchCachedConfig(); // works
     },
     methods: {
     }
