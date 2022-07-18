@@ -5,6 +5,10 @@
 			<!-- <button class="about-link btn-link-muted" @click="showAbout = true">What is this?</button> -->
 			<button class="about-link btn-link-muted" @click="sModal.modalId = 'about'">What is this?</button>
 
+			<teleport v-if="sModal.modalId == 'about'" to="#modal-teleport-dest">
+				<AboutModal xxoptions="modalOptions" />
+			</teleport>
+
 			<!-- <Modal :show="showAbout" @close="showAbout = false">
 				<h3 class="modal-title">About Irulan</h3>
 				<div class="modal-content">
@@ -54,7 +58,9 @@ export default defineComponent({
 		Browser,
 		ContractTool,
 		Deploy,
-		CreateAsset
+		CreateAsset,
+
+		AboutModal: defineAsyncComponent(() => import('../modals/AboutModal.vue'))
 	},
 	data() {
 		return {

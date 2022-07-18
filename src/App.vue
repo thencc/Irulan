@@ -15,8 +15,12 @@
 		<div id="modal-content" class="modal-content"></div>
 	</div> -->
 
-	<Modal :show="state.sModal.modalId == 'about'" @close="state.sModal.modalId = ''">
+	<!-- <Modal :show="state.sModal.modalId == 'about'" @close="state.sModal.modalId = ''">
 		<AboutModal />
+	</Modal> -->
+
+	<Modal :show="!!(state.sModal.modalId)">
+		<div id="modal-teleport-dest"></div>
 	</Modal>
 </template>
 

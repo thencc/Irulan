@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-overlay" v-if="show">
+    <div v-if="show" :class="`modal-overlay ${show ? 'is-active' : ''}`">
         <div class="modal vertical-center" :style="{ width: width }">
             <div class="close-modal" @click="close">X</div>
             <slot></slot>
@@ -9,6 +9,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useKeypress } from 'vue3-keypress';
+
+import { sModal } from '../state/modules/sModal';
 
 export default defineComponent({
     props: {
@@ -21,6 +23,7 @@ export default defineComponent({
     setup(props, ctx) {
         const onEsc = function () {
             ctx.emit('close');
+            sModal.modalId = '';
         }
 
         useKeypress({
@@ -34,8 +37,9 @@ export default defineComponent({
         })
     },
     methods: {
-        close (data?: any) {
+        close(data?: any) {
             this.$emit('close', data);
+            sModal.modalId = '';
         }
     }
 });
@@ -52,6 +56,10 @@ export default defineComponent({
     right: 0;
     background-color: rgba(0,0,0,0.6);
     z-index: 100;
+}
+
+.modal-overlay.active {
+
 }
 
 .modal-back {
@@ -100,6 +108,32 @@ export default defineComponent({
 
     &:hover {
         color: $pink;
+    }
+}
+
+/** fancy animate in */
+.modal-overlay.is-active > .modal {
+    animation: slide-up 0.25s cubic-bezier(0.33, 1, 0.68, 1) forwards,
+        fade-in 0.1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+@keyframes slide-up {
+    0% {
+        top: calc(50% + 20px);
+    }
+
+    100% {
+        top: 50%;
+    }
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
 </style>
