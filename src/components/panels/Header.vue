@@ -2,21 +2,11 @@
 	<header class="header">
 		<div class="header-left">
 			<h1>Irulan</h1>
-			<!-- <button class="about-link btn-link-muted" @click="showAbout = true">What is this?</button> -->
+
 			<button class="about-link btn-link-muted" @click="sModal.modalId = 'about'">What is this?</button>
-
 			<teleport v-if="sModal.modalId == 'about'" to="#modal-teleport-dest">
-				<AboutModal xxoptions="modalOptions" />
+				<AboutModal />
 			</teleport>
-
-			<!-- <Modal :show="showAbout" @close="showAbout = false">
-				<h3 class="modal-title">About Irulan</h3>
-				<div class="modal-content">
-					<p>Irulan is a general purpose utility to interact with Algorand contracts, powered by <a
-							href="https://thencc.github.io/algonautjs/" target="_blank">Algonaut.js</a>.</p>
-					<p>It's also <a href="https://github.com/thencc/Irulan" target="_blank">open source</a>!</p>
-				</div>
-			</Modal> -->
 		</div>
 		<div style="flex-grow: 1"></div>
 		<div class="header-right">
@@ -36,25 +26,19 @@ import state from '../../state';
 import { sModal } from '../../state/modules/sModal';
 
 // components
-// import Setup from '../Setup.vue';
-// import Log from '../Log.vue';
 import Browser from '../Browser.vue';
 import ContractTool from '../ContractTool.vue';
 import Account from '../Account.vue';
-import Modal from '../Modal.vue';
 import Deploy from '../Deploy.vue';
 import CreateAsset from '../CreateAsset.vue';
 
 export default defineComponent({
 	components: {
-		// Setup,
 		Setup: defineAsyncComponent(
 			// () => '../Setup.vue'
 			() => import('../Setup.vue')
 		),
-		// Log,
 		Account,
-		Modal,
 		Browser,
 		ContractTool,
 		Deploy,
@@ -68,10 +52,8 @@ export default defineComponent({
 			showAbout: false
 		}
 	},
-	// setup() {
+	// mounted() {
 	// },
-	mounted() {
-	},
 	methods: {
 	}
 });

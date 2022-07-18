@@ -21,8 +21,7 @@ watch(
 				});
 			}
 		} else {
-			// reset
-			// sSearch.response = null;
+			// resets
 
 			// removes just "modal" query param
 			router.nonDestructivePush({
@@ -52,11 +51,12 @@ watch(
 				console.warn('bad modal query string');
 			}
 		} else {
-			console.warn('TODO reset sModal');
+			// do any necessary resets here
+			sModal.modalId = '';
 		}
 	},
 	{
 		immediate: true, // happened immediately anyway on first load of router (i think)
 		// deep: false // not needed
 	}
-)
+);

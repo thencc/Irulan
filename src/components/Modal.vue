@@ -58,10 +58,6 @@ export default defineComponent({
     z-index: 100;
 }
 
-.modal-overlay.active {
-
-}
-
 .modal-back {
     cursor: pointer;
     color: $textlight;
@@ -78,9 +74,11 @@ export default defineComponent({
 
 .modal {
     max-height: 98%;
-    background-color: $bg;
+    min-height: 40px;
     margin: 0 auto;
     padding: 10px;
+
+    background-color: $bg;
     border: 2px solid $border;
     display: block;
     text-align: left;

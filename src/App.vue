@@ -10,14 +10,6 @@
 		</transition>
 	</router-view>
 
-	<!-- <div :class="`modal ${modal ? 'is-active' : ''}`">
-		<div class="modal-background" @click="$root.closeModal()"></div>
-		<div id="modal-content" class="modal-content"></div>
-	</div> -->
-
-	<!-- <Modal :show="state.sModal.modalId == 'about'" @close="state.sModal.modalId = ''">
-		<AboutModal />
-	</Modal> -->
 
 	<Modal :show="!!(state.sModal.modalId)">
 		<div id="modal-teleport-dest"></div>
@@ -46,7 +38,7 @@ export default defineComponent({
     ContractTool,
     Deploy,
     CreateAsset,
-	AboutModal: defineAsyncComponent(() => import('./components/modals/AboutModal.vue'))
+	// AboutModal: defineAsyncComponent(() => import('./components/modals/AboutModal.vue'))
 },
 	data() {
 		return {
