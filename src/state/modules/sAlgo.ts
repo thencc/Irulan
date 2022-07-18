@@ -244,10 +244,8 @@ watch(
 
 		if (ledger) {
 			await sAlgo.init(ledger);
-			// TODO
-			// bus.emit('changed-net'); // aka refresh search + viewer
 		} else {
-			console.warn('TODO reset');
+			// make any necessary resets here
 		}
 
 		// router.nonDestructivePush({

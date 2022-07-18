@@ -43,7 +43,7 @@ const router = createRouter({
 			// component: Terms
 			components: {
 				default: Terms,
-				header: AppPanel // TODO remove this. // DONT include header component
+				// header: AppPanel // TODO remove this. // DONT include header component
 			}
 		},
 		{
@@ -110,8 +110,7 @@ router.beforeEach(async (to, from, next) => {
 	// console.log('r befo', from, to);
 
 	if (to.params.contract == 'undefined') {
-		console.warn('contract undefined!');
-		console.warn('TODO come back and fix this'); // TODO
+		console.warn('SHOULDNT HAPPEN CHECK IT OUT DEVS');
 		delete to.params.contract;
 	}
 

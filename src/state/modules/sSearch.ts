@@ -52,8 +52,8 @@ const parseQuery = async (q: string) => {
 	sSearch.response = null; // reset
 	var response = {} as any;
 
-	// TODO add back in... (make this an emit?)
-	// state.logRoute(`Searching: ${this.query}`, route);
+	// make this an emit?
+	state.log(`Searching: ${q}`);
 
 	// console.log('pre-lookup', state.sAlgo.algonaut.sdk);
 	console.log('pre-lookup:', state.sAlgo.algonaut.config?.BASE_SERVER);
@@ -63,7 +63,7 @@ const parseQuery = async (q: string) => {
 	if (state.sAlgo.algonaut.sdk?.isValidAddress(q)) { // new
 		console.log('doing account lookup');
 
-		// state.success('Account found.'); // TODO add back in
+		state.success('Account found.');
 		response = await state.sAlgo.algonaut.getAccountInfo(q);
 		console.log('search respo', response);
 
@@ -226,6 +226,7 @@ watch(
 
 // shim (can remove this assuming we connect to a node like testnet.)
 // TODO remove this, but do final local vars for app somehow
+// this is here because we need to reload query after sign in to grab local vars
 bus.on('signed-in', () => {
 	parseQuery(sSearch.query);
 });

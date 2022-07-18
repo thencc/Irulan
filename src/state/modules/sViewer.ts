@@ -8,6 +8,8 @@ import { bus } from '../../bus';
 // modular states
 import { sApp } from './sApp';
 
+// TODO all over this file + elsewhere update to contractId -> appId
+
 export const sViewer = reactive({
 	// TODO make type a computed field like tables/PresenceCtx.ts reactive ...toRefs trick
 	// + can make computed currentViewObj?
@@ -55,31 +57,6 @@ watch(
 		*/
 
 
-		// TODO rename contractId -> appId
-		// if (rc.params.contractId) {
-		// 	if (typeof rc.params.contractId == 'string') {
-		// 		console.log('got params contractId', rc.params.contractId, parseInt(rc.params.contractId));
-		// 		// sViewer.type = 'contract'; // in watcher
-		// 		sViewer.contractId = parseInt(rc.params.contractId) || null;
-		// 	} else {
-		// 		// its an array of strings or something...
-		// 		console.warn('param is arr, not string');
-		// 		sViewer.contractId = null;
-		// 	}
-		// } else {
-		// 	sViewer.contractId = null;
-		// }
-
-		// else if (rc.params.appId) {
-		// 	console.warn('TODO');
-		// } else if (rc.params.assetId) {
-		// 	console.warn('TODO');
-		// }
-
-		// else {
-		// 	console.warn('RESET sViewer');
-		// 	sViewer.reset();
-		// }
 	},
 	{
 		// immediate: true, // happened immediately anyway on first load of router (i think)
@@ -95,15 +72,10 @@ watch(
 	() => sViewer.appId,
 	async (appId, appIdOld) => {
 		if (appId) {
-			sViewer.type = 'contract'; // TODO update
+			sViewer.type = 'contract'; // TODO update to app
 
 			if (appId !== appIdOld) {
-				console.warn('TODO loadContract');
-
-				// TODO
-				// loadContract (try app + asset)
-				// parseQuery(q);
-
+				//
 				router.nonDestructivePush({
 					params: {
 						appId: appId.toString()
