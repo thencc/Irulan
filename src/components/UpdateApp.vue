@@ -1,16 +1,19 @@
 <template>
-    <button @click="showModal = true">
+    <button @click="sModal.modalId = 'contract-update'; sModal.width = '70%'">
         Update Contract
     </button>
-    <Modal :show="showModal" @close="close" :width="'70%'">
+
+    <teleport v-if="sModal.modalId == 'contract-update'" to="#modal-teleport-dest">
         <h3 class="modal-title">Update Contract</h3>
         <div class="modal-content">
             <div class="programs">
                 <p>(updating app <span class="green">{{ app.index }}</span>)</p>
                 <h4 class="purple">Approval Program</h4>
-                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10" v-model="deployArgs.approvalProgram"></textarea>
+                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10"
+                    v-model="deployArgs.approvalProgram"></textarea>
                 <h4 class="purple">Clear State Program</h4>
-                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10" v-model="deployArgs.clearStateProgram"></textarea>
+                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10"
+                    v-model="deployArgs.clearStateProgram"></textarea>
             </div>
             <div class="args">
                 <h4 class="purple">Arguments</h4>
@@ -24,21 +27,22 @@
             </div>
         </div>
         <p class="pink" v-if="deployError">{{ deployError }}</p>
-        <p class="align-right"><LoadingButton @click="deploy" type="submit" :loading="deployLoading">Update Contract</LoadingButton></p>
-    </Modal>
+        <p class="align-right">
+            <LoadingButton @click="deploy" type="submit" :loading="deployLoading">Update Contract</LoadingButton>
+        </p>
+    </teleport>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
 import state from '../state';
+import { sModal } from '../state/modules/sModal';
 
 // comps
-import Modal from './Modal.vue';
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
 
 export default defineComponent({
     components: {
-        Modal,
         ArrayField,
         LoadingButton
     },
@@ -49,7 +53,7 @@ export default defineComponent({
     data() {
         return {
             state,
-            showModal: false,
+            sModal,
             deployLoading: false,
             deployError: '',
             deployArgs: {
@@ -80,7 +84,7 @@ export default defineComponent({
     },
     methods: {
         close () {
-            this.showModal = false;
+            sModal.close();
             this.deployError = '';
             this.deployLoading = false;
 

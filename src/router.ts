@@ -17,7 +17,6 @@ interface RouterExt {
 }
 
 // pages
-import Main from './components/pages/Main.vue';
 import Dashboard from './components/pages/Dashboard.vue';
 import About from './components/pages/About.vue';
 import Terms from './components/pages/Terms.vue';

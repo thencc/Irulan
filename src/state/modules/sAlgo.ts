@@ -72,7 +72,6 @@ export const sAlgo = reactive({
 	config: baseConfig, // aka configEditable
 	configLocalStorage: false as false | CustomNodeConfig,
 
-	showSetup: false,
 	connected: false,
 	connecting: false,
 	activeAccount: null as null | string,
@@ -188,8 +187,6 @@ export const sAlgo = reactive({
 				ledger: sAlgo.config.ledger
 			}
 		});
-
-		this.showSetup = false; // close node settings modal
 
 		// re-init if route doesnt change, otherwise watcher catches it
 		if (sAlgo.ledger == sAlgo.config.ledger) {

@@ -22,6 +22,8 @@ watch(
 				// unique bits
 				if (mId == 'contract-deploy') {
 					sModal.width = '70%';
+				} else if (mId == 'contract-update') {
+					sModal.width = '70%';
 				}
 
 				await router.nonDestructivePush({

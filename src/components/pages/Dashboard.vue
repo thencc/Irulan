@@ -19,21 +19,17 @@
 import { defineComponent } from 'vue';
 import state from '../../state';
 
-// import Setup from '../Setup.vue';
 import Log from '../Log.vue';
 import Browser from '../Browser.vue';
 import ContractTool from '../ContractTool.vue';
 import Account from '../Account.vue';
-import Modal from '../Modal.vue';
 import Deploy from '../Deploy.vue';
 import CreateAsset from '../CreateAsset.vue';
 
 export default defineComponent({
 	components: {
-		// Setup,
 		Log,
 		Account,
-		Modal,
 		Browser,
 		ContractTool,
 		Deploy,
