@@ -1,17 +1,20 @@
 <template>
-    <button @click="showModal = true">
+    <button @click="sModal.modalId = 'create-asset'">
         Create Asset
     </button>
-    <Modal :show="showModal" @close="close" :width="'40%'">
+
+    <teleport v-if="sModal.modalId == 'create-asset'" to="#modal-teleport-dest">
         <h3 class="modal-title">Create Asset</h3>
         <div class="modal-content">
             <div class="properties">
                 <label class="purple" for="assetName">Asset Name</label>
-                <input id="assetName" name="assetName" type="text" v-model="assetArgs.assetName" placeholder="Asset name">
+                <input id="assetName" name="assetName" type="text" v-model="assetArgs.assetName"
+                    placeholder="Asset name">
                 <label class="purple" for="symbol">Symbol</label>
                 <input id="symbol" name="symbol" type="text" v-model="assetArgs.symbol" placeholder="Asset symbol">
                 <label class="purple" for="decimals">Decimals</label>
-                <input id="decimals" name="decimals" type="number" v-model="assetArgs.decimals" placeholder="Decimal places">
+                <input id="decimals" name="decimals" type="number" v-model="assetArgs.decimals"
+                    placeholder="Decimal places">
                 <label class="purple" for="amount">Quantity</label>
                 <input id="amount" name="amount" type="number" v-model="assetArgs.amount" placeholder="Quantity">
                 <label class="purple" for="metaBlock">Note</label>
@@ -20,20 +23,29 @@
         </div>
         <p class="pink" v-if="deployError">{{ deployError }}</p>
         <p class="green" v-if="deployStatus">{{ deployStatus }}</p>
-        <p class="align-right"><LoadingButton @click="deploy" type="submit" :loading="deployLoading">Deploy Asset</LoadingButton></p>
-    </Modal>
+        <p class="align-right">
+            <LoadingButton @click="deploy" type="submit" :loading="deployLoading">Deploy Asset</LoadingButton>
+        </p>
+    </teleport>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
-import Modal from './Modal.vue'
-import LoadingButton from './LoadingButton.vue'
-import state from '../state';
+import { defineComponent } from 'vue';
+
 import router from '../router';
+import state from '../state';
+import { sModal } from '../state/modules/sModal';
+
+// components
+import LoadingButton from './LoadingButton.vue'
 
 export default defineComponent({
+    components: {
+        LoadingButton
+    },
     data() {
         return {
-            showModal: false,
+            sModal,
+
             deployError: false,
             deployLoading: false,
             deployStatus: '',
@@ -45,9 +57,6 @@ export default defineComponent({
                 metaBlock: ''
             }
         }
-    },
-    setup() {
-
     },
     methods: {
         async deploy () {
@@ -82,7 +91,8 @@ export default defineComponent({
             this.deployStatus = '';
         },
         close() {
-            this.showModal = false;
+            sModal.close();
+
             // reset form
             this.assetArgs = {
                 assetName: '',
@@ -93,10 +103,7 @@ export default defineComponent({
             };
         }
     },
-    components: {
-        Modal,
-        LoadingButton
-    }
+
 })
 </script>
 <style lang="scss" scoped>

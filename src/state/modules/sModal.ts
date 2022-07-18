@@ -2,7 +2,12 @@ import { reactive, watch } from 'vue';
 import router from '../../router';
 
 export const sModal = reactive({
-	modalId: '' // empty is modal closed
+	modalId: '', // empty is modal closed
+
+	close() {
+		// add resets here
+		sModal.modalId = '';
+	}
 });
 
 watch(
@@ -51,8 +56,7 @@ watch(
 				console.warn('bad modal query string');
 			}
 		} else {
-			// do any necessary resets here
-			sModal.modalId = '';
+			sModal.close();
 		}
 	},
 	{

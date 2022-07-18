@@ -22,8 +22,8 @@ export default defineComponent({
     },
     setup(props, ctx) {
         const onEsc = function () {
-            ctx.emit('close');
-            sModal.modalId = '';
+            // ctx.emit('close');
+            sModal.close();
         }
 
         useKeypress({
@@ -38,8 +38,8 @@ export default defineComponent({
     },
     methods: {
         close(data?: any) {
-            this.$emit('close', data);
-            sModal.modalId = '';
+            // this.$emit('close', data);
+            sModal.close();
         }
     }
 });

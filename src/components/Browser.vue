@@ -283,19 +283,12 @@ import { defineComponent, ref, watch } from 'vue';
 import { useKeypress } from 'vue3-keypress';
 
 import * as utils from '../utils';
-import { bus } from '../bus';
 import router from '../router';
 
 // states
 import state from '../state';
 
-// components
-import Modal from './Modal.vue';
-
 export default defineComponent({
-    components: {
-        Modal
-    },
     data() {
         return {
             state,

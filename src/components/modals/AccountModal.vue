@@ -181,7 +181,7 @@ export default defineComponent({
 				state.sAlgo.activeAccount = (acct as any).addr;
 				state.success('Connected to account: ' + state.sAlgo.activeAccount);
 				this.closeRecover();
-				sModal.modalId = '';
+				sModal.close();
 			} catch (e: any) {
 				this.loginError = e.toString();
 			}
@@ -196,7 +196,7 @@ export default defineComponent({
 		},
 		close() {
 			this.page = 'options';
-			sModal.modalId = '';
+			sModal.close();
 		},
 		closeRecover() {
 			this.showRecover = false;
