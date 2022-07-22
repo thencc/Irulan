@@ -13,9 +13,12 @@ import state from '../state';
 
 export default defineComponent({
     data() {
-        return { 
-            state 
+        return {
+            state
         }
+    },
+    mounted() {
+        state.log('The real universe is always one step beyond logic.');
     }
 })
 </script>

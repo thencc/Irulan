@@ -1,23 +1,34 @@
 <template>
-    <button @click="showModal = true">
+    <button @click="sModal.modalId = 'contract-deploy'; sModal.width = '70%'">
         Deploy Contract
     </button>
-    <Modal :show="showModal" @close="close" :width="'70%'">
+
+    <teleport v-if="sModal.modalId == 'contract-deploy'" to="#modal-teleport-dest">
         <h3 class="modal-title">Deploy Contract</h3>
         <div class="modal-content">
             <div class="programs">
                 <h4 class="purple">Approval Program</h4>
-                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10" v-model="deployArgs.approvalProgram"></textarea>
+                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10"
+                    v-model="deployArgs.approvalProgram"></textarea>
                 <h4 class="purple">Clear State Program</h4>
-                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10" v-model="deployArgs.clearStateProgram"></textarea>
+                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10"
+                    v-model="deployArgs.clearStateProgram"></textarea>
             </div>
             <div class="args">
                 <div class="schema">
                     <h4 class="purple">Schema</h4>
-                    <p class="small muted field"><label for="localInts">localInts: </label><input type="number" v-model="deployArgs.schema.localInts" placeholder="localInts" id="localInts" name="localInts"></p>
-                    <p class="small muted field"><label for="localBytes">localBytes: </label><input type="number" v-model="deployArgs.schema.localBytes" placeholder="localBytes" id="localBytes" name="localBytes"></p>
-                    <p class="small muted field"><label for="globalInts">globalInts: </label><input type="number" v-model="deployArgs.schema.globalInts" placeholder="globalInts" id="globalInts" name="globalInts"></p>
-                    <p class="small muted field"><label for="globalBytes">globalBytes: </label><input type="number" v-model="deployArgs.schema.globalBytes" placeholder="globalBytes" id="globalBytes" name="globalBytes"></p>
+                    <p class="small muted field"><label for="localInts">localInts: </label><input type="number"
+                            v-model="deployArgs.schema.localInts" placeholder="localInts" id="localInts"
+                            name="localInts"></p>
+                    <p class="small muted field"><label for="localBytes">localBytes: </label><input type="number"
+                            v-model="deployArgs.schema.localBytes" placeholder="localBytes" id="localBytes"
+                            name="localBytes"></p>
+                    <p class="small muted field"><label for="globalInts">globalInts: </label><input type="number"
+                            v-model="deployArgs.schema.globalInts" placeholder="globalInts" id="globalInts"
+                            name="globalInts"></p>
+                    <p class="small muted field"><label for="globalBytes">globalBytes: </label><input type="number"
+                            v-model="deployArgs.schema.globalBytes" placeholder="globalBytes" id="globalBytes"
+                            name="globalBytes"></p>
                 </div>
                 <h4 class="purple">Arguments</h4>
                 <ArrayField v-model="deployArgs.args" :placeholder="'Add argument'" />
@@ -30,15 +41,20 @@
             </div>
         </div>
         <p class="pink" v-if="deployError">{{ deployError }}</p>
-        <p class="align-right"><LoadingButton @click="deploy" type="submit" :loading="deployLoading">Deploy Contract</LoadingButton></p>
-    </Modal>
+        <p class="align-right">
+            <LoadingButton @click="deploy" type="submit" :loading="deployLoading">Deploy Contract</LoadingButton>
+        </p>
+    </teleport>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-import Modal from './Modal.vue';
+
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
+
+import router from '../router';
 import state from '../state';
+import { sModal } from '../state/modules/sModal';
 // import { approvalProgram, clearProgram, schema } from './deploy-test';
 
 // uncomment to load test contract
@@ -46,9 +62,14 @@ import state from '../state';
 const TESTDATA = false;
 
 export default defineComponent({
+    components: {
+        ArrayField,
+        LoadingButton
+    },
     data() {
         return {
-            showModal: false,
+            sModal,
+
             deployLoading: false,
             deployError: '',
             deployArgs: {
@@ -78,7 +99,7 @@ export default defineComponent({
     },
     methods: {
         close () {
-            this.showModal = false;
+            sModal.close();
             this.deployError = '';
             this.deployLoading = false;
 
@@ -101,25 +122,25 @@ export default defineComponent({
             }
         },
         async deploy () {
-            if (!state.algonaut.account) return state.error('No account connected.');
+            if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
             this.deployLoading = true;
             this.deployError = '';
             state.log('Deploying application...');
 
             try {
                 let res;
-                if (state.algonaut.config?.SIGNING_MODE === 'walletconnect') {
+                if (state.sAlgo.algonaut.config?.SIGNING_MODE === 'walletconnect') {
                     // sign via WC
-                    const txn = await state.algonaut.atomicCreateApp({
+                    const txn = await state.sAlgo.algonaut.atomicCreateApp({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
                         schema: this.deployArgs.schema,
                         optionalFields: this.deployArgs.optionalFields
                     });
-                    res = await state.algonaut.sendTransaction([txn]);
+                    res = await state.sAlgo.algonaut.sendTransaction([txn]);
                 } else {
-                    res = await state.algonaut.createApp({
+                    res = await state.sAlgo.algonaut.createApp({
                         tealApprovalCode: this.deployArgs.approvalProgram,
                         tealClearCode: this.deployArgs.clearStateProgram,
                         appArgs: this.deployArgs.args,
@@ -146,8 +167,12 @@ export default defineComponent({
 
                     if (appId) {
                         console.log('navigating to contract...')
-                        const route = state.getNewRoute(this.$route, { contractId: appId });
-                        this.$router.push(route);
+                        router.nonDestructivePush({
+                            name: 'DashApp',
+                            params: {
+                                appId
+                            }
+                        });
                     }
                 }
             } catch (e: any) {
@@ -158,14 +183,10 @@ export default defineComponent({
             }
             this.deployLoading = false;
         }
-    },
-    components: {
-        Modal,
-        ArrayField,
-        LoadingButton
-    },
-})
+    }
+});
 </script>
+
 <style lang="scss" scoped>
 .modal-content {
     display: flex;

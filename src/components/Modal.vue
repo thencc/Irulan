@@ -1,6 +1,6 @@
 <template>
-    <div class="modal-overlay" v-if="show">
-        <div class="modal vertical-center" :style="{ width: width }">
+    <div v-if="show" :class="`modal-overlay ${show ? 'is-active' : ''}`">
+        <div class="modal vertical-center" :style="{ width: sModal.width }">
             <div class="close-modal" @click="close">X</div>
             <slot></slot>
         </div>
@@ -10,10 +10,21 @@
 import { defineComponent, ref } from 'vue';
 import { useKeypress } from 'vue3-keypress';
 
+import { sModal } from '../state/modules/sModal';
+
 export default defineComponent({
+    props: {
+        show: Boolean,
+    },
+    data() {
+        return {
+            sModal
+        }
+    },
     setup(props, ctx) {
         const onEsc = function () {
-            ctx.emit('close');
+            // ctx.emit('close');
+            sModal.close();
         }
 
         useKeypress({
@@ -26,23 +37,18 @@ export default defineComponent({
             ]
         })
     },
-
-    props: {
-        show: Boolean,
-        width: {
-            type: String,
-            default: '40%'
-        }
-    },
     methods: {
-        close (data?: any) {
-            this.$emit('close', data);
+        close(data?: any) {
+            // this.$emit('close', data);
+            sModal.close();
         }
     }
-})
+});
 </script>
+
 <style lang="scss">
 @import '../assets/variables';
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -69,9 +75,11 @@ export default defineComponent({
 
 .modal {
     max-height: 98%;
-    background-color: $bg;
+    min-height: 40px;
     margin: 0 auto;
     padding: 10px;
+
+    background-color: $bg;
     border: 2px solid $border;
     display: block;
     text-align: left;
@@ -99,6 +107,32 @@ export default defineComponent({
 
     &:hover {
         color: $pink;
+    }
+}
+
+/** fancy animate in */
+.modal-overlay.is-active > .modal {
+    animation: slide-up 0.25s cubic-bezier(0.33, 1, 0.68, 1) forwards,
+        fade-in 0.1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+@keyframes slide-up {
+    0% {
+        top: calc(50% + 20px);
+    }
+
+    100% {
+        top: 50%;
+    }
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
 </style>

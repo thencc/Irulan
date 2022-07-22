@@ -1,156 +1,203 @@
 <template>
     <div class="search">
-        <form @submit.prevent="search" class="search-form">
-            <input type="text" v-model="query" placeholder="Account / App ID / Asset ID">
-            <button class="btn-gray">Search</button>
+        <form @submit.prevent="" class="search-form">
+            <input v-model="searchQueryInputVal" type="search" placeholder="Account/App/Asset ID (&#8984;+K)"
+                ref="searchInput">
+            <button class="btn-gray" title="&#8984; K">Search</button>
         </form>
     </div>
     <div class="browser">
-        <div class="searching" v-if="searching">Searching...</div>
-        <div class="results" v-if="response">
-            <p class="pink empty align-center" v-if="response.type === 'empty'">{{ response.message }}</p>
+        <div class="searching" v-if="state.sSearch.loading">Searching...</div>
 
-            <div class="object" v-if="response.object">
-                <h2>{{ response.type }}
-                    <span :class="response.type === 'account' ? 'purple' : 'green'">
-                        {{ response.type === 'account'
-                            ? utils.shortAddr(response.object.address)
-                            : response.object.index
+        <div class="results" v-if="searchRes">
+            <p class="pink empty align-center" v-if="searchRes.type === 'empty'">
+                {{ searchRes.message }}
+            </p>
+
+            <div class="object" v-else-if="searchRes && searchRes.object">
+                <h2>{{ searchRes.type }}
+                    <span :class="searchRes.type === 'account' ? 'purple' : 'green'">
+                        {{ searchRes.type === 'account'
+                        ? utils.shortAddr(searchRes.object.address)
+                        : searchRes.object.index
                         }}
                     </span>
                 </h2>
-                <p
-                    v-if="response.object.creatorAddress">
+                <p v-if="searchRes.object.creatorAddress">
                     Creator:
-                    <a
-                        href=""
-                        class="purple"
-                        @click.prevent="setSearch(response.object.creatorAddress)"
-                    >
-                        {{ utils.shortAddr(response.object.creatorAddress) }}
-                    </a>
+                    <router-link :to="state.sSearch.getSearchPath(searchRes.object.creatorAddress)"
+                        v-slot="{ route, href }">
+                        <a :href="href" class="purple">
+                            {{ utils.shortAddr(searchRes.object.creatorAddress) }}
+                        </a>
+                    </router-link>
                 </p>
-                <button @click="loadApp(response.object.index)" v-if="response.type === 'app'">Load Contract</button>
 
-                <div class="app" v-if="response.type === 'app'">
+                <router-link v-if="searchRes.type === 'app'" :to="getDashAppPath(searchRes.object.index)"
+                    v-slot="{ route }">
+                    <button>Load Contract</button>
+                </router-link>
+
+                <div class="app" v-if="searchRes.type === 'app'">
                     <h3 class="purple">Global State</h3>
-                    <table class="browser-table state-table" v-if="response.object.globals && response.object.globals.length">
+                    <table class="browser-table state-table"
+                        v-if="searchRes.object.globals && searchRes.object.globals.length">
                         <tr class="browser-table-heading">
                             <th>Key</th>
                             <th>Value</th>
                             <th>Address</th>
                         </tr>
-                        <tr v-for="item in response.object.globals" :key="item.key">
+                        <tr v-for="item in searchRes.object.globals" :key="item.key">
                             <td class="key">{{ item.key }}</td>
                             <td>{{ item.value }}</td>
                             <td>{{ item.address }}</td>
                         </tr>
                     </table>
-                    <p class="muted" v-if="!response.object.globals || !response.object.globals.length">No global state schema.</p>
+                    <p class="muted" v-if="!searchRes.object.globals || !searchRes.object.globals.length">No global
+                        state
+                        schema.</p>
 
                     <h3 class="purple">Local State</h3>
-                    <table class="browser-table state-table" v-if="response.object.locals && response.object.locals.length">
+                    <table class="browser-table state-table"
+                        v-if="searchRes.object.locals && searchRes.object.locals.length">
                         <tr class="browser-table-heading">
                             <th>Key</th>
                             <th>Value</th>
                             <th>Address</th>
                         </tr>
-                        <tr v-for="item in response.object.locals" :key="item.key">
+                        <tr v-for="item in searchRes.object.locals" :key="item.key">
                             <td class="key">{{ item.key }}</td>
                             <td>{{ item.value }}</td>
                             <td>{{ item.address }}</td>
                         </tr>
                     </table>
-                    <p class="muted" v-if="!response.object.locals || !response.object.locals.length">No local state schema.</p>
+                    <p class="muted" v-if="!searchRes.object.locals || !searchRes.object.locals.length">No local state
+                        schema.</p>
                 </div>
 
-                <div class="asset" v-if="response.type === 'asset'">
+                <div class="asset" v-if="searchRes.type === 'asset'">
                     <table class="browser-table">
                         <tr>
                             <td class="key">Name</td>
-                            <td>{{ response.object.params.name }}</td>
+                            <td>{{ searchRes.object.params.name }}</td>
                         </tr>
                         <tr>
                             <td class="key">Unit Name</td>
-                            <td>{{ response.object.params['unit-name'] }}</td>
+                            <td>{{ searchRes.object.params['unit-name'] }}</td>
                         </tr>
                         <tr>
                             <td class="key">Total</td>
-                            <td>{{ response.object.params.total }}</td>
+                            <td>{{ searchRes.object.params.total }}</td>
                         </tr>
                         <tr>
                             <td class="key">URL</td>
-                            <td class="small"><a :href="response.object.params.url" target="_blank">{{ response.object.params.url }}</a></td>
+                            <td class="small"><a :href="searchRes.object.params.url" target="_blank">{{
+                                    searchRes.object.params.url }}</a></td>
                         </tr>
                         <tr>
                             <td class="key">Frozen</td>
-                            <td>{{ response.object.params['default-frozen'] }}</td>
+                            <td>{{ searchRes.object.params['default-frozen'] }}</td>
                         </tr>
                         <tr>
                             <td class="key">Decimals</td>
-                            <td>{{ response.object.params.decimals }}</td>
+                            <td>{{ searchRes.object.params.decimals }}</td>
                         </tr>
                         <tr>
                             <td class="key">Creator</td>
-                            <td><a href="" style="" @click.prevent="setSearch(response.object.params.creator)" class="purple long-cell">{{ response.object.params.creator }}</a></td>
+                            <td>
+                                <router-link :to="state.sSearch.getSearchPath(searchRes.object.params.creator)"
+                                    v-slot="{ route, href }">
+                                    <a :href="href" class="long-cell purple">
+                                        {{ searchRes.object.params.creator }}
+                                    </a>
+                                </router-link>
+                            </td>
                         </tr>
                         <tr>
                             <td class="key">Manager</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.manager)" class="purple long-cell">{{ response.object.params.manager }}</a></td>
+                            <td>
+                                <router-link :to="state.sSearch.getSearchPath(searchRes.object.params.manager)"
+                                    v-slot="{ route, href }">
+                                    <a :href="href" class="long-cell purple">
+                                        {{ searchRes.object.params.manager }}
+                                    </a>
+                                </router-link>
+                            </td>
                         </tr>
                         <tr>
                             <td class="key">Clawback</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.clawback)" class="purple long-cell">{{ response.object.params.clawback }}</a></td>
+                            <td>
+                                <router-link :to="state.sSearch.getSearchPath(searchRes.object.params.clawback)"
+                                    v-slot="{ route, href }">
+                                    <a :href="href" class="long-cell purple">
+                                        {{ searchRes.object.params.clawback }}
+                                    </a>
+                                </router-link>
+                            </td>
                         </tr>
                         <tr>
                             <td class="key">Reserve</td>
-                            <td><a href="" @click.prevent="setSearch(response.object.params.reserve)" class="purple long-cell">{{ response.object.params.reserve }}</a></td>
+                            <td>
+                                <router-link :to="state.sSearch.getSearchPath(searchRes.object.params.reserve)"
+                                    v-slot="{ route, href }">
+                                    <a :href="href" class="long-cell purple">
+                                        {{ searchRes.object.params.reserve }}
+                                    </a>
+                                </router-link>
+                            </td>
                         </tr>
                     </table>
                 </div>
 
-                <div class="account" v-if="response.type === 'account'">
+                <div class="account" v-if="searchRes.type === 'account'">
                     <div class="balances">
                         <div class="balance">
                             <p class="balance-caption muted">Balance</p>
-                            <p class="balance-amount yellow">{{ (response.object.amount / 1000000).toFixed(4) }} ALGO</p>
+                            <p class="balance-amount yellow">{{ (searchRes.object.amount / 1000000).toFixed(4) }} ALGO
+                            </p>
                         </div>
                         <div class="balance">
                             <p class="balance-caption muted">Rewards</p>
-                            <p class="balance-amount yellow">{{ (response.object.rewards / 1000000).toFixed(4) }} ALGO</p>
+                            <p class="balance-amount yellow">{{ (searchRes.object.rewards / 1000000).toFixed(4) }} ALGO
+                            </p>
                         </div>
                     </div>
 
                     <h3 class="purple">Assets</h3>
-                    <p class="muted" v-if="!response.object.assets || !response.object.assets.length">No assets.</p>
-                    <table class="browser-table" v-if="response.object['assets'].length">
+                    <p class="muted" v-if="!searchRes.object.assets || !searchRes.object.assets.length">No assets.</p>
+                    <table class="browser-table" v-if="searchRes.object['assets'].length">
                         <tr class="browser-table-heading">
                             <th>Asset ID</th>
                             <th>Amount</th>
                             <th>Frozen?</th>
                             <th>Creator</th>
                         </tr>
-                        <tr v-for="asset in response.object.assets" :key="asset['asset-id']">
+                        <tr v-for="asset in searchRes.object.assets" :key="asset['asset-id']">
                             <td class="key">
-                                <a href="" @click.prevent="setSearch(asset['asset-id'])" class="yellow">{{ asset['asset-id'] }}</a>
+                                <router-link :to="state.sSearch.getSearchPath(asset['asset-id'])"
+                                    v-slot="{ route, href }">
+                                    <a :href="href" class="yellow">
+                                        {{ asset['asset-id'] }}
+                                    </a>
+                                </router-link>
                             </td>
                             <td>{{ asset.amount }}</td>
                             <td>{{ asset['is-frozen'].toString() }}</td>
                             <td v-if="asset.creator">
-                                <a
-                                    href=""
-                                    class="purple"
-                                    @click.prevent="setSearch(asset.creator)"
-                                >
-                                    {{ utils.shortAddr(asset.creator) }}
-                                </a>
+                                <router-link :to="state.sSearch.getSearchPath(asset.creator)" v-slot="{ route, href }">
+                                    <a :href="href" class="purple">
+                                        {{ utils.shortAddr(asset.creator) }}
+                                    </a>
+                                </router-link>
                             </td>
                         </tr>
                     </table>
 
                     <h3 class="purple">Created Assets</h3>
-                    <p class="muted" v-if="!response.object['created-assets'] || !response.object['created-assets'].length">No created assets.</p>
-                    <table class="browser-table" v-if="response.object['created-assets'].length">
+                    <p class="muted"
+                        v-if="!searchRes.object['created-assets'] || !searchRes.object['created-assets'].length">No
+                        created assets.</p>
+                    <table class="browser-table" v-if="searchRes.object['created-assets'].length">
                         <tr class="browser-table-heading">
                             <th>Asset ID</th>
                             <th>Asset Name</th>
@@ -158,9 +205,13 @@
                             <th>Total</th>
                             <th>URL</th>
                         </tr>
-                        <tr v-for="asset in response.object['created-assets']" :key="asset.index">
+                        <tr v-for="asset in searchRes.object['created-assets']" :key="asset.index">
                             <td class="key">
-                                <a href="" @click.prevent="setSearch(asset.index)" class="yellow">{{ asset.index }}</a>
+                                <router-link :to="state.sSearch.getSearchPath(asset.index)" v-slot="{ href }">
+                                    <a :href="href" class="yellow">
+                                        {{ asset.index }}
+                                    </a>
+                                </router-link>
                             </td>
                             <td>{{ asset.params.name }}</td>
                             <td>{{ asset.params['unit-name'] }}</td>
@@ -170,10 +221,19 @@
                     </table>
 
                     <h3 class="purple">Local State</h3>
-                    <p class="muted" v-if="!response.object['apps-local-state'] || !response.object['apps-local-state'].length">No local state.</p>
+                    <p class="muted"
+                        v-if="!searchRes.object['apps-local-state'] || !searchRes.object['apps-local-state'].length">No
+                        local state.</p>
 
-                    <div class="local-state-app" v-for="app in response.object['apps-local-state']" :key="app.id">
-                        <h4>App <a href="" @click.prevent="setSearch(app.id)" class="green">{{ app.id }}</a></h4>
+                    <div class="local-state-app" v-for="app in searchRes.object['apps-local-state']" :key="app.id">
+                        <h4>
+                            App
+                            <router-link :to="state.sSearch.getSearchPath(app.id)" v-slot="{ href }">
+                                <a :href="href" class="green">
+                                    {{ app.id }}
+                                </a>
+                            </router-link>
+                        </h4>
                         <table class="browser-table" v-if="app['key-value'] && app['key-value'].length">
                             <tr class="browser-table-heading">
                                 <th>Key</th>
@@ -189,160 +249,122 @@
                     </div>
 
                     <h3 class="purple">Created Apps</h3>
-                    <p class="muted" v-if="!response.object['created-apps'] || !response.object['created-apps'].length">No created apps.</p>
-                    <table class="browser-table" v-if="response.object['created-apps'].length">
+                    <p class="muted"
+                        v-if="!searchRes.object['created-apps'] || !searchRes.object['created-apps'].length">
+                        No created apps.</p>
+                    <table class="browser-table" v-if="searchRes.object['created-apps'].length">
                         <tr class="browser-table-heading">
                             <th>App ID</th>
                             <th></th>
                         </tr>
-                        <tr v-for="app in response.object['created-apps']" :key="app.id">
-                            <td class="key">{{ app.id }}</td>
+                        <tr v-for="app in searchRes.object['created-apps']" :key="app.id">
+                            <td class="key">
+                                <router-link :to="state.sSearch.getSearchPath(app.id)" v-slot="{ href }">
+                                    <a :href="href" class="green">
+                                        {{ app.id }}
+                                    </a>
+                                </router-link>
+                            </td>
                             <td>
-                                <button class="btn-link pink" @click="setSearch(app.id)">View in Browser</button>
-                                <button @click="loadApp(app.id)">Load Contract</button>
+                                <router-link :to="getDashAppPath(app.id)">
+                                    <button>Load Contract</button>
+                                </router-link>
                             </td>
                         </tr>
                     </table>
                 </div>
-
-                <!-- <h3 class="purple">Full Response</h3>
-                <pre class="response">{{ response.object }}</pre> -->
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import state from '../state';
-import { bus } from '../bus';
-import Modal from './Modal.vue';
+import { defineComponent, ref, watch } from 'vue';
+import { useKeypress } from 'vue3-keypress';
 
 import * as utils from '../utils';
+import router from '../router';
+
+// states
+import state from '../state';
 
 export default defineComponent({
-    components: {
-        Modal
-    },
     data() {
         return {
             state,
             utils,
-            response: null as any,
-            query: '',
-            searching: false
-        }
-    },
-    created () {
-        this.$watch(
-            () => this.$route.params,
-            (toParams: any) => {
-                this.handleParams();
-            }
-        );
 
-        bus.on('signed-in', this.signedInHandler);
-    },
-    beforeUnmount() {
-        bus.off('signed-in', this.signedInHandler);
-    },
-    methods: {
-        signedInHandler() {
-            this.handleParams();
-        },
-        handleParams() {
-            // happens on page load, route updates + AFTER auth (to get local vars of app for ex)
-            if (this.$route.name === 'search' || this.$route.name === 'full') {
-                this.setSearch(this.$route.params.query);
-            }
-            if (this.$route.name === 'contract' || this.$route.name === 'full') {
-                this.loadApp(parseInt(this.$route.params.contractId as string));
-            }
-        },
-        loadApp(appIndex: number) {
-            this.$router.push(state.getNewRoute(this.$route, { contractId: appIndex.toString(), query: this.query }));
-            state.loadApp(appIndex);
-        },
-        setSearch(query: any) {
-            this.query = query;
-            this.search();
-        },
-        decode (s: string) {
-            return state.algonaut.fromBase64(s);
-        },
-        async search () {
-            const route = state.getNewRoute(this.$route, { query: this.query });
-            this.$router.push(route);
-            this.searching = true;
-            this.response = null
-            var response = {} as any;
-            state.logRoute(`Searching: ${this.query}`, route);
-            if (state.algonaut.sdk?.isValidAddress(this.query)) {
-                state.success('Account found.');
-                response = await state.algonaut.getAccountInfo(this.query);
-                this.searching = false;
-                this.response = {
-                    type: 'account',
-                    object: response
-                }
-
-
-                // get asset info
-                if (this.response.object.assets) {
-                    this.response.object.assets.map((asset: any) => {
-                        state.algonaut.getAssetInfo(asset['asset-id']).then(assetInfo => {
-                            console.log(assetInfo);
-                            asset.creator = assetInfo.params.creator;
-                            return asset;
-                        })
-                    })
-                }
-            } else if (parseInt(this.query)) {
-                // attempt to find app
-                try {
-                    response = await state.algonaut.getAppInfo(parseInt(this.query));
-                    state.success('App found.');
-                    this.searching = false;
-                    this.response = {
-                        type: 'app',
-                        object: response
-                    }
-                } catch (e) {
-                    try {
-                        response = await state.algonaut.getAssetInfo(parseInt(this.query));
-                        state.success('Asset found: ' + response.params.name);
-                        this.searching = false;
-                        this.response = {
-                            type: 'asset',
-                            object: response
-                        }
-                    } catch (e) {
-                        console.error(e);
-                        this.searching = false;
-                        this.response = {
-                            type: 'empty',
-                            message: 'Nothing found.'
-                        }
-                        state.error(this.response.message);
-                    }
-                }
-            } else {
-                this.response = {
-                    type: 'empty',
-                    message: 'Not a valid resource.'
-                };
-                state.error(this.response.message);
-                this.searching = false;
-            }
+            searchQueryInputVal: '',
+            queryTimer: 0 as number | NodeJS.Timeout
         }
     },
     computed: {
-        globalState: function () {
-            if (this.response && this.response.object && this.response.type === 'app') {
-                return state.algonaut.stateArrayToObject((this as any).response.object.globals);
+        searchRes: () => state.sSearch.response
+    },
+    setup(props, ctx) {
+        const searchInput = ref<HTMLInputElement>();
+
+        // focus search input with meta+K key cmd
+        useKeypress({
+            keyEvent: 'keydown',
+            keyBinds: [
+                {
+                    keyCode: 75, // K. keycode as int (https://github.com/lupas/vue3-keypress#key-binds)
+                    modifiers: ['metaKey'],
+                    success: () => {
+                        // console.log('meta+K pressed');
+                        searchInput.value?.focus();
+                        searchInput.value?.select();
+                    }
+                }
+            ]
+        });
+
+        return { searchInput }; // expose
+    },
+    created () {
+        watch(
+            () => state.sSearch.query,
+            (q) => {
+                this.searchQueryInputVal = q;
+            },
+            { immediate: true }
+        )
+    },
+    watch: {
+        searchQueryInputVal: {
+            handler(queryNew, queryOld) {
+                // console.log('queryNew', queryNew);
+
+                // if it wasnt set programmatically like from clicking a link, then debounce typed search for less req/s
+                if (queryNew !== state.sSearch.query) {
+                    clearTimeout(this.queryTimer);
+
+                    this.queryTimer = setTimeout(() => {
+                        // console.log('timeouted');
+                        state.sSearch.query = queryNew;
+                        // this.checkingUsername = false;
+                    }, 1000);
+                } else {
+                    // console.log('dont queryNew debounce');
+                }
             }
         }
-    }
+    },
+    methods: {
+        getDashAppPath(appId: number) {
+            let r = router.nonDestructiveResolve({
+                name: 'DashApp',
+                params: {
+                    appId: appId.toString()
+                }
+            });
+            return r.fullPath;
+        },
+        decode (s: string) {
+            return state.sAlgo.algonaut.fromBase64(s);
+        },
+    },
 });
 </script>
 
@@ -361,6 +383,8 @@ $space: 10px;
     flex: 1 1 70%;
     border: 2px solid $border;
     overflow-y: scroll;
+    overflow-x: scroll;
+    // max-width: 420px;
 
     h3 {
         margin-top: 2em;
@@ -383,6 +407,22 @@ $space: 10px;
     input {
         flex: 1 1 90%;
         padding: 5px 10px;
+    }
+    input::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        cursor: pointer;
+
+        background-color: rgba(255, 255, 255, 0.5);
+        -webkit-mask-image: url(https://fonts.gstatic.com/s/i/materialicons/cancel/v16/24px.svg);
+        mask-image: url(https://fonts.gstatic.com/s/i/materialicons/cancel/v16/24px.svg);
+        -webkit-mask-size: contain;
+        mask-size: contain;
+    }
+    input::-webkit-search-cancel-button:hover {
+        background-color: rgba(255, 255, 255, 0.75);
     }
 
     button {
@@ -445,14 +485,19 @@ $space: 10px;
             max-width: 260px;
             overflow-x: scroll;
             padding-right: 10px;
-            margin-right: -10px;
-            mask-image: linear-gradient(to left,
+            margin-right: -48px;
+            mask-image: linear-gradient(
+                to left,
                 rgba(0, 0, 0, 0) 0px,
-                black 10px);
-            -webkit-mask-image: linear-gradient(to left,
+                black 10px
+            );
+            -webkit-mask-image: linear-gradient(
+                to left,
                 rgba(0, 0, 0, 0) 0px,
-                black 10px);
+                black 10px
+            );
         }
     }
+
 }
 </style>

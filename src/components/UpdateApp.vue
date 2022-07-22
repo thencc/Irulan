@@ -1,16 +1,19 @@
 <template>
-    <button @click="showModal = true">
+    <button @click="sModal.modalId = 'contract-update'; sModal.width = '70%'">
         Update Contract
     </button>
-    <Modal :show="showModal" @close="close" :width="'70%'">
+
+    <teleport v-if="sModal.modalId == 'contract-update'" to="#modal-teleport-dest">
         <h3 class="modal-title">Update Contract</h3>
         <div class="modal-content">
             <div class="programs">
                 <p>(updating app <span class="green">{{ app.index }}</span>)</p>
                 <h4 class="purple">Approval Program</h4>
-                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10" v-model="deployArgs.approvalProgram"></textarea>
+                <textarea name="approvalProgram" id="approvalProgram" cols="30" rows="10"
+                    v-model="deployArgs.approvalProgram"></textarea>
                 <h4 class="purple">Clear State Program</h4>
-                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10" v-model="deployArgs.clearStateProgram"></textarea>
+                <textarea name="clearStateProgram" id="clearStateProgram" cols="30" rows="10"
+                    v-model="deployArgs.clearStateProgram"></textarea>
             </div>
             <div class="args">
                 <h4 class="purple">Arguments</h4>
@@ -24,24 +27,33 @@
             </div>
         </div>
         <p class="pink" v-if="deployError">{{ deployError }}</p>
-        <p class="align-right"><LoadingButton @click="deploy" type="submit" :loading="deployLoading">Update Contract</LoadingButton></p>
-    </Modal>
+        <p class="align-right">
+            <LoadingButton @click="deploy" type="submit" :loading="deployLoading">Update Contract</LoadingButton>
+        </p>
+    </teleport>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
-import Modal from './Modal.vue';
+import { defineComponent } from 'vue';
+import state from '../state';
+import { sModal } from '../state/modules/sModal';
+
+// comps
 import ArrayField from './ArrayField.vue';
 import LoadingButton from './LoadingButton.vue';
-import state from '../state';
 
 export default defineComponent({
+    components: {
+        ArrayField,
+        LoadingButton
+    },
     props: {
+        // TODO type this / just use sApp state
         app: {} as any
     },
     data() {
         return {
             state,
-            showModal: false,
+            sModal,
             deployLoading: false,
             deployError: '',
             deployArgs: {
@@ -57,13 +69,13 @@ export default defineComponent({
         }
     },
     watch: {
-        'state.currentApp.approvalDecompiled': {
+        'app.approvalDecompiled': {
             immediate: true,
             handler(c) {
                 this.deployArgs.approvalProgram = (c || '').replaceAll('\t','');
             }
         },
-        'state.currentApp.clearDecompiled': {
+        'app.clearDecompiled': {
             immediate: true,
             handler(c) {
                 this.deployArgs.clearStateProgram = (c || '').replaceAll('\t','');
@@ -72,14 +84,14 @@ export default defineComponent({
     },
     methods: {
         close () {
-            this.showModal = false;
+            sModal.close();
             this.deployError = '';
             this.deployLoading = false;
 
             // reset form
             this.deployArgs = {
-                approvalProgram: (state.currentApp.approvalDecompiled || '').replaceAll('\t',''),
-                clearStateProgram: (state.currentApp.clearDecompiled || '').replaceAll('\t',''),
+                approvalProgram: (this.app.approvalDecompiled || '').replaceAll('\t',''),
+                clearStateProgram: (this.app.clearDecompiled || '').replaceAll('\t',''),
                 args: [],
                 optionalFields: {
                     accounts: [],
@@ -89,12 +101,12 @@ export default defineComponent({
             }
         },
         async deploy () {
-            if (!state.algonaut.account) return state.error('No account connected.');
+            if (!state.sAlgo.algonaut.account) return state.error('No account connected.');
             this.deployLoading = true;
             this.deployError = '';
             state.log('Deploying application...');
             try {
-                let res = await state.algonaut.updateApp({
+                let res = await state.sAlgo.algonaut.updateApp({
                     appIndex: this.app.index,
                     tealApprovalCode: this.deployArgs.approvalProgram,
                     tealClearCode: this.deployArgs.clearStateProgram,
@@ -132,13 +144,9 @@ export default defineComponent({
             this.deployLoading = false;
         }
     },
-    components: {
-        Modal,
-        ArrayField,
-        LoadingButton
-    },
 })
 </script>
+
 <style lang="scss" scoped>
 .modal-content {
     display: flex;

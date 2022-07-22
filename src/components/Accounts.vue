@@ -113,7 +113,7 @@ export default defineComponent({
             this.loading = true;
             state.log('Getting account info...');
             try {
-                this.acct = await state.algonaut.getAccountInfo(this.address);
+                this.acct = await state.sAlgo.algonaut.getAccountInfo(this.address);
                 console.log(this.acct);
                 state.success('Account fetched: ' + this.acct.address);
             } catch (e) {
