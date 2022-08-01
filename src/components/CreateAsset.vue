@@ -83,22 +83,22 @@ export default defineComponent({
                 assetURL: '',
                 defaultFrozen: false,
                 assetMetadataHash: '',
-                manager: state.sAlgo.activeAccount || '',
-                reserve: state.sAlgo.activeAccount || '',
-                freeze: state.sAlgo.activeAccount || '',
-                clawback: state.sAlgo.activeAccount || '',
-                rekeyTo: state.sAlgo.activeAccount || ''
+                manager: '',
+                reserve: '',
+                freeze: '',
+                clawback: '',
+                rekeyTo: ''
             }
         }
     },
     updated() {
         if (state.sAlgo.activeAccount) {
             const account = state.sAlgo.activeAccount;
-            this.assetArgs.manager = account;
-            this.assetArgs.freeze = account;
-            this.assetArgs.rekeyTo = account;
-            this.assetArgs.reserve = account;
-            this.assetArgs.clawback = account;
+            if (!this.assetArgs.manager.length) this.assetArgs.manager = account;
+            if (!this.assetArgs.freeze.length) this.assetArgs.freeze = account;
+            if (!this.assetArgs.rekeyTo.length) this.assetArgs.rekeyTo = account;
+            if (!this.assetArgs.reserve.length) this.assetArgs.reserve = account;
+            if (!this.assetArgs.clawback.length) this.assetArgs.clawback = account;
         }
     }, 
     methods: {
