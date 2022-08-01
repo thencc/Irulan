@@ -9,22 +9,47 @@
             <div class="properties">
                 <label class="purple" for="assetName">Asset Name</label>
                 <input id="assetName" name="assetName" type="text" v-model="assetArgs.assetName"
-                    placeholder="Asset name">
+                    placeholder="Asset name" required>
                 <label class="purple" for="symbol">Symbol</label>
-                <input id="symbol" name="symbol" type="text" v-model="assetArgs.symbol" placeholder="Asset symbol">
+                <input id="symbol" name="symbol" type="text" v-model="assetArgs.symbol" placeholder="Asset symbol" required>
                 <label class="purple" for="decimals">Decimals</label>
                 <input id="decimals" name="decimals" type="number" v-model="assetArgs.decimals"
-                    placeholder="Decimal places">
+                    placeholder="Decimal places" required>
                 <label class="purple" for="amount">Quantity</label>
-                <input id="amount" name="amount" type="number" v-model="assetArgs.amount" placeholder="Quantity">
+                <input id="amount" name="amount" type="number" v-model="assetArgs.amount" placeholder="Quantity" required>
                 <label class="purple" for="metaBlock">Note</label>
                 <input id="metaBlock" name="metaBlock" type="text" v-model="assetArgs.metaBlock" placeholder="Note">
+                <label class="purple" for="assetURL">Asset URL</label>
+                <input id="assetURL" name="assetURL" type="text" v-model="assetArgs.assetURL" placeholder="Asset URL">
+                <label class="purple" for="assetMetadataHash">Metadata Hash</label>
+                <input id="assetMetadataHash" name="assetMetadataHash" type="text" v-model="assetArgs.assetMetadataHash" placeholder="Metadata Hash">
+                <p class="small muted">Optional. Must be exactly 32 bytes long.</p>
+
+                <h4>Addresses</h4>
+                <p class="small muted">Defaults to current authenticated account.</p>
+                
+                <label class="purple" for="manager">Manager Address</label>
+                <input id="manager" name="manager" type="text" v-model="assetArgs.manager" placeholder="Manager Address">
+                <label class="purple" for="clawback">Clawback Address</label>
+                <input id="clawback" name="clawback" type="text" v-model="assetArgs.clawback" placeholder="Clawback Address">
+                <label class="purple" for="freeze">Freeze Address</label>
+                <input id="freeze" name="freeze" type="text" v-model="assetArgs.freeze" placeholder="Freeze Address">
+                <label class="purple" for="reserve">Reserve Address</label>
+                <input id="reserve" name="reserve" type="text" v-model="assetArgs.reserve" placeholder="Reserve Address">
+                <label class="purple" for="rekeyTo">RekeyTo Address</label>
+                <input id="rekeyTo" name="rekeyTo" type="text" v-model="assetArgs.rekeyTo" placeholder="RekeyTo Address">
             </div>
         </div>
         <p class="pink" v-if="deployError">{{ deployError }}</p>
         <p class="green" v-if="deployStatus">{{ deployStatus }}</p>
         <p class="align-right">
-            <LoadingButton @click="deploy" type="submit" :loading="deployLoading">Deploy Asset</LoadingButton>
+            <LoadingButton @click="deploy" type="submit" :loading="deployLoading" 
+                :disabled="!assetArgs.assetName || 
+                           !assetArgs.symbol ||
+                           !assetArgs.decimals || 
+                           !assetArgs.amount">
+                Deploy Asset
+            </LoadingButton>
         </p>
     </teleport>
 </template>
@@ -54,10 +79,28 @@ export default defineComponent({
                 symbol: '',
                 decimals: 3,
                 amount: 0,
-                metaBlock: ''
+                metaBlock: '',
+                assetURL: '',
+                defaultFrozen: false,
+                assetMetadataHash: '',
+                manager: state.sAlgo.activeAccount || '',
+                reserve: state.sAlgo.activeAccount || '',
+                freeze: state.sAlgo.activeAccount || '',
+                clawback: state.sAlgo.activeAccount || '',
+                rekeyTo: state.sAlgo.activeAccount || ''
             }
         }
     },
+    updated() {
+        if (state.sAlgo.activeAccount) {
+            const account = state.sAlgo.activeAccount;
+            this.assetArgs.manager = account;
+            this.assetArgs.freeze = account;
+            this.assetArgs.rekeyTo = account;
+            this.assetArgs.reserve = account;
+            this.assetArgs.clawback = account;
+        }
+    }, 
     methods: {
         async deploy () {
             this.deployLoading = true;
@@ -99,7 +142,15 @@ export default defineComponent({
                 symbol: '',
                 decimals: 3,
                 amount: 0,
-                metaBlock: ''
+                metaBlock: '',
+                assetURL: '',
+                defaultFrozen: false,
+                assetMetadataHash: '',
+                manager: '',
+                reserve: '',
+                freeze: '',
+                clawback: '',
+                rekeyTo: ''
             };
         }
     },
