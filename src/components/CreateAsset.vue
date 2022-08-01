@@ -27,7 +27,7 @@
 
                 <h4>Addresses</h4>
                 <p class="small muted">Defaults to current authenticated account.</p>
-                
+
                 <label class="purple" for="manager">Manager Address</label>
                 <input id="manager" name="manager" type="text" v-model="assetArgs.manager" placeholder="Manager Address">
                 <label class="purple" for="clawback">Clawback Address</label>
@@ -36,8 +36,8 @@
                 <input id="freeze" name="freeze" type="text" v-model="assetArgs.freeze" placeholder="Freeze Address">
                 <label class="purple" for="reserve">Reserve Address</label>
                 <input id="reserve" name="reserve" type="text" v-model="assetArgs.reserve" placeholder="Reserve Address">
-                <label class="purple" for="rekeyTo">RekeyTo Address</label>
-                <input id="rekeyTo" name="rekeyTo" type="text" v-model="assetArgs.rekeyTo" placeholder="RekeyTo Address">
+                <!-- <label class="purple" for="rekeyTo">RekeyTo Address</label>
+                <input id="rekeyTo" name="rekeyTo" type="text" v-model="assetArgs.rekeyTo" placeholder="RekeyTo Address"> -->
             </div>
         </div>
         <p class="pink" v-if="deployError">{{ deployError }}</p>
