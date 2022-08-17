@@ -1,5 +1,6 @@
-import { reactive, watch } from 'vue';
+import { reactive, watch, markRaw } from 'vue';
 import Algonaut from 'algonaut.js';
+// import Algonaut from '../../../../algonautjs/dist/index';
 // import { AlgonautConfig } from 'algonaut.js/dist/AlgonautTypes';
 
 import state from '../index';
@@ -63,7 +64,8 @@ const formatConfigForAlgonaut = (config: CustomNodeConfig) => {
 };
 
 // must start w something, defaults w testnet
-const algonaut = new Algonaut(formatConfigForAlgonaut(defaultConfigTestnet));
+const algonaut = markRaw(new Algonaut(formatConfigForAlgonaut(defaultConfigTestnet)));
+console.log(algonaut);
 
 // state
 export const sAlgo = reactive({
@@ -143,7 +145,7 @@ export const sAlgo = reactive({
 
 		try {
 			state.log('Connecting...');
-			this.algonaut = new Algonaut(algoConfig);
+			this.algonaut = markRaw(new Algonaut(algoConfig));
 
 			const status = await this.algonaut.checkStatus();
 			if (status['last-round']) {
@@ -215,13 +217,13 @@ export const sAlgo = reactive({
 			return null;
 		}
 	},
-	saveAccount(type: 'local' | 'walletconnect', account: any) {
+	saveAccount(type: 'local' | 'walletconnect' | 'inkey', account: any) {
 		let ledger = this.ledger;
 		if (ledger) {
 			localStorage.setItem(`${type}_${ledger}`, account);
 		}
 	},
-	removeAccount(type: 'local' | 'walletconnect') {
+	removeAccount(type: 'local' | 'walletconnect' | 'inkey') {
 		let ledger = this.ledger;
 		if (ledger) {
 			localStorage.removeItem(`${type}_${ledger}`);

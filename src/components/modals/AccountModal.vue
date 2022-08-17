@@ -36,6 +36,7 @@
 			</div>
 
 			<p class="align-center">Choose your fighter:</p>
+			<button @click="inkeyLogin">🐙 Inkey</button>
 			<button @click="wcLogin">Pera Algo Wallet</button>
 			<button @click="page = 'recover'">Recover from mnemonic</button>
 			<button @click="createNew">Create new account</button>
@@ -202,6 +203,21 @@ export default defineComponent({
 			this.showRecover = false;
 			this.loginError = '';
 			this.loginPasscode = '';
+		},
+		async inkeyLogin() {
+			state.sAlgo.algonaut.initInkey({ src: 'https://inkey.app/' });
+			await state.sAlgo.algonaut.inkeyWallet.frameBus?.isReady(); // wait til the frame is ready
+			const account = await state.sAlgo.algonaut.inkeyConnect();
+			state.sAlgo.activeAccount = account.address;	
+			state.success('Connected to account: ' + state.sAlgo.activeAccount);
+			this.close();
+		},
+		async inkeyLogout() {
+			state.sAlgo.activeAccount = '';
+			state.sAlgo.algonaut.account = undefined;
+			state.sAlgo.algonaut.inkeyDisconnect();
+			state.sAlgo.removeAccount('inkey');
+			this.close();
 		},
 		async wcLogin() {
 			await state.sAlgo.algonaut.connectAlgoWallet({
