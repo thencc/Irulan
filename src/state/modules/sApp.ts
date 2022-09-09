@@ -4,7 +4,7 @@ import state from '../index';
 import { sAlgo } from './sAlgo';
 
 // types
-import { AlgonautAppState } from 'algonaut.js/dist/AlgonautTypes';
+import { AlgonautAppState } from '@thencc/algonautjs/dist/AlgonautTypes';
 type CurrentApp = AlgonautAppState & { approvalDecompiled?: string, clearDecompiled?: string, balance?: number };
 
 export const sApp = reactive({
