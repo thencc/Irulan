@@ -1,5 +1,5 @@
 import { reactive, watch, markRaw } from 'vue';
-import Algonaut from 'algonaut.js';
+import Algonaut from '@thencc/algonautjs';
 // import Algonaut from '../../../../algonautjs/dist/index';
 // import { AlgonautConfig } from 'algonaut.js/dist/AlgonautTypes';
 
