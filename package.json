@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite",
-    "link": "npm link algonaut.js",
+    "link": "npm link @thencc/algonautjs",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "deploy": "firebase deploy --only hosting"
   },
   "dependencies": {
+    "@thencc/algonautjs": "^0.1.64",
     "@types/crypto-js": "^4.1.1",
-    "@thencc/algonautjs": "^0.1.62",
     "crypto-js": "^4.1.1",
     "events": "^3.3.0",
     "parse-domain": "^7.0.0",
