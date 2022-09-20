@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@types/crypto-js": "^4.1.1",
-    "@thencc/algonautjs": "^0.1.61",
+    "@thencc/algonautjs": "^0.1.62",
     "crypto-js": "^4.1.1",
     "events": "^3.3.0",
     "parse-domain": "^7.0.0",

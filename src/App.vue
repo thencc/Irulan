@@ -30,16 +30,16 @@ import CreateAsset from './components/CreateAsset.vue';
 
 export default defineComponent({
 	components: {
-    Setup,
-    Log,
-    Account,
-    Modal,
-    Browser,
-    ContractTool,
-    Deploy,
-    CreateAsset,
-	// AboutModal: defineAsyncComponent(() => import('./components/modals/AboutModal.vue'))
-},
+		Setup,
+		Log,
+		Account,
+		Modal,
+		Browser,
+		ContractTool,
+		Deploy,
+		CreateAsset,
+		// AboutModal: defineAsyncComponent(() => import('./components/modals/AboutModal.vue'))
+	},
 	data() {
 		return {
 			fadeDelay: '',
@@ -72,7 +72,7 @@ export default defineComponent({
 
 	h1 {
 		flex: 0 0 auto;
-	background: linear-gradient(45deg, #FFD78A 0%, #EC66AA 16%, #7B4CDE 33%, #69DEE6 56%, #7B4DDF 70%, #FF6188 85%, #FFD866 100%);
+		background: linear-gradient(45deg, #FFD78A 0%, #EC66AA 16%, #7B4CDE 33%, #69DEE6 56%, #7B4DDF 70%, #FF6188 85%, #FFD866 100%);
 		font-weight: bold;
 		font-size: 1.5em;
 		margin: 0;
@@ -86,6 +86,7 @@ export default defineComponent({
 		-webkit-text-fill-color: transparent;
 
 		animation: shine 300s linear infinite;
+
 		@keyframes shine {
 			to {
 				background-position: 800% center;
@@ -98,7 +99,8 @@ export default defineComponent({
 	// flex: 1 1 50%;
 	display: flex;
 
-	h1, .about-link {
+	h1,
+	.about-link {
 		line-height: 2em;
 		margin: 0 10px;
 	}
@@ -147,31 +149,8 @@ header {
 	color: $textlight;
 }
 
-.container {
-	display: flex;
-	position: absolute;
-	top: $headerheight;
-	bottom: 0;
-	left: 0;
-	right: 0;
-
-	.left-col {
-		flex: 0 0 40%;
-		display: flex;
-		max-width: 420px;
-	}
-
-	.right-col {
-		// flex: 1 0 60%;
-		flex: 1 0 min-content;
-
-		.module {
-			margin-left: 0;
-		}
-	}
-}
-
-.left-col, .right-col {
+.left-col,
+.right-col {
 	display: flex;
 	flex-direction: column;
 
@@ -182,12 +161,12 @@ header {
 
 // LOG
 .terminal {
-		background: #000;
-		color: white;
-		height: 300px;
-		overflow-y: scroll;
-		padding: 5px;
-		font-size: 0.8em;
+	background: #000;
+	color: white;
+	height: 300px;
+	overflow-y: scroll;
+	padding: 5px;
+	font-size: 0.8em;
 }
 
 .line.success {
@@ -217,13 +196,16 @@ table {
 	animation: fade-in 0.1s;
 	// animation: fade-in 1s;
 }
+
 .fade-leave-active {
 	animation: fade-in 0.1s reverse;
 }
+
 @keyframes fade-in {
 	0% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 1;
 	}

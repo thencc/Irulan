@@ -72,6 +72,7 @@ export default defineComponent({
 		-webkit-text-fill-color: transparent;
 
 		animation: shine 300s linear infinite;
+
 		@keyframes shine {
 			to {
 				background-position: 800% center;
@@ -84,7 +85,8 @@ export default defineComponent({
 	// flex: 1 1 50%;
 	display: flex;
 
-	h1, .about-link {
+	h1,
+	.about-link {
 		line-height: 2em;
 		margin: 0 10px;
 	}
@@ -134,6 +136,7 @@ header {
 	bottom: 0;
 	left: 0;
 	right: 0;
+	height: calc(100vh - $headerheight);
 
 	.left-col {
 		flex: 0 0 40%;
@@ -151,7 +154,8 @@ header {
 	}
 }
 
-.left-col, .right-col {
+.left-col,
+.right-col {
 	display: flex;
 	flex-direction: column;
 
