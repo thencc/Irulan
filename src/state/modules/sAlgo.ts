@@ -19,13 +19,13 @@ export interface CustomNodeConfig {
 export type NetType = 'mainnet' | 'testnet';
 
 // default node settings (testnet)
-const TESTNET_SERVER = 'https://twinfrogs.ncc.la/atn';
-const TESTNET_INDEXER = 'https://twinfrogs.ncc.la/atni';
-const TESTNET_APIKEY = '494d49c48f0f55f5d25d86fabb17bee8fbfcbf818ba257670f4ea076672e0fe2';
+const TESTNET_SERVER = 'https://node.testnet.algoexplorerapi.io';
+const TESTNET_INDEXER = 'https://algoindexer.testnet.algoexplorerapi.io';
+const TESTNET_APIKEY = 'application/json';
 // defaults (mainnet)
-const MAINNET_SERVER = 'https://twinfrogs.ncc.la/amn';
-const MAINNET_INDEXER = 'https://twinfrogs.ncc.la/amni';
-const MAINNET_APIKEY = '3fd53de10f0e2e2b24c4b3a30525a4c94c9b86d7ba9aba64bee01b00ae8b4cc9';
+const MAINNET_SERVER = 'https://node.algoexplorerapi.io';
+const MAINNET_INDEXER = 'https://algoindexer.algoexplorerapi.io';
+const MAINNET_APIKEY = 'application/json';
 
 const baseConfig: CustomNodeConfig = {
 	ledger: 'testnet',
@@ -42,7 +42,7 @@ const defaultConfigTestnet: CustomNodeConfig = {
 	server: TESTNET_SERVER,
 	indexer: TESTNET_INDEXER,
 	apiKey: TESTNET_APIKEY,
-	apiKeyHeaderName: 'X-Algo-API-Token'
+	apiKeyHeaderName: 'accept'
 };
 const defaultConfigMainnet: CustomNodeConfig = {
 	...baseConfig,
@@ -50,7 +50,7 @@ const defaultConfigMainnet: CustomNodeConfig = {
 	server: MAINNET_SERVER,
 	indexer: MAINNET_INDEXER,
 	apiKey: MAINNET_APIKEY,
-	apiKeyHeaderName: 'X-Algo-API-Token'
+	apiKeyHeaderName: 'accept'
 };
 
 const formatConfigForAlgonaut = (config: CustomNodeConfig) => {
