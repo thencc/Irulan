@@ -1,5 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+// TODO update this awkward type extension to new well supported appraoch
+// https://vuejs.org/api/utility-types.html#componentcustomoptions
+/**
+ * import { Route } from 'vue-router'
+
+	declare module 'vue' {
+	interface ComponentCustomOptions {
+		beforeRouteEnter?(to: any, from: any, next: () => void): void
+	}
+	}
+ */
+
 // types
 import type { Router } from 'vue-router';
 interface RouterExt {
