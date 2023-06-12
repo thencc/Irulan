@@ -207,7 +207,7 @@ export default defineComponent({
 		async inkeyLogin() {
 			state.sAlgo.algonaut.initInkey({ src: 'https://inkey.app/' });
 			await state.sAlgo.algonaut.inkeyWallet.frameBus?.isReady(); // wait til the frame is ready
-			const account = await state.sAlgo.algonaut.inkeyConnect();
+			const account = await state.sAlgo.algonaut.connect(); //.inkeyConnect deprecated to .connect
 			state.sAlgo.activeAccount = account.address;	
 			state.success('Connected to account: ' + state.sAlgo.activeAccount);
 			this.close();
