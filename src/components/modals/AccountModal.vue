@@ -205,10 +205,12 @@ export default defineComponent({
 			this.loginPasscode = '';
 		},
 		async inkeyLogin() {
-			state.sAlgo.algonaut.initInkey({ src: 'https://inkey.app/' });
-			await state.sAlgo.algonaut.inkeyWallet.frameBus?.isReady(); // wait til the frame is ready
-			const account = await state.sAlgo.algonaut.inkeyConnect();
-			state.sAlgo.activeAccount = account.address;	
+			// state.sAlgo.algonaut.initInkey({ src: 'https://inkey.app/' });
+			// await state.sAlgo.algonaut.inkeyWallet.frameBus?.isReady(); // wait til the frame is ready
+			const account = await state.sAlgo.algonaut.connect({
+				inkey: true,
+			});
+			state.sAlgo.activeAccount = account[0].address;	
 			state.success('Connected to account: ' + state.sAlgo.activeAccount);
 			this.close();
 		},
