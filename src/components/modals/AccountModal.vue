@@ -207,7 +207,7 @@ export default defineComponent({
 		async inkeyLogin() {
 			// state.sAlgo.algonaut.initInkey({ src: 'https://inkey.app/' });
 			// await state.sAlgo.algonaut.inkeyWallet.frameBus?.isReady(); // wait til the frame is ready
-			const account = await state.sAlgo.algonaut.connect({
+			let account = await state.sAlgo.algonaut.connect({
 				inkey: true,
 			});
 			state.sAlgo.activeAccount = account[0].address;	
@@ -222,24 +222,31 @@ export default defineComponent({
 			this.close();
 		},
 		async wcLogin() {
-			await state.sAlgo.algonaut.connectAlgoWallet({
-				onConnect: this.onConnect,
-				onDisconnect: this.onDisconnect,
-				onSessionUpdate: this.onSessionUpdate
-			} as any)
+			let account = await state.sAlgo.algonaut.connect({
+  				pera: true,
+			});
+			// await state.sAlgo.algonaut.connectAlgoWallet({
+			// 	onConnect: this.onConnect,
+			// 	onDisconnect: this.onDisconnect,
+			// 	onSessionUpdate: this.onSessionUpdate
+			// } as any)
+			state.sAlgo.activeAccount = account[0].address;	
+			state.success('Connected to account: ' + state.sAlgo.activeAccount);
+			this.close();
 		},
+		
 		async wcLogout() {
 			state.sAlgo.removeAccount('walletconnect');
 			state.sAlgo.activeAccount = '';
 			state.sAlgo.algonaut.account = undefined;
 		},
-		onConnect(payload: any) {
-			const { accounts } = payload.params[0];
-			state.sAlgo.activeAccount = accounts[0];
-			state.sAlgo.algonaut.setWalletConnectAccount(accounts[0]);
-			state.success('Connected to account: ' + state.sAlgo.activeAccount);
-			this.close();
-		},
+		// onConnect(payload: any) {
+		// 	const { accounts } = payload.params[0];
+		// 	state.sAlgo.activeAccount = accounts[0];
+		// 	state.sAlgo.algonaut.setWalletConnectAccount(accounts[0]);
+		// 	state.success('Connected to account: ' + state.sAlgo.activeAccount);
+		// 	this.close();
+		// },
 		onDisconnect() {
 			state.sAlgo.activeAccount = null;
 			state.error('Disconnected from account.');
