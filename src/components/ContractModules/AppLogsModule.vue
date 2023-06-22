@@ -372,7 +372,7 @@ export default defineComponent({
 
 			if (this.options.onlyMyLogs) {
 				if (state.sAlgo.algonaut.account) {
-					logsReq = logsReq.sender(state.sAlgo.algonaut.account.addr);
+					logsReq = logsReq.sender(state.sAlgo.algonaut.account.address);
 				} else {
 					console.log('FYI - you are not logged in, cannot show only my logs...')
 				}

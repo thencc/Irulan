@@ -56,7 +56,7 @@ const parseQuery = async (q: string) => {
 	state.log(`Searching: ${q}`);
 
 	// console.log('pre-lookup', state.sAlgo.algonaut.sdk);
-	console.log('pre-lookup:', state.sAlgo.algonaut.config?.BASE_SERVER);
+	// console.log('pre-lookup:', state.sAlgo.algonaut.config?.BASE_SERVER);
 
 	// look account?
 	// if (state.sAlgo.algonaut.sdk?.isValidAddress(q)) { // old

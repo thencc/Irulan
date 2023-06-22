@@ -11,7 +11,7 @@
                     <p class="form-label">Ledger</p>
                     <div class="ops-container">
                         <div v-for="l of ledgerOptions" :key="l.id" class="radio-op">
-                            <input v-model="sAlgo.config.ledger" :value="l.id" type="radio" name="ledger"
+                            <input v-model="sAlgo.ledger" :value="l.id" type="radio" name="ledger"
                                 :id="`ledger-${l.id}`" xxdisabled="sAlgo.config.useCustomNode">
                             <label :for="`ledger-${l.id}`">
                                 {{ l.label }}
@@ -19,20 +19,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-field">
+                
+                <!-- <div class="form-field">
                     <p class="form-label">Node Configuration</p>
                     <input type="radio" name="node" id="node-default" :value="false"
                         v-model="sAlgo.config.useCustomNode">
                     <label for="node-default">
                         Default
                     </label>
-
                     <input type="radio" name="node" id="node-custom" :value="true" v-model="sAlgo.config.useCustomNode">
                     <label for="node-custom">
                         Custom Node
                     </label>
-                </div>
-                <div class="server-config" v-show="sAlgo.config.useCustomNode">
+                </div> -->
+
+                <!-- <div class="server-config" v-show="sAlgo.config.useCustomNode">
                     <p>
                         <label for="server">Server</label>
                         <input type="text" v-model="sAlgo.config.server" id="server" name="server">
@@ -55,7 +56,7 @@
                         <input type="text" v-model="sAlgo.config.port" id="port" name="port">
                     </p>
                     <p class="small formtext">Make sure this server matches the ledger selection above.</p>
-                </div>
+                </div> -->
                 <div class="actions align-right">
                     <button class="btn-secondary" type="button" @click.stop.prevent="sAlgo.clearSettings">
                         Clear Saved Settings

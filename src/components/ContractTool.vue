@@ -304,7 +304,7 @@ export default defineComponent({
             if (window.confirm('Are you sure you want to delete this application? You may only do so if you are the creator.')) {
                 this.deleteAppLoading = true;
                 try {
-                    const res = await state.sAlgo.algonaut.deleteApplication(sApp.currentApp.index);
+                    const res = await state.sAlgo.algonaut.deleteApp(sApp.currentApp.index);
                     if (res.status === 'fail') {
                         state.error(res.message);
                     } else {

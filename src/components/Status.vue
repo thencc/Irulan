@@ -2,7 +2,7 @@
 	<span class="status" v-if="state.sAlgo.connected">
 		<span class="circle"></span>
 		<span class="status-text">
-			<span class="ledger green">{{ state.sAlgo.algonaut.config?.LEDGER || '' }}</span>
+			<span class="ledger green">{{ state.sAlgo.algonaut.nodeConfig?.LEDGER || '' }}</span>
 			<span class="server muted">{{ hostname }}</span>
 		</span>
 	</span>
@@ -27,7 +27,7 @@ export default defineComponent({
 	},
 	computed: {
 		hostname() {
-			const server = state.sAlgo.algonaut.config?.BASE_SERVER;
+			const server = state.sAlgo.algonaut.nodeConfig.BASE_SERVER;
 			if (state.sAlgo.connected && server) {
 				var name = parseDomain(fromUrl(server));
 				if (name.type === 'RESERVED') return name.hostname;

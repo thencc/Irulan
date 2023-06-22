@@ -42,7 +42,7 @@ export const sApp = reactive({
 	async getMoreAppData(appId: number) {
 		// `https://indexer.algoexplorerapi.io/v2/applications/740582846?include-all=true`
 		// `https://indexer.testnet.algoexplorerapi.io/v2/applications/740582846?include-all=true`
-		const url = `https://indexer${state.sAlgo.algonaut.config?.LEDGER == 'testnet' ? '.testnet' : ''}.algoexplorerapi.io/v2/applications/${appId}?include-all=true`;
+		const url = `https://indexer${state.sAlgo.algonaut.nodeConfig?.LEDGER == 'testnet' ? '.testnet' : ''}.algoexplorerapi.io/v2/applications/${appId}?include-all=true`;
 		const res = await fetch(url);
 		if (!res.ok) {
 			throw new Error('err getMoreAppData res');

@@ -19,59 +19,60 @@ export interface CustomNodeConfig {
 export type NetType = 'mainnet' | 'testnet';
 
 // default node settings (testnet)
-const TESTNET_SERVER = 'https://node.testnet.algoexplorerapi.io';
-const TESTNET_INDEXER = 'https://algoindexer.testnet.algoexplorerapi.io';
-const TESTNET_APIKEY = 'application/json';
-// defaults (mainnet)
-const MAINNET_SERVER = 'https://node.algoexplorerapi.io';
-const MAINNET_INDEXER = 'https://algoindexer.algoexplorerapi.io';
-const MAINNET_APIKEY = 'application/json';
+// const TESTNET_SERVER = 'https://node.testnet.algoexplorerapi.io';
+// const TESTNET_INDEXER = 'https://algoindexer.testnet.algoexplorerapi.io';
+// const TESTNET_APIKEY = 'application/json';
+// // defaults (mainnet)
+// const MAINNET_SERVER = 'https://node.algoexplorerapi.io';
+// const MAINNET_INDEXER = 'https://algoindexer.algoexplorerapi.io';
+// const MAINNET_APIKEY = 'application/json';
 
-const baseConfig: CustomNodeConfig = {
-	ledger: 'testnet',
-	server: '',
-	indexer: '',
-	apiKey: '',
-	apiKeyHeaderName: '',
-	port: '',
-	useCustomNode: false
-};
-const defaultConfigTestnet: CustomNodeConfig = {
-	...baseConfig,
-	ledger: 'testnet',
-	server: TESTNET_SERVER,
-	indexer: TESTNET_INDEXER,
-	apiKey: TESTNET_APIKEY,
-	apiKeyHeaderName: 'accept'
-};
-const defaultConfigMainnet: CustomNodeConfig = {
-	...baseConfig,
-	ledger: 'mainnet',
-	server: MAINNET_SERVER,
-	indexer: MAINNET_INDEXER,
-	apiKey: MAINNET_APIKEY,
-	apiKeyHeaderName: 'accept'
-};
+// const baseConfig: CustomNodeConfig = {
+// 	ledger: 'testnet',
+// 	server: '',
+// 	indexer: '',
+// 	apiKey: '',
+// 	apiKeyHeaderName: '',
+// 	port: '',
+// 	useCustomNode: false
+// };
+// const defaultConfigTestnet: CustomNodeConfig = {
+// 	...baseConfig,
+// 	ledger: 'testnet',
+// 	server: TESTNET_SERVER,
+// 	indexer: TESTNET_INDEXER,
+// 	apiKey: TESTNET_APIKEY,
+// 	apiKeyHeaderName: 'accept'
+// };
+// const defaultConfigMainnet: CustomNodeConfig = {
+// 	...baseConfig,
+// 	ledger: 'mainnet',
+// 	server: MAINNET_SERVER,
+// 	indexer: MAINNET_INDEXER,
+// 	apiKey: MAINNET_APIKEY,
+// 	apiKeyHeaderName: 'accept'
+// };
 
-const formatConfigForAlgonaut = (config: CustomNodeConfig) => {
-	return {
-		BASE_SERVER: config.server,
-		INDEX_SERVER: config.indexer,
-		LEDGER: config.ledger,
-		PORT: config.port,
-		API_TOKEN: { [config.apiKeyHeaderName]: config.apiKey }
-	};
-};
+// const formatConfigForAlgonaut = (config: CustomNodeConfig) => {
+// 	return {
+// 		BASE_SERVER: config.server,
+// 		INDEX_SERVER: config.indexer,
+// 		LEDGER: config.ledger,
+// 		PORT: config.port,
+// 		API_TOKEN: { [config.apiKeyHeaderName]: config.apiKey }
+// 	};
+// };
 
 // must start w something, defaults w testnet
-const algonaut = markRaw(new Algonaut(formatConfigForAlgonaut(defaultConfigTestnet)));
+// const algonaut = markRaw(new Algonaut(formatConfigForAlgonaut(defaultConfigTestnet)));
+const algonaut = markRaw(new Algonaut());
 console.log(algonaut);
 
 // state
 export const sAlgo = reactive({
 	algonaut, // helper lib
 	ledger: null as null | 'testnet' | 'mainnet', // the ledger shown in the url
-	config: baseConfig, // aka configEditable
+	// config: baseConfig, // aka configEditable
 	configLocalStorage: false as false | CustomNodeConfig,
 
 	connected: false,
@@ -86,66 +87,68 @@ export const sAlgo = reactive({
 	// 	console.log('isConnected?');
 	// },
 
-	getConfigFor(ledger: NetType) {
-		console.log('getConfigFor:', ledger);
+	// getConfigFor(ledger: NetType) {
+	// 	console.log('getConfigFor:', ledger);
 
-		if (ledger !== 'mainnet' && ledger !== 'testnet') {
-			console.warn('bad ledger / net type');
-			throw new Error('bad ledger type');
-		}
+	// 	if (ledger !== 'mainnet' && ledger !== 'testnet') {
+	// 		console.warn('bad ledger / net type');
+	// 		throw new Error('bad ledger type');
+	// 	}
 
-		let configFromLS = JSON.parse(localStorage.getItem('config') || 'false') as CustomNodeConfig | false;
-		this.configLocalStorage = configFromLS;
-		// console.log('configFromLS', configFromLS);
+	// 	let configFromLS = JSON.parse(localStorage.getItem('config') || 'false') as CustomNodeConfig | false;
+	// 	this.configLocalStorage = configFromLS;
+	// 	// console.log('configFromLS', configFromLS);
 
-		let useCustomNode = false;
+	// 	let useCustomNode = false;
 
-		// is there localstorage cache?
-		if (this.configLocalStorage) {
-			this.config = this.configLocalStorage; // keep for editable fields
-			if (this.configLocalStorage.ledger == ledger) {
-				if (this.configLocalStorage.useCustomNode) {
-					useCustomNode = true;
-				}
-			} else {
-				// mirror node select radio input, so dont select custom if we wont init w it
-				this.config.useCustomNode = false;
-			}
-		}
+	// 	// is there localstorage cache?
+	// 	if (this.configLocalStorage) {
+	// 		this.config = this.configLocalStorage; // keep for editable fields
+	// 		if (this.configLocalStorage.ledger == ledger) {
+	// 			if (this.configLocalStorage.useCustomNode) {
+	// 				useCustomNode = true;
+	// 			}
+	// 		} else {
+	// 			// mirror node select radio input, so dont select custom if we wont init w it
+	// 			this.config.useCustomNode = false;
+	// 		}
+	// 	}
 
-		// keep editable radio on correct net/ledger (ex: localstorage exists for mainnet, but loads page: ./testnet/app/93272663 )
-		sAlgo.config.ledger = ledger;
+	// 	// keep editable radio on correct net/ledger (ex: localstorage exists for mainnet, but loads page: ./testnet/app/93272663 )
+	// 	sAlgo.config.ledger = ledger;
 
-		let configForInit: CustomNodeConfig;
+	// 	let configForInit: CustomNodeConfig;
 
-		if (useCustomNode) {
-			// up to the user/dev to put in correct server/key settings for correct net/ledger
-			configForInit = this.configLocalStorage as CustomNodeConfig;
-		} else {
-			if (ledger == 'mainnet') {
-				configForInit = defaultConfigMainnet;
-			} else if (ledger == 'testnet') {
-				configForInit = defaultConfigTestnet;
-			} else {
-				// this else ever shouldnt happen...
-				configForInit = defaultConfigTestnet;
-			}
-		}
+	// 	if (useCustomNode) {
+	// 		// up to the user/dev to put in correct server/key settings for correct net/ledger
+	// 		configForInit = this.configLocalStorage as CustomNodeConfig;
+	// 	} else {
+	// 		if (ledger == 'mainnet') {
+	// 			configForInit = defaultConfigMainnet;
+	// 		} else if (ledger == 'testnet') {
+	// 			configForInit = defaultConfigTestnet;
+	// 		} else {
+	// 			// this else ever shouldnt happen...
+	// 			configForInit = defaultConfigTestnet;
+	// 		}
+	// 	}
 
-		return configForInit;
-	},
+	// 	return configForInit;
+	// },
+
 	init: async function (ledger: NetType) {
 		console.log('sAlgo init:', ledger);
 
-		let config = sAlgo.getConfigFor(ledger);
-		let algoConfig = formatConfigForAlgonaut(config);
+		// let config = sAlgo.getConfigFor(ledger);
+		// let algoConfig = formatConfigForAlgonaut(config);
 
 		this.connecting = true;
 		this.connected = false;
 
 		try {
 			state.log('Connecting...');
-			this.algonaut = markRaw(new Algonaut(algoConfig));
+			// this.algonaut = markRaw(new Algonaut(algoConfig));
+			this.algonaut.setNodeConfig(ledger);
 
 			const status = await this.algonaut.checkStatus();
 			if (status['last-round']) {
@@ -156,20 +159,20 @@ export const sAlgo = reactive({
 				// localStorage.setItem('config', JSON.stringify(config));
 
 				// if we have an account from WC, set it
-				if (this.activeAccount && localStorage.getItem('walletconnect')) {
-					// this.algonaut.setWalletConnectAccount(this.activeAccount);
-					this.algonaut.connectAlgoWallet({
-						onConnect: () => {
-							state.success('Set WalletConnect account: ' + this.activeAccount)
-						},
-						onDisconnect: () => {
+				// if (this.activeAccount && localStorage.getItem('walletconnect')) {
+				// 	// this.algonaut.setWalletConnectAccount(this.activeAccount);
+				// 	this.algonaut.connectAlgoWallet({
+				// 		onConnect: () => {
+				// 			state.success('Set WalletConnect account: ' + this.activeAccount)
+				// 		},
+				// 		onDisconnect: () => {
 
-						},
-						onSessionUpdate: () => {
+				// 		},
+				// 		onSessionUpdate: () => {
 
-						}
-					})
-				}
+				// 		}
+				// 	})
+				// }
 			}
 		} catch (e) {
 			console.warn((e as Error).message);
@@ -182,24 +185,30 @@ export const sAlgo = reactive({
 		console.log('applySettings');
 
 		// save (never saves ncc default config, only user input)
-		localStorage.setItem('config', JSON.stringify(sAlgo.config));
+		localStorage.setItem('dapp-ledger', sAlgo.ledger || 'testnet');
 
 		router.nonDestructivePush({
 			params: {
-				ledger: sAlgo.config.ledger
+				ledger: sAlgo.ledger || 'testnet'
 			}
 		});
 
 		// re-init if route doesnt change, otherwise watcher catches it
-		if (sAlgo.ledger == sAlgo.config.ledger) {
-			await sAlgo.init(sAlgo.config.ledger);
+		// if (sAlgo.ledger == sAlgo.config.ledger) {
+		// 	await sAlgo.init(sAlgo.config.ledger);
+		// } else {
+		// 	console.warn('NOW push to new ledger router...');
+		// }
+		if (sAlgo.algonaut.nodeConfig.LEDGER == sAlgo.ledger) {
+			await sAlgo.init(sAlgo.ledger || 'testnet');
 		} else {
 			console.warn('NOW push to new ledger router...');
 		}
 	},
 	clearSettings() {
-		this.config = baseConfig;
-		localStorage.removeItem('config');
+		// this.config = baseConfig;
+		// localStorage.removeItem('config');
+		localStorage.removeItem('dapp-ledger');
 		state.log('Settings cleared');
 	},
 

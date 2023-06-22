@@ -128,26 +128,33 @@ export default defineComponent({
             state.log('Deploying application...');
 
             try {
-                let res;
-                if (state.sAlgo.algonaut.config?.SIGNING_MODE === 'walletconnect') {
-                    // sign via WC
-                    const txn = await state.sAlgo.algonaut.atomicCreateApp({
-                        tealApprovalCode: this.deployArgs.approvalProgram,
-                        tealClearCode: this.deployArgs.clearStateProgram,
-                        appArgs: this.deployArgs.args,
-                        schema: this.deployArgs.schema,
-                        optionalFields: this.deployArgs.optionalFields
-                    });
-                    res = await state.sAlgo.algonaut.sendTransaction([txn]);
-                } else {
-                    res = await state.sAlgo.algonaut.createApp({
-                        tealApprovalCode: this.deployArgs.approvalProgram,
-                        tealClearCode: this.deployArgs.clearStateProgram,
-                        appArgs: this.deployArgs.args,
-                        schema: this.deployArgs.schema,
-                        optionalFields: this.deployArgs.optionalFields
-                    });
-                }
+                let res = await state.sAlgo.algonaut.createApp({
+                    tealApprovalCode: this.deployArgs.approvalProgram,
+                    tealClearCode: this.deployArgs.clearStateProgram,
+                    appArgs: this.deployArgs.args,
+                    schema: this.deployArgs.schema,
+                    optionalFields: this.deployArgs.optionalFields
+                });
+                // if (state.sAlgo.algonaut.config?.SIGNING_MODE === 'walletconnect') {
+                //     // sign via WC
+                //     const txn = await state.sAlgo.algonaut.atomicCreateApp({
+                //         tealApprovalCode: this.deployArgs.approvalProgram,
+                //         tealClearCode: this.deployArgs.clearStateProgram,
+                //         appArgs: this.deployArgs.args,
+                //         schema: this.deployArgs.schema,
+                //         optionalFields: this.deployArgs.optionalFields
+                //     });
+                //     res = await state.sAlgo.algonaut.sendTransaction([txn]);
+                // } 
+                // else {
+                //     res = await state.sAlgo.algonaut.createApp({
+                //         tealApprovalCode: this.deployArgs.approvalProgram,
+                //         tealClearCode: this.deployArgs.clearStateProgram,
+                //         appArgs: this.deployArgs.args,
+                //         schema: this.deployArgs.schema,
+                //         optionalFields: this.deployArgs.optionalFields
+                //     });
+                // }
                 if (res.status === 'fail') {
                     this.deployError = res.message;
                     state.error('Could not deploy app.');
